@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: State machine For New Account Onboarding Processes.
 Resources:
-  LambdaFunctionIAMRole:
+  StateMachineLambdaFunctionIAMRole:
       Type: "AWS::IAM::Role"
       Properties:
           Path: "/"
@@ -46,7 +46,7 @@ Resources:
       Handler: index_create_account.handler
       Runtime: nodejs4.3
       CodeUri: ./src
-      Role: !GetAtt LambdaFunctionIAMRole.Arn
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
   SetCredentialsLambdaFunction:
     Type: AWS::Serverless::Function
@@ -55,7 +55,7 @@ Resources:
       Handler: index_set_credentials.handler
       Runtime: nodejs4.3
       CodeUri: ./src
-      Role: !GetAtt LambdaFunctionIAMRole.Arn
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
   FindRegionsLambdaFunction:
     Type: AWS::Serverless::Function
@@ -64,7 +64,7 @@ Resources:
       Handler: index_find_regions.handler
       Runtime: nodejs4.3
       CodeUri: ./src
-      Role: !GetAtt LambdaFunctionIAMRole.Arn
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
   NextRegionLambdaFunction:
     Type: AWS::Serverless::Function
@@ -73,7 +73,7 @@ Resources:
       Handler: index_next_region.handler
       Runtime: nodejs4.3
       CodeUri: ./src
-      Role: !GetAtt LambdaFunctionIAMRole.Arn
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
   SetResultsLambdaFunction:
     Type: AWS::Serverless::Function
@@ -82,7 +82,7 @@ Resources:
       Handler: index_set_results.handler
       Runtime: nodejs4.3
       CodeUri: ./src
-      Role: !GetAtt LambdaFunctionIAMRole.Arn
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
   FinalResultLambdaFunction:
     Type: AWS::Serverless::Function
@@ -91,7 +91,7 @@ Resources:
       Handler: index_final_result.handler
       Runtime: nodejs4.3
       CodeUri: ./src
-      Role: !GetAtt LambdaFunctionIAMRole.Arn
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
   HealthStackSetupLambdaFunction:
     Type: AWS::Serverless::Function
@@ -100,7 +100,7 @@ Resources:
       Handler: index_health_stack.handler
       Runtime: nodejs4.3
       CodeUri: ./src
-      Role: !GetAtt LambdaFunctionIAMRole.Arn
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 300
   AddAccountToDestinationLambdaFunction:
     Type: AWS::Serverless::Function
@@ -109,8 +109,68 @@ Resources:
       Handler: index_alerts_destination.handler
       Runtime: nodejs4.3
       CodeUri: ./src
-      Role: !GetAtt LambdaFunctionIAMRole.Arn
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 300
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri: ./swagger.yaml
+      StageName: Prod
+      Variables:
+        LambdaFunctionName: !Ref ProxyLambdaFunction
+  ProxyLambdaFunctionIAMRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+          Path: "/"
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Sid: "AllowLambdaServiceToAssumeRole"
+                Effect: "Allow"
+                Action:
+                  - "sts:AssumeRole"
+                Principal:
+                  Service:
+                    - "lambda.amazonaws.com"
+          Policies:
+            -
+              PolicyName: "InlinePolicy"
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "logs:CreateLogGroup"
+                      - "logs:CreateLogStream"
+                      - "logs:PutLogEvents"
+                    Resource: "arn:aws:logs:*:*:*"
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "states:*"
+                    Resource: "*"
+  ProxyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Proxy
+      Handler: index.handler
+      Runtime: nodejs4.3
+      CodeUri: ./src
+      Role: !GetAtt ProxyLambdaFunctionIAMRole.Arn
+      Timeout: 60
+      Environment:
+        Variables:
+          STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /{proxy+}
+            Method: ANY
 
   StateMachineIAMRole:
       Type: "AWS::IAM::Role"
@@ -255,3 +315,14 @@ Resources:
           }
         }
       RoleArn: !GetAtt StateMachineIAMRole.Arn
+
+Outputs:
+  APIURL:
+    Description: "URL of your API endpoint"
+    Value: !Join
+      - ''
+      - - https://
+        - !Ref ApiGatewayApi
+        - '.execute-api.'
+        - !Ref 'AWS::Region'
+        - '.amazonaws.com/Prod'
