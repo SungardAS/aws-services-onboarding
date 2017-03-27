@@ -1,0 +1,16 @@
+version: 0.1
+phases:
+  install:
+    commands:
+      - npm install time
+      - sed -i "s/AWS::REGION/$AWS_DEFAULT_REGION/g" template.yaml
+      - sed -i "s/AWS::ACCOUNT_ID/$AWS_ACCOUNT_ID/g" template.yaml
+      - cd src; npm install; cd ..
+      - aws cloudformation package
+         --template-file template.yaml
+         --s3-bucket $S3_BUCKET_NAME
+         --output-template-file samTemplate.yaml
+artifacts:
+  type: zip
+  files:
+    - samTemplate.yaml
