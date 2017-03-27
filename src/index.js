@@ -7,10 +7,10 @@ exports.handler = (event, context) => {
 
 baseHandler.get = function(params, callback) {
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
-  var params = {
+  var input = {
     executionArn: process.env.STATE_MACHINE_ARN
   };
-  stepfunctions.describeExecution(params, function(err, data) {
+  stepfunctions.describeExecution(input, function(err, data) {
     if (err) {
       console.log(err, err.stack);
       callback(err);
@@ -33,12 +33,12 @@ baseHandler.get = function(params, callback) {
 baseHandler.post = function(params, callback) {
 
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
-  var params = {
+  var input = {
     stateMachineArn: process.env.STATE_MACHINE_ARN,
-    input: event.input,
+    input: params.input,
     //name: 'STRING_VALUE'
   };
-  stepfunctions.startExecution(params, function(err, data) {
+  stepfunctions.startExecution(input, function(err, data) {
     if (err) {
       console.log(err, err.stack);
       callback(err);
