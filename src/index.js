@@ -38,9 +38,7 @@ baseHandler.post = function(params, callback) {
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
 
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
-  if (params.account_id) {
-    inputDoc.account.id = params.account_id;
-  }
+  inputDoc.account = params.account;
   inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
   inputDoc.federation.authorizer_user_guid = params.userGuid;
   inputDoc.alerts_destination.params.parameters.forEach(function(attr) {
