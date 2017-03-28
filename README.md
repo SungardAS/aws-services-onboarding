@@ -21,7 +21,11 @@ Input Parameter Values
 
 - CustomAuthorizerIAMRoleName:
 
+  Enter the `NAME (not ARN) of IAM Role that has the permission for API Gateway to invoke custom authorizer Lambda Function`. (See <a href="https://s3.amazonaws.com/cloudformation-serverless-codepipeline.us-east-1/roles/role_apigateway-lambda-execution-role.json">here</a> for Trust Relationships and Policy Document).
+
 - CustomAuthorizerLambdaName:
+
+  Enter the `NAME (not ARN) of custom authorizer Lambda Function`. (See <a href="https://github.com/SungardAS/aws-services-authorizer">here</a> for the Lambda Function Project for Custom Authorizer using SSO Server).
 
 - EncryptionLambdaName:
 
@@ -35,7 +39,7 @@ Input Parameter Values
 
 - GitHubSourceRepositoryOwner: `SungardAS`
 
-- ParameterOverrides: 
+- ParameterOverrides:
 
 - ProjectImage: `aws/codebuild/nodejs:4.3.2`
 
