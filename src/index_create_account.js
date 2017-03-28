@@ -1,11 +1,14 @@
 
 exports.handler = (event, context, callback) => {
   //event.account.id = Math.random().toString().replace('0.', '').replace('.', '');
-  var accountId = '808331752250';
+  if (event.account.id == null) {
+    // create a new account, but temporarily set an already created account
+    event.account.id = '808331752250';
+    event.account.created_at = new Date().toString();
+  }
+  var accountId = event.account.id;
 
   // set account info
-  event.account.id = accountId;
-  event.account.created_at = new Date().toString();
 
   // set account info for federation
   var roles = event.billing_master.roles;
@@ -20,3 +23,7 @@ exports.handler = (event, context, callback) => {
 
   callback(null, event);
 };
+
+
+// sgas-msaws-api / api / controllers / AwsAccountController.js
+// sgas-msaws-api / api / services / awsIAMService.js
