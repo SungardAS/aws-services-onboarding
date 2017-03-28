@@ -39,7 +39,7 @@ baseHandler.post = function(params, callback) {
 
   var input = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
   if (params.account_id) {
-    input.account_id = params.account_id;
+    input.account.id = params.account_id;
   }
   input.billing_master.roles = params.roles_to_federate_to_billing_master;
   input.federation.authorizer_user_guid = params.userGuid;
