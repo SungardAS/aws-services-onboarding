@@ -37,13 +37,13 @@ baseHandler.post = function(params, callback) {
 
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
 
-  var input = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
+  var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
   if (params.account_id) {
-    input.account.id = params.account_id;
+    inputDoc.account.id = params.account_id;
   }
-  input.billing_master.roles = params.roles_to_federate_to_billing_master;
-  input.federation.authorizer_user_guid = params.userGuid;
-  input.alerts_destination.params.parameters.forEach(function(attr) {
+  inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
+  inputDoc.federation.authorizer_user_guid = params.userGuid;
+  inputDoc.alerts_destination.params.parameters.forEach(function(attr) {
     if (attr.ParameterKey == "KinesisStreamArn") {
       attr.ParameterValue = params.kinesis_stream_arn;
     }
@@ -51,16 +51,16 @@ baseHandler.post = function(params, callback) {
       attr.ParameterValue = params.cwl_to_kinesis_role_arn;
     }
   });
-  input.health.cloudformationLambdaExecutionRole = params.cloudformation_lambda_execution_role_name;
-  input.health.codePipelineServiceRole = params.codepipeline_service_role_name;
-  input.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
-  input.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
+  inputDoc.health.cloudformationLambdaExecutionRole = params.cloudformation_lambda_execution_role_name;
+  inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
+  inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
+  inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
 
   var input = {
     stateMachineArn: process.env.STATE_MACHINE_ARN,
-    input: JSON.stringify(input),
-    //name: 'STRING_VALUE'
+    input: JSON.stringify(inputDoc),
   };
+  if (params.execution_name) input.name = params.execution_name;
   stepfunctions.startExecution(input, function(err, data) {
     if (err) {
       console.log(err, err.stack);
