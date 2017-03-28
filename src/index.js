@@ -1,4 +1,6 @@
 
+var AWS = require('aws-sdk');
+
 var baseHandler = require('aws-services-lib/lambda/base_handler.js')
 
 exports.handler = (event, context) => {
@@ -8,7 +10,7 @@ exports.handler = (event, context) => {
 baseHandler.get = function(params, callback) {
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
   var input = {
-    executionArn: process.env.STATE_MACHINE_ARN
+    executionArn: params.executionArn
   };
   stepfunctions.describeExecution(input, function(err, data) {
     if (err) {
@@ -49,4 +51,5 @@ baseHandler.post = function(params, callback) {
       //  "startDate":"2017-02-12T02:12:07.464Z"}
       callback(null, data);
     }
+  });
 };
