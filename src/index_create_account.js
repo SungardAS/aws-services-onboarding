@@ -8,8 +8,6 @@ exports.handler = (event, context, callback) => {
   }
   var accountId = event.account.id;
 
-  // set account info
-
   // set account info for federation
   var roles = event.billing_master.roles;
   roles.push({"roleArn": "arn:aws:iam::" + event.account.id + ":role/OrganizationAccountAccessRole"});
