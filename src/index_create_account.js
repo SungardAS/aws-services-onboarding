@@ -11,7 +11,6 @@ exports.handler = (event, context, callback) => {
   var roles = event.billing_master.roles;
   roles.push({"roleArn": "arn:aws:iam::" + event.account.id + ":role/OrganizationAccountAccessRole"});
   event.federation.roles = roles;
-  event.federation.authorizer_user_guid = accountId;
 
   // set account id in alerts destination
   event.alerts_destination.accountToAdd = accountId;

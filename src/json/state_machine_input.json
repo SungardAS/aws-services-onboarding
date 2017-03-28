@@ -1,0 +1,135 @@
+{
+  "credentials": null,
+  "billing_master": {
+    "roles":[]
+  },
+  "account": {
+    "id": null,
+    "created_at": null
+  },
+  "federation": {
+    "roles": [],
+    "authorizer_user_guid": null,
+    "durationSeconds": 0
+  },
+  "alerts_destination": {
+    "action": "launch",
+    "destinationName": "alertDestination",
+    "accountToAdd": "",
+    "params": {
+      "stackName": "SungardAS-aws-services-alerts-destination",
+      "region": null,
+      "usePreviousTemplate": true,
+      "parameters": [
+        {
+          "ParameterKey": "Accounts",
+          "ParameterValue": null
+        },
+        {
+          "ParameterKey": "AlertKinesisDestinationName",
+          "ParameterValue": "alertDestination"
+        },
+        {
+          "ParameterKey": "KinesisStreamArn",
+          "ParameterValue": null
+        },
+        {
+          "ParameterKey": "CWLtoKinesisRoleArn",
+          "ParameterValue": null
+        }
+      ]
+    }
+  },
+  "cloudtrail": {
+    "path": "/cloudtrail",
+    "httpMethod": "POST",
+    "headers": {
+      "Credentials": null
+    },
+    "queryStringParameters": {
+      "region": null
+    },
+    "body": {
+      "region": null
+    },
+    "result": null
+  },
+  "awsconfig": {
+    "path": "/awsconfig",
+    "httpMethod": "POST",
+    "headers": {
+      "Credentials": null
+    },
+    "queryStringParameters": {
+      "region": null
+    },
+    "body": {
+      "region": null
+    },
+    "result": null
+  },
+  "health": {
+    "action": "launch",
+    "accountId": null,
+    "cloudformationLambdaExecutionRole": null,
+    "codePipelineServiceRole": null,
+    "gitHubPersonalAccessToken": null,
+    "healthLogGroupName": "/SungardAS/Alerts/Health",
+    "subscriptionFilterDestinationArn": null,
+    "params": {
+      "stackName": "SungardAS-aws-services-health-pipeline",
+      "templateUrl": "https://s3.amazonaws.com/cloudformation-serverless-codepipeline.us-east-1/codepipeline.yaml",
+      "parameters": [
+        {
+          "ParameterKey": "CloudformationLambdaExecutionRoleArn",
+          "ParameterValue": null
+        },
+        {
+          "ParameterKey": "CodePipelineServiceRoleArn",
+          "ParameterValue": null
+        },
+        {
+          "ParameterKey": "GitHubPersonalAccessToken",
+          "ParameterValue": "null"
+        },
+        {
+          "ParameterKey": "GitHubSourceRepositoryBranch",
+          "ParameterValue": "master"
+        },
+        {
+          "ParameterKey": "GitHubSourceRepositoryName",
+          "ParameterValue": "aws-services-health"
+        },
+        {
+          "ParameterKey": "GitHubSourceRepositoryOwner",
+          "ParameterValue": "SungardAS"
+        },
+        {
+          "ParameterKey": "ParameterOverrides",
+          "ParameterValue": null
+        },
+        {
+          "ParameterKey": "ProjectImage",
+          "ParameterValue": "aws/codebuild/nodejs:4.3.2"
+        },
+        {
+          "ParameterKey": "CustomAuthorizerIAMRoleName",
+          "ParameterValue": ""
+        },
+        {
+          "ParameterKey": "CustomAuthorizerLambdaName",
+          "ParameterValue": ""
+        }
+      ]
+    }
+  },
+  "configrules": {
+  },
+  "final_result": {
+    "alerts_destination": null,
+    "cloudtrail": [],
+    "awsconfig": [],
+    "health": [],
+    "configrules": []
+  }
+}
