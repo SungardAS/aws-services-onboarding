@@ -439,7 +439,7 @@ Resources:
             },
             "SaveCloudwatchLog": {
               "Type" : "Task",
-              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Save-To-CloudwatchLog",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-CloudwatchLogs",
               "Next": "FinalState"
             },
             "FinalState": {
