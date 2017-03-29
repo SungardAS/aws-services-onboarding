@@ -38,9 +38,20 @@ baseHandler.post = function(params, callback) {
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
 
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
-  inputDoc.account = params.account;
+
   inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
+
+  if (params.account.id) {
+    inputDoc.account.httpMethod = "GET";
+    inputDoc.account.queryStringParameters.accountId = params.account.id;
+  }
+  else {
+    inputDoc.account.httpMethod = "POST";
+    inputDoc.account.body = params.account;
+  }
+
   inputDoc.federation.authorizer_user_guid = params.userGuid;
+
   inputDoc.alerts_destination.params.parameters.forEach(function(attr) {
     if (attr.ParameterKey == "KinesisStreamArn") {
       attr.ParameterValue = params.kinesis_stream_arn;
@@ -49,6 +60,7 @@ baseHandler.post = function(params, callback) {
       attr.ParameterValue = params.cwl_to_kinesis_role_arn;
     }
   });
+
   inputDoc.health.cloudformationLambdaExecutionRole = params.cloudformation_lambda_execution_role_name;
   inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
   inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;

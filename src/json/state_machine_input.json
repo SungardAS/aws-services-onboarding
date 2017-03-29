@@ -4,8 +4,24 @@
     "roles":[]
   },
   "account": {
-    "id": null,
-    "created_at": null
+    "path": "/accounts",
+    "httpMethod": null,
+    "headers": {
+    },
+    "requestContext": {
+      "authorizer": {
+        "user_guid": "dummy"
+      }
+    },
+    "queryStringParameters": {
+      "accountId": null
+    },
+    "body": {
+      "name": null,
+      "desc": null,
+      "email": null,
+      "checkStatus": true
+    }
   },
   "federation": {
     "roles": [],
@@ -126,6 +142,7 @@
   "configrules": {
   },
   "final_result": {
+    "account_id": null,
     "alerts_destination": null,
     "cloudtrail": [],
     "awsconfig": [],
