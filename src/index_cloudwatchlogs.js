@@ -17,7 +17,7 @@ exports.handler = function (event, context) {
     awsconfig: event.awsconfig,
     health: event.health
   }
-  var sentAt = (new Date()).getTime();
+  var sentAt = (new Date()).toISOString();
   var logMessage = {
     "awsid": event.account_id,
     "subject": "Result of Creating New AWS Account",
@@ -27,11 +27,11 @@ exports.handler = function (event, context) {
   };
 
   var input = {
-    region: region,
+    region: process.env.AWS_DEFAULT_REGION,
     groupName: logGroupName,
     streamName: sentAt.replace(/:/g, '') + "-" + uuid.v4(),
     logMessage: JSON.stringify(logMessage),
-    timestamp: sentAt
+    timestamp: (new Date()).getTime()
   };
   console.log(input);
 
