@@ -1,6 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: State machine For New Account Onboarding Processes.
+
+Parameters:
+  AccountLogGroupName:
+    Type: String
+    Default: "/SungardAS/Alerts/Account"
+    Description: Account Cloudwatch Log Group Name
+  SubscriptionFilterDestinationArn:
+    Type: String
+    Description: Subscription Filter Destination Arn
+
 Resources:
   StateMachineLambdaFunctionIAMRole:
       Type: "AWS::IAM::Role"
@@ -199,6 +209,65 @@ Resources:
             Path: /{proxy+}
             Method: ANY
 
+  AlertLambdaFunctionIAMRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Sid: "AllowLambdaServiceToAssumeRole"
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRole"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+      Policies:
+        -
+          PolicyName: "InlinePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
+              -
+                Effect: "Allow"
+                Action:
+                  - "logs:*"
+                  - "cloudwatchlogs:*"
+                Resource: "*"
+  CloudWatchLogsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-CloudwatchLogs
+      Handler: index_cloudwatchlogs.handler
+      Runtime: nodejs4.3
+      CodeUri: ./src
+      Role: !GetAtt AlertLambdaFunctionIAMRole.Arn
+      Timeout: 300
+      Environment:
+        Variables:
+          ACCOUNT_LOG_GROUP_NAME: !Ref AccountLogGroupName
+          STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
+  AccountLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Ref AccountLogGroupName
+  SubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn: AccountLogGroup
+    Properties:
+      LogGroupName: !Ref AccountLogGroupName
+      FilterPattern: ""
+      DestinationArn: !Ref SubscriptionFilterDestinationArn
+
   StateMachineIAMRole:
       Type: "AWS::IAM::Role"
       Properties:
@@ -366,6 +435,11 @@ Resources:
             "SetFinalResultState": {
               "Type" : "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Final-Result",
+              "Next": "SaveCloudwatchLog"
+            },
+            "SaveCloudwatchLog": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Save-To-CloudwatchLog",
               "Next": "FinalState"
             },
             "FinalState": {

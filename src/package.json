@@ -11,6 +11,7 @@
   "dependencies": {
     "aws-sdk": "^2.6.7",
     "aws-services-lib": "https://github.com/SungardAS/aws-services-lib.git#master",
-    "sleep": "^5.1.0"
+    "sleep": "^5.1.0",
+    "node-uuid": "^1.4.7"
   }
 }

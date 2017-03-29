@@ -39,7 +39,7 @@ Input Parameter Values
 
 - GitHubSourceRepositoryOwner: `SungardAS`
 
-- ParameterOverrides:
+- ParameterOverrides: `{ "AccountLogGroupName": "/SungardAS/Alerts/Account", "SubscriptionFilterDestinationArn": "arn:aws:logs:<region>:<account>:destination:<destination_name>" }`
 
 - ProjectImage: `aws/codebuild/nodejs:4.3.2`
 
