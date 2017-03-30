@@ -7,21 +7,28 @@ var logGroupName = process.env.ACCOUNT_LOG_GROUP_NAME;
 
 exports.handler = function (event, context) {
 
-  function succeeded(input) { context.done(null, true); }
-  function failed(err) { context.fail(err, null); }
-  function errored(err) { context.fail(err, null); }
-
-  var message = {
-    alerts_destination: event.alerts_destination,
-    cloudtrail: event.cloudtrail,
-    awsconfig: event.awsconfig,
-    health: event.health
+  function succeeded(input) {
+    event.cloudwatchlog = true;
+    context.done(null, event);
   }
+  function failed(err) {
+    event.cloudwatchlog = false;
+    context.done(null, event);
+  }
+  function errored(err) {
+    event.cloudwatchlog = err;
+    context.done(null, event);
+  }
+
+  var message = "Health Alert : " + event.health;
+  message += "\n\nAlert Destinations : \n" + JSON.stringify(event.alerts_destination);
+  message += "\n\nCloudTrail : \n" + JSON.stringify(event.cloudtrail);
+  message += "\n\nAWSConfig: \n" + JSON.stringify(event.awsconfig);
   var sentAt = (new Date()).toISOString();
   var logMessage = {
     "awsid": event.account_id,
     "subject": "Result of Creating New AWS Account",
-    "message": JSON.stringify(message),
+    "message": message,
     "sentBy": process.env.STATE_MACHINE_ARN,
     "sentAt": sentAt
   };
