@@ -3,7 +3,10 @@ exports.handler = (event, context, callback) => {
 
   // find account id
   var accountId = null;
-  var retDoc = JSON.parse(event.account.result.body);
+  var retDoc = event.account.result.body;
+  if (typeof(retDoc) == 'string') {
+    retDoc = JSON.parse(retDoc);
+  }
   if (retDoc.Account) {
     // this is result of find account
     accountId = retDoc.Account.Id;
