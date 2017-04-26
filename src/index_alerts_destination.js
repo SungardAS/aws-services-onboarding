@@ -3,6 +3,8 @@ var fs = require('fs');
 var AWS = require('aws-sdk');
 var StackBuilder = require('aws-services-lib/stack_builder');
 
+var DESTINATION_TEMPLATE_PATH = '/templates/destination.yaml'
+
 const createResponse = (statusCode, body) => {
   return {
     statusCode: statusCode,
@@ -16,52 +18,11 @@ exports.handler = function (event, context) {
 
   console.log(JSON.stringify(event));
 
-  // read in the destination template
-  if (event.templatePath) {
-    event.params.templateStr = fs.readFileSync(__dirname + event.templatePath, {encoding:'utf8'});
-    event.params.usePreviousTemplate = false;
-  }
-  else {
-    event.params.usePreviousTemplate = true;
-  }
-  console.log(event.params);
-
-  var ec2Main = new AWS.EC2({region:'us-east-1'});
-  ec2Main.describeRegions({}, function(err, regions) {
-    if (err) {
-      context.fail(err, null);
-    }
-    else {
-      build(regions.Regions, 0, event, function(err, res) {
-        if (err) {
-          context.fail(err, null);
-        }
-        else {
-          console.log("\n\nStarting to check stack status");
-          checkStatus(regions.Regions, 0, event, function(err, res) {
-            if (err) {
-              context.fail(err, null);
-            }
-            else {
-              context.done(null, createResponse(200, res));
-            }
-          });
-        }
-      });
-    }
-  });
-}
-
-function build(regions, idx, event, callback) {
-
-  var params = JSON.parse(JSON.stringify(event.params));
-  params.region = regions[idx].RegionName;
-  params.nowait = true;
-
-  findDestinationPolicy(params.region, event.destinationName, function(err, policy) {
+  // find account list from the destination policy in the main region
+  findDestinationPolicy(process.env.AWS_DEFAULT_REGION, event.destinationName, function(err, policy) {
     if (err) {
       console.log(err);
-      return callback(null, err);
+      return context.fail(err, null);
     }
     else {
       // add new account to the policyDocument
@@ -78,40 +39,88 @@ function build(regions, idx, event, callback) {
       else {
         accountListStr = event.accountToAdd;
       }
-      params.parameters.forEach(function(param) {
+      event.params.parameters.forEach(function(param) {
         if (param.ParameterKey == "Accounts") {
           param.ParameterValue = accountListStr;
         }
       });
-      console.log(params);
+      console.log(event.params);
 
-      // now stack operation
-      var stack_builder = new StackBuilder();
-      stack_builder[event.action](params, function(err, status) {
-        if(err) {
-          if (event.action == 'launch') {
-            console.log("Error occurred during " + event.action + " in region, " + params.region + " : " + err);
-            result[params.region] = err;
-            return callback(null, result);
-          }
-          else if (event.action == 'drop') {
-            console.log("stack was already removed in region, " + params.region);
-            result[params.region] = err;
-            return callback(null, result);
-          }
+      // find all regions and create/update the stack in each region
+      var ec2Main = new AWS.EC2({region:process.env.AWS_DEFAULT_REGION});
+      ec2Main.describeRegions({}, function(err, regions) {
+        if (err) {
+          context.fail(err, null);
         }
         else {
-          console.log("completed to " + event.action + " stack in region, " + params.region + " : " + status);
-          result[params.region] = status;
-          if (++idx >= regions.length) {
-            return callback(null, result);
-          }
-          else {
-            build(regions, idx, event, callback);
-          }
+          build(regions.Regions, 0, event, function(err, res) {
+            if (err) {
+              context.fail(err, null);
+            }
+            else {
+              console.log("\n\nStarting to check stack status");
+              checkStatus(regions.Regions, 0, event, function(err, res) {
+                if (err) {
+                  context.fail(err, null);
+                }
+                else {
+                  context.done(null, createResponse(200, res));
+                }
+              });
+            }
+          });
         }
       });
     }
+  });
+}
+
+function build(regions, idx, event, callback) {
+
+  var params = JSON.parse(JSON.stringify(event.params));
+  params.region = regions[idx].RegionName;
+  params.nowait = true;
+
+  // check if this region already has the destination stack
+  var cloudformation = new AWS.CloudFormation({region: params.region});
+  cloudformation.describeStacks({ StackName: event.params.stackName }, function(err, data) {
+    if (err) {
+      console.log('error in cloudformation.describeStacks : ' + err);
+      // read in the destination template
+      params.templateStr = fs.readFileSync(__dirname + DESTINATION_TEMPLATE_PATH, {encoding:'utf8'});
+      params.usePreviousTemplate = false;
+    }
+    else {
+      console.log(data);
+      params.usePreviousTemplate = true;
+    }
+
+    // now stack operation
+    var stack_builder = new StackBuilder();
+    stack_builder[event.action](params, function(err, status) {
+      if(err) {
+        if (event.action == 'launch') {
+          console.log("Error occurred during " + event.action + " in region, " + params.region + " : " + err);
+          result[params.region] = err;
+          return callback(null, result);
+        }
+        else if (event.action == 'drop') {
+          console.log("stack was already removed in region, " + params.region);
+          result[params.region] = err;
+          return callback(null, result);
+        }
+      }
+      else {
+        console.log("completed to " + event.action + " stack in region, " + params.region + " : " + status);
+        result[params.region] = status;
+        if (++idx >= regions.length) {
+          return callback(null, result);
+        }
+        else {
+          build(regions, idx, event, callback);
+        }
+      }
+    });
   });
 }
 
@@ -154,9 +163,9 @@ function findDestinationPolicy(region, destinationName, callback) {
       callback(err, null);
     }
     else {
-      console.log(data);
+      //console.log(data);
       if (data && data.destinations.length > 0) {
-        console.log("found destination in region, " + region + " : " + data);
+        console.log("found destination in region, " + region + " : " + JSON.stringify(data));
         if (data.destinations[0].accessPolicy) {
           callback(null, data.destinations[0].accessPolicy);
         }
