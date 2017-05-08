@@ -29,32 +29,8 @@
     "durationSeconds": 0
   },
   "alerts_destination": {
-    "action": "launch",
     "destinationName": "alertDestination",
-    "accountToAdd": "",
-    "params": {
-      "stackName": "SungardAS-aws-services-alerts-destination",
-      "region": null,
-      "usePreviousTemplate": true,
-      "parameters": [
-        {
-          "ParameterKey": "Accounts",
-          "ParameterValue": null
-        },
-        {
-          "ParameterKey": "AlertKinesisDestinationName",
-          "ParameterValue": "alertDestination"
-        },
-        {
-          "ParameterKey": "KinesisStreamArn",
-          "ParameterValue": null
-        },
-        {
-          "ParameterKey": "CWLtoKinesisRoleArn",
-          "ParameterValue": null
-        }
-      ]
-    }
+    "accountToAdd": ""
   },
   "cloudtrail": {
     "path": "/cloudtrail",

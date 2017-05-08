@@ -1,9 +1,5 @@
 
-var fs = require('fs');
 var AWS = require('aws-sdk');
-var StackBuilder = require('aws-services-lib/stack_builder');
-
-var DESTINATION_TEMPLATE_PATH = '/templates/destination.yaml'
 
 const createResponse = (statusCode, body) => {
   return {
@@ -19,140 +15,74 @@ exports.handler = function (event, context) {
   console.log(JSON.stringify(event));
 
   // find account list from the destination policy in the main region
-  findDestinationPolicy(process.env.AWS_DEFAULT_REGION, event.destinationName, function(err, policy) {
+  findDestination(process.env.AWS_DEFAULT_REGION, event.destinationName, function(err, destination) {
     if (err) {
       console.log(err);
       return context.fail(err, null);
     }
     else {
-      // add new account to the policyDocument
-      var accountListStr = "";
-      if (policy) {
-        var policyDocument = JSON.parse(policy);
-        if (policyDocument.Statement[0].Principal.AWS.indexOf(event.accountToAdd) >= 0) {
-          accountListStr = policyDocument.Statement[0].Principal.AWS.join();
+      // add new account to the accessPolicyDocument
+      if (destination) {
+        var accessPolicyDocument = JSON.parse(destination.accessPolicy);
+        if (accessPolicyDocument.Statement[0].Principal.AWS.indexOf(event.accountToAdd) < 0) {
+          accessPolicyDocument.Statement[0].Principal.AWS.push(event.accountToAdd);
         }
-        else {
-          accountListStr = policyDocument.Statement[0].Principal.AWS.join() + "," + event.accountToAdd;
-        }
+        // find all regions and create/update the stack in each region
+        var ec2Main = new AWS.EC2({region:process.env.AWS_DEFAULT_REGION});
+        ec2Main.describeRegions({}, function(err, regions) {
+          if (err) {
+            return context.fail(err, null);
+          }
+          else {
+            build(regions.Regions, 0, event.destinationName, JSON.stringify(accessPolicyDocument), function(err, res) {
+              if (err) {
+                return context.fail(err, null);
+              }
+              else {
+                return context.done(null, createResponse(200, res));
+              }
+            });
+          }
+        });
       }
       else {
-        accountListStr = event.accountToAdd;
+        var err = "no destination is found with name [" + event.destinationName + "]";
+        console.log(err);
+        return context.fail(err, null);
       }
-      event.params.parameters.forEach(function(param) {
-        if (param.ParameterKey == "Accounts") {
-          param.ParameterValue = accountListStr;
-        }
-      });
-      console.log(event.params);
-
-      // find all regions and create/update the stack in each region
-      var ec2Main = new AWS.EC2({region:process.env.AWS_DEFAULT_REGION});
-      ec2Main.describeRegions({}, function(err, regions) {
-        if (err) {
-          context.fail(err, null);
-        }
-        else {
-          build(regions.Regions, 0, event, function(err, res) {
-            if (err) {
-              context.fail(err, null);
-            }
-            else {
-              console.log("\n\nStarting to check stack status");
-              checkStatus(regions.Regions, 0, event, function(err, res) {
-                if (err) {
-                  context.fail(err, null);
-                }
-                else {
-                  context.done(null, createResponse(200, res));
-                }
-              });
-            }
-          });
-        }
-      });
     }
   });
 }
 
-function build(regions, idx, event, callback) {
+function build(regions, idx, destinationName, accessPolicy, callback) {
 
-  var params = JSON.parse(JSON.stringify(event.params));
-  params.region = regions[idx].RegionName;
-  params.nowait = true;
+  var region = regions[idx].RegionName;
 
   // check if this region already has the destination stack
-  var cloudformation = new AWS.CloudFormation({region: params.region});
-  cloudformation.describeStacks({ StackName: event.params.stackName }, function(err, data) {
+  var cloudwatchlogs = new AWS.CloudWatchLogs({region: region});
+  params = {
+    accessPolicy: accessPolicy,
+    destinationName: destinationName
+  };
+  cloudwatchlogs.putDestinationPolicy(params, function(err, data) {
     if (err) {
-      console.log('error in cloudformation.describeStacks : ' + err);
-      // read in the destination template
-      params.templateStr = fs.readFileSync(__dirname + DESTINATION_TEMPLATE_PATH, {encoding:'utf8'});
-      params.usePreviousTemplate = false;
+      console.log('error in cloudwatchlogs.putDestinationPolicy : ' + err);
+      return callback(err, null);
     }
     else {
-      console.log(data);
-      params.usePreviousTemplate = true;
-    }
-
-    // now stack operation
-    var stack_builder = new StackBuilder();
-    stack_builder[event.action](params, function(err, status) {
-      if(err) {
-        if (event.action == 'launch') {
-          console.log("Error occurred during " + event.action + " in region, " + params.region + " : " + err);
-          result[params.region] = err;
-          return callback(null, result);
-        }
-        else if (event.action == 'drop') {
-          console.log("stack was already removed in region, " + params.region);
-          result[params.region] = err;
-          return callback(null, result);
-        }
-      }
-      else {
-        console.log("completed to " + event.action + " stack in region, " + params.region + " : " + status);
-        result[params.region] = status;
-        if (++idx >= regions.length) {
-          return callback(null, result);
-        }
-        else {
-          build(regions, idx, event, callback);
-        }
-      }
-    });
-  });
-}
-
-function checkStatus(regions, idx, event, callback) {
-
-  var params = JSON.parse(JSON.stringify(event.params));
-  params.region = regions[idx].RegionName;
-
-  // now stack operation
-  if (result[params.region]) {
-    var stack_builder = new StackBuilder();
-    stack_builder["waitFor" + event.action](params, function(err, status) {
-      if(err) {
-        console.log("Error occurred during waitForComplete in region, " + params.region + " : " + err);
-        result[params.region] = err;
+      console.log("completed to cloudwatchlogs.putDestinationPolicy in region, " + region);
+      result[region] = true;
+      if (++idx >= regions.length) {
         return callback(null, result);
       }
       else {
-        console.log("completed to waitForComplete in region, " + params.region + " : " + status);
-        result[params.region] = status;
-        if (++idx >= regions.length) {
-          return callback(null, result);
-        }
-        else {
-          checkStatus(regions, idx, event, callback);
-        }
+        build(regions, idx, destinationName, accessPolicy, callback);
       }
-    });
-  }
+    }
+  });
 }
 
-function findDestinationPolicy(region, destinationName, callback) {
+function findDestination(region, destinationName, callback) {
   var cloudwatchlogs = new AWS.CloudWatchLogs({region: region});
   params = {
     DestinationNamePrefix: destinationName
@@ -167,7 +97,8 @@ function findDestinationPolicy(region, destinationName, callback) {
       if (data && data.destinations.length > 0) {
         console.log("found destination in region, " + region + " : " + JSON.stringify(data));
         if (data.destinations[0].accessPolicy) {
-          callback(null, data.destinations[0].accessPolicy);
+          //callback(null, data.destinations[0].accessPolicy);
+          callback(null, data.destinations[0]);
         }
         else {
           callback(null, null);
