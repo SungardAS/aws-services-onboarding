@@ -74,7 +74,7 @@ function build(region, destination) {
   var params = {
     DestinationNamePrefix: destination.destinationName
   };
-  cloudwatchlogs.describeDestinations(params).promise().then(function(data) {
+  return cloudwatchlogs.describeDestinations(params).promise().then(function(data) {
     if (data && data.destinations.length > 0) {
       console.log("found destination in region, " + region + " : " + JSON.stringify(data));
       return destination;
@@ -99,7 +99,7 @@ function build(region, destination) {
       accessPolicy: destination.accessPolicy,
       destinationName: destination.destinationName
     };
-    cloudwatchlogs.putDestinationPolicy(params).promise().then(function(data) {
+    return cloudwatchlogs.putDestinationPolicy(params).promise().then(function(data) {
       console.log("completed to cloudwatchlogs.putDestinationPolicy in region, " + region);
       return true;
     }).catch(function(err) {
