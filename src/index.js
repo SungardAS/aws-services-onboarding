@@ -52,15 +52,6 @@ baseHandler.post = function(params, callback) {
 
   inputDoc.federation.authorizer_user_guid = params.userGuid;
 
-  inputDoc.alerts_destination.params.parameters.forEach(function(attr) {
-    if (attr.ParameterKey == "KinesisStreamArn") {
-      attr.ParameterValue = params.kinesis_stream_arn;
-    }
-    else if (attr.ParameterKey == "CWLtoKinesisRoleArn") {
-      attr.ParameterValue = params.cwl_to_kinesis_role_arn;
-    }
-  });
-
   inputDoc.health.cloudformationLambdaExecutionRole = params.cloudformation_lambda_execution_role_name;
   inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
   inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
