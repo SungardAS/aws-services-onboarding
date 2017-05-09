@@ -55,7 +55,7 @@ exports.handler = function (event, context) {
         data.Regions.forEach(function(region) {
           result[region.RegionName] = retArray[index];
         });
-        context.done(null, retArray);
+        context.done(null, createResponse(200, result));
       }).catch(function(err) {
         throw err;
       });
