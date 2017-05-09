@@ -51,8 +51,8 @@ exports.handler = function (event, context) {
         promises.push(build(region.RegionName, destination));
       });
       var result = {};
-      Promise.all(promises).then(function(retArray, index) {
-        data.Regions.forEach(function(region) {
+      Promise.all(promises).then(function(retArray) {
+        data.Regions.forEach(function(region, index) {
           result[region.RegionName] = retArray[index];
         });
         context.done(null, createResponse(200, result));
