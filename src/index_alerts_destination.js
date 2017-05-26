@@ -95,8 +95,13 @@ function build(region, destination) {
       });
     }
   }).then(function(destination) {
+    // replace the region with the current target region
+    var accessPolicy = JSON.parse(destination.accessPolicy);
+    var tokens = accessPolicy.Statement[0].Resource.split(':');
+    tokens[3] = region;
+    accessPolicy.Statement[0].Resource = tokens.join(':');
     params = {
-      accessPolicy: destination.accessPolicy,
+      accessPolicy: JSON.stringify(accessPolicy),
       destinationName: destination.destinationName
     };
     return cloudwatchlogs.putDestinationPolicy(params).promise().then(function(data) {
