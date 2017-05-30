@@ -40,6 +40,7 @@ baseHandler.post = function(params, callback) {
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
 
   inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
+  inputDoc.configrules.rules = params.default_configrules_to_enable;
 
   if (params.account.id) {
     inputDoc.account.httpMethod = "GET";

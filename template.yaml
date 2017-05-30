@@ -424,7 +424,19 @@ Resources:
                       "End": true
                     }
                   }
-                }
+                },
+                {
+                  "StartAt": "ConfigRulesActionState",
+                  "States": {
+                    "ConfigRulesActionState": {
+                      "Type": "Task",
+                      "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-ConfigRules",
+                      "InputPath": "$.configrules",
+                      "ResultPath": "$.configrules.result",
+                      "End": true
+                    }
+                  }
+                } 
               ]
             },
             "SetResultsState": {
