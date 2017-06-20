@@ -8,5 +8,7 @@ exports.handler = (event, context, callback) => {
   event.awsconfig.body.region = region;
   event.configrules.queryStringParameters.region = region;
   event.configrules.body.region = region;
+  event.configrules.rules = event.rules;
+  console.log(event);
   callback(null, event);
 };
