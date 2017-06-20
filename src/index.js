@@ -40,8 +40,7 @@ baseHandler.post = function(params, callback) {
 
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
 
-  console.log('=============PARAMS=============');
-  console.log(params);
+  console.log(params.default_configrules_to_enable);
 
   inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
   inputDoc.configrules.rules = params.default_configrules_to_enable;
@@ -66,6 +65,8 @@ baseHandler.post = function(params, callback) {
     stateMachineArn: process.env.STATE_MACHINE_ARN,
     input: JSON.stringify(inputDoc),
   };
+  console.log("======INPUT=====");
+  console.log(input);
   if (params.execution_name) input.name = params.execution_name;
   stepfunctions.startExecution(input, function(err, data) {
     if (err) {
