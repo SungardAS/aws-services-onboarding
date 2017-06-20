@@ -9,6 +9,8 @@ exports.handler = (event, context) => {
 }
 
 baseHandler.get = function(params, callback) {
+  console.log('=============PARAMS=============');
+  console.log(params);
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
   var input = {
     executionArn: params.executionArn
