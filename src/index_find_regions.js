@@ -19,6 +19,7 @@ exports.handler = (event, context, callback) => {
     event.cloudtrail.headers.Credentials = credentials;
     event.awsconfig.headers.Credentials = credentials;
     event.configrules.headers.Credentials = credentials;
+    console.log(event);
     callback(null, event);
   }).catch(function(err) {
     callback(err);

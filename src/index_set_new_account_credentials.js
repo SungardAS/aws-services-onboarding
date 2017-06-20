@@ -10,6 +10,9 @@ exports.handler = (event, context, callback) => {
   var codedCredentials = new Buffer(JSON.stringify(credentials)).toString('base64');
   event.cloudtrail.headers.Credentials = codedCredentials;
   event.awsconfig.headers.Credentials = codedCredentials;
+  event.configrules.headers.Credentials = codedCredentials;
+
+  console.log(codedCredentials);
 
   callback(null, event);
 };
