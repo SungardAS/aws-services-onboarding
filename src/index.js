@@ -44,6 +44,7 @@ baseHandler.post = function(params, callback) {
 
   inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
   inputDoc.configrules.rules = params.default_configrules_to_enable;
+  inputDoc.configrules.customerAccount = params.account.id;
 
   if (params.account.id) {
     inputDoc.account.httpMethod = "GET";
