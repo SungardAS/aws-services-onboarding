@@ -9,6 +9,7 @@ exports.handler = (event, context) => {
 }
 
 baseHandler.get = function(params, callback) {
+  
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
   var input = {
     executionArn: params.executionArn
@@ -39,7 +40,11 @@ baseHandler.post = function(params, callback) {
 
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
 
+  console.log(params.default_configrules_to_enable);
+
   inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
+  inputDoc.configrules.rules = params.default_configrules_to_enable;
+  inputDoc.configrules.customerAccount = params.account.id;
 
   if (params.account.id) {
     inputDoc.account.httpMethod = "GET";
@@ -61,6 +66,8 @@ baseHandler.post = function(params, callback) {
     stateMachineArn: process.env.STATE_MACHINE_ARN,
     input: JSON.stringify(inputDoc),
   };
+  console.log("======INPUT=====");
+  console.log(input);
   if (params.execution_name) input.name = params.execution_name;
   stepfunctions.startExecution(input, function(err, data) {
     if (err) {

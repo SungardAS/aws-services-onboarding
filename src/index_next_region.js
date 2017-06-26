@@ -6,5 +6,8 @@ exports.handler = (event, context, callback) => {
   event.cloudtrail.body.region = region;
   event.awsconfig.queryStringParameters.region = region;
   event.awsconfig.body.region = region;
+  event.configrules.queryStringParameters.region = region;
+  event.configrules.body.region = region;
+  console.log(event);
   callback(null, event);
 };

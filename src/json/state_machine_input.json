@@ -116,6 +116,19 @@
     }
   },
   "configrules": {
+    "path": "/configrules",
+    "httpMethod": "POST",
+    "headers": {
+      "Credentials": null
+    },
+    "queryStringParameters": {
+      "region": null
+    },
+    "body": {
+      "region": null
+    },
+    "result": null,
+    "rules": []
   },
   "final_result": {
     "account_id": null,
