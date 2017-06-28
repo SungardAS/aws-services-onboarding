@@ -399,7 +399,7 @@ Resources:
             },
             "Parallel": {
               "Type": "Parallel",
-              "Next": "SetResultsState",
+              "Next": "ConfigRulesActionState",
               "Branches": [
                 {
                   "StartAt": "CloudtrailActionState",
