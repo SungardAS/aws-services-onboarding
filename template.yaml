@@ -430,8 +430,8 @@ Resources:
             "ConfigRulesActionState": {
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-ConfigRules",
-              "InputPath": "$.configrules",
-              "ResultPath": "$.configrules.result",
+              "InputPath": "$[0].configrules",
+              "ResultPath": "$[0].configrules.result",
               "Next": "SetResultsState"
             },
             "SetResultsState": {
