@@ -70,6 +70,15 @@ Resources:
   SetAccountLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: SungardAS-Onboarding-Integration-With-Billing
+      Handler: index_integrate_billing_account.handler
+      Runtime: nodejs4.3
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+  SetAccountLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
       FunctionName: SungardAS-Onboarding-Set-Account
       Handler: index_set_account.handler
       Runtime: nodejs4.3
@@ -327,6 +336,13 @@ Resources:
             "CreateAccount": {
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Account",
+              "InputPath": "$.account",
+              "ResultPath": "$.account.result",
+              "Next": "IntegrateNewAccountWithBilling"
+            },
+            "IntegrateNewAccountWithBilling": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Integration-With-Billing",
               "InputPath": "$.account",
               "ResultPath": "$.account.result",
               "Next": "SetAccount"
