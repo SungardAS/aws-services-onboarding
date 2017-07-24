@@ -27,9 +27,11 @@ exports.handler = (event, context, callback) => {
 
   // find account id
   var accountId = null;
-  //var retDoc = event.account.result.body;
+  console.log("11111111111111111111")
   console.log(event)
-  var retDoc = event.billingDetails;
+  console.log("11111111111111111111")
+  var retDoc = event.account.result.body;
+  var billing = event.account.billingDetails;
   if (typeof(retDoc) == 'string') {
     retDoc = JSON.parse(retDoc);
   }
@@ -43,7 +45,7 @@ exports.handler = (event, context, callback) => {
   }
   console.log("retDoc:"+retDoc);
   if(accountId){
-    registerAccount(accountId,retDoc);
+    registerAccount(accountId,billing);
     event.IntegrateBillingStatus=truea;
   }else{
     console.log("Customer Accound not found");

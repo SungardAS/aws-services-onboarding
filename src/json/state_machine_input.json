@@ -21,7 +21,8 @@
       "desc": null,
       "email": null,
       "checkStatus": true
-    }
+    },
+    "billingDetails":null
   },
   "federation": {
     "roles": [],
