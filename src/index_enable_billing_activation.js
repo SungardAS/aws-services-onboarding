@@ -12,9 +12,10 @@ var registerAccount = function(accId, params) {
     activationDate: datetime
   }
   console.log("bodyjson:"+bodyjson);
-  console.log("URL:"+params.billingUrl);
+  var billingUrl = params.billingUrl+"?client_id="+ params.apiKey +"&client_secret="+params.secretKey;
+  console.log("URL:"+billingUrl);
   req({
-    url: params.billingUrl, //URL to hit
+    url: billingUrl, //URL to hit
     method: 'POST',
     json: bodyjson 
     }, function(error, response, body){
