@@ -47,7 +47,7 @@ exports.handler = (event, context, callback) => {
   console.log("retDoc:"+retDoc);
   if(accountId){
     registerAccount(accountId,billing);
-    event.IntegrateBillingStatus=truea;
+    event.IntegrateBillingStatus=true;
   }else{
     console.log("Customer Accound not found");
     event.IntegrateBillingStatus=false;

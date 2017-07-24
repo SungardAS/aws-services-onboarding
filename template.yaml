@@ -343,8 +343,7 @@ Resources:
             "EnableBillingActivation": {
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Enable-Billing-Activation",
-              "InputPath": "$.account",
-              "ResultPath": "$",
+              "InputPath": "$",
               "Next": "SetAccount"
             },
             "SetAccount": {

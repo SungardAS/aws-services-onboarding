@@ -2,6 +2,7 @@
 exports.handler = (event, context, callback) => {
 
   // find account id
+  console.log(event)
   var accountId = null;
   var retDoc = event.account.result.body;
   if (typeof(retDoc) == 'string') {
