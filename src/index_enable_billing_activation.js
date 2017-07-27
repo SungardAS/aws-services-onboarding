@@ -2,8 +2,8 @@ var req = require("request");
 var registerAccount = function(accId, params) {
   var datetime = new Date();
   var bodyjson = {
-    SGID: params.SGID,
-    OfferingNum: params.OfferingNum,
+    sgId: params.SGID,
+    offeringNum: params.OfferingNum,
     masterAwsId: params.masterAwsId,
     customerAwsId: accId,
     customerAwsName: params.name,
