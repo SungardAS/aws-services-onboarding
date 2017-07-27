@@ -11,16 +11,18 @@ var registerAccount = function(accId, params) {
     awsDesc: params.desc,
     activationDate: datetime
   }
-  console.log("bodyjson:"+bodyjson);
+  console.log(bodyjson);
   var billingUrl = params.billingUrl+"?client_id="+ params.apiKey +"&client_secret="+params.secretKey;
-  console.log("URL:"+billingUrl);
+  console.log(billingUrl);
   req({
     url: billingUrl, //URL to hit
     method: 'POST',
     json: bodyjson 
     }, function(error, response, body){
-           console.log("error:"+error);
-           console.log("response:"+response);
+           console.log("error:");
+           console.log(error);
+           console.log("response:");
+           console.log(response);
   });
 }
 
@@ -28,9 +30,6 @@ exports.handler = (event, context, callback) => {
 
   // find account id
   var accountId = null;
-  console.log("11111111111111111111")
-  console.log(event)
-  console.log("11111111111111111111")
   var retDoc = event.account.result.body;
   var billing = event.account.billingDetails;
   if (typeof(retDoc) == 'string') {
@@ -44,7 +43,7 @@ exports.handler = (event, context, callback) => {
     // this is result of create account
     accountId = retDoc.CreateAccountStatus.AccountId;
   }
-  console.log("retDoc:"+retDoc);
+  console.log(retDoc);
   if(accountId){
     registerAccount(accountId,billing);
     event.IntegrateBillingStatus=true;

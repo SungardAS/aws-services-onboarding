@@ -2,7 +2,6 @@
 exports.handler = (event, context, callback) => {
 
   // find account id
-  console.log(event)
   var accountId = null;
   var retDoc = event.account.result.body;
   if (typeof(retDoc) == 'string') {
@@ -23,6 +22,7 @@ exports.handler = (event, context, callback) => {
 
   // set account id in health alert
   event.health.accountId = accountId;
+  console.log(event)
 
   callback(null, event);
 };
