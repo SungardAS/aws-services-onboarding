@@ -22,7 +22,7 @@ var registerAccount = function(accId, params) {
            console.log("error:");
            console.log(error);
            console.log("response:");
-           console.log(response);
+           console.log(response.body);
   });
 }
 
