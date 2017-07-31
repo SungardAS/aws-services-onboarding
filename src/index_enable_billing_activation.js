@@ -13,7 +13,6 @@ var registerAccount = function(accId, params) {
   }
   console.log(bodyjson);
   var billingUrl = params.billingUrl+"?client_id="+ params.apiKey +"&client_secret="+params.secretKey;
-  console.log(billingUrl);
   req({
     url: billingUrl, //URL to hit
     method: 'POST',
