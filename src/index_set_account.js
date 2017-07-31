@@ -22,6 +22,7 @@ exports.handler = (event, context, callback) => {
 
   // set account id in health alert
   event.health.accountId = accountId;
+  console.log(event)
 
   callback(null, event);
 };

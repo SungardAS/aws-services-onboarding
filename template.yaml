@@ -67,6 +67,15 @@ Resources:
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
+  EnableBillingActivationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Enable-Billing-Activation
+      Handler: index_enable_billing_activation.handler
+      Runtime: nodejs4.3
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
   SetAccountLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -329,6 +338,12 @@ Resources:
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Account",
               "InputPath": "$.account",
               "ResultPath": "$.account.result",
+              "Next": "EnableBillingActivation"
+            },
+            "EnableBillingActivation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Enable-Billing-Activation",
+              "InputPath": "$",
               "Next": "SetAccount"
             },
             "SetAccount": {
