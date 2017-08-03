@@ -7,7 +7,7 @@ const alertMailTemplate = "./template/alertmail.txt";
 //----------------------------------------------------------------------
 var sendAlertMailBySes = function(params, errorMsg, email){
   var ses = new aws.SES();
-  var params = {
+  var emailParams = {
     Destination: {
       ToAddresses : [email]
     },
@@ -26,7 +26,7 @@ var sendAlertMailBySes = function(params, errorMsg, email){
     data = data.replace(/__ERROR__/gm, JSON.stringify(errorMsg)); 
     data = data.replace(/__PARAMS__/gm, JSON.stringify(params));
     params.Message.Body.Html.Data = data;
-    ses.sendEmail(params, function(err, data) {
+    ses.sendEmail(emailParams, function(err, data) {
       if (err) console.log(err, err.stack); // an error occurred
       else     console.log(data);           // successful response
     });
@@ -45,9 +45,7 @@ var registerAccount = function(accId, params, event) {
     awsDesc: params.desc,
     activationDate: datetime
   }
-  console.log(bodyjson);
   var billingUrl = params.billingUrl+"?client_id="+ params.apiKey +"&client_secret="+params.secretKey;
-  console.log(billingUrl);
   try{
     req({
       url: billingUrl, //URL to hit
