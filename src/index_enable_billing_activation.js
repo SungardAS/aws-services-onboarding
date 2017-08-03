@@ -1,7 +1,6 @@
 'use strict';
-var aws = require('aws-sdk');
+const aws = require('aws-sdk');
 const req = require("request");
-const nodemailer = require('nodemailer');
 const fs = require('fs');
 const alertMailTemplate = "./template/alertmail.txt";
 
@@ -23,7 +22,8 @@ var sendAlertMailBySes = function(params, errorMsg, email){
   fs.readFile(alertMailTemplate, function(err, data) {
     if(err) throw err;
     data = data.toString();
-    data = data.replace(/__ERROR__/gm, JSON.stringify(errorMsg));
+    // replacing predefine mail template with actual error message
+    data = data.replace(/__ERROR__/gm, JSON.stringify(errorMsg)); 
     data = data.replace(/__PARAMS__/gm, JSON.stringify(params));
     params.Message.Body.Html.Data = data;
     ses.sendEmail(params, function(err, data) {
@@ -94,6 +94,7 @@ exports.handler = (event, context, callback) => {
       accountId = retDoc.CreateAccountStatus.AccountId;
     }
     if(accountId){
+      // sending rquest to billing( rest call) for register account
       registerAccount(accountId, billingInfo, event);
     } else{
       console.log("customer account id not found:"+JSON.stringify(retDoc));
