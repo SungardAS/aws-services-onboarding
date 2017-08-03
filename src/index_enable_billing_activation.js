@@ -62,12 +62,12 @@ var registerAccount = function(accId, params, event) {
           event.BillingActivationStatus=false;
 	  sendAlertMailBySes(bodyjson, error, params.email)
         }else{
-          if(body.errorcode == "0"){
+          if(response.body.errorcode == "0"){
             event.BillingActivationStatus=true;
           }else{
             event.BillingActivationStatus=false;
 	    // send alrt mail to service now group
-	    sendAlertMailBySes(bodyjson, body.message, params.email)
+	    sendAlertMailBySes(bodyjson, response.body, params.email)
 	  }
 	}
     });
@@ -108,8 +108,7 @@ exports.handler = (event, context, callback) => {
       event.BillingActivationStatus=false;
   }
 
-  //callback(null, event);
-  callback(null, null);
+  callback(null, event);
 };
 //----------------------------------------------------------------------
 if (require.main === module) {
