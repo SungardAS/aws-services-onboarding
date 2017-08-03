@@ -60,20 +60,20 @@ var registerAccount = function(accId, params, event) {
         console.log("body:"+ JSON.stringify(response.statusCode));
 	if(error){
           event.BillingActivationStatus=false;
-	  sendAlertMailBySes(bodyjson, error, params.email)
+	  sendAlertMailBySes(bodyjson, error, params.billingemail)
         }else{
           if(response.body.errorcode == "0"){
             event.BillingActivationStatus=true;
           }else{
             event.BillingActivationStatus=false;
 	    // send alrt mail to service now group
-	    sendAlertMailBySes(bodyjson, response.body, params.email)
+	    sendAlertMailBySes(bodyjson, response.body, params.billingemail)
 	  }
 	}
     });
   }catch(err){
     event.BillingActivationStatus=false;
-    sendAlertMailBySes(bodyjson, error, params.email)
+    sendAlertMailBySes(bodyjson, error, params.billingemail)
   }
 }
 //----------------------------------------------------------------------
@@ -99,12 +99,12 @@ exports.handler = (event, context, callback) => {
       registerAccount(accountId, billingInfo, event);
     } else{
       console.log("customer account id not found:"+JSON.stringify(retDoc));// its happened when account creation failed
-      sendAlertMailBySes(billingInfo, retDoc.CreateAccountStatus.FailureReason, billingInfo.email)
+      sendAlertMailBySes(billingInfo, retDoc.CreateAccountStatus.FailureReason, billingInfo.billingemail)
       event.BillingActivationStatus=false;
     }
   } else{
       console.log("customer account id not found");
-      sendAlertMailBySes(billingInfo, retDoc, billingInfo.email)
+      sendAlertMailBySes(billingInfo, retDoc, billingInfo.billingemail)
       event.BillingActivationStatus=false;
   }
 
