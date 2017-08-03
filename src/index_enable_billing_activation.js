@@ -25,7 +25,7 @@ var sendAlertMailBySes = function(params, errorMsg, email){
     // replacing predefine mail template with actual error message
     data = data.replace(/__ERROR__/gm, JSON.stringify(errorMsg)); 
     data = data.replace(/__PARAMS__/gm, JSON.stringify(params));
-    params.Message.Body.Html.Data = data;
+    emailParams.Message.Body.Html.Data = data;
     ses.sendEmail(emailParams, function(err, data) {
       if (err) console.log(err, err.stack); // an error occurred
       else     console.log(data);           // successful response
