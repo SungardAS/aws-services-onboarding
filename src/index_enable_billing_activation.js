@@ -99,12 +99,13 @@ exports.handler = (event, context, callback) => {
       registerAccount(accountId, billingInfo, event);
     } else{
       console.log("customer account id not found:"+JSON.stringify(retDoc));// its happened when account creation failed
-      sendAlertMailBySes(billingInfo, retDoc.CreateAccountStatus.FailureReason, billingInfo.billingemail)
+      let errmsg = "Found Error While Creating Account:"+ JSON.stringify(retDoc.CreateAccountStatus.FailureReason);
+      sendAlertMailBySes(billingInfo, errmsg, billingInfo.billingemail)
       event.BillingActivationStatus=false;
     }
   } else{
       console.log("customer account id not found");
-      sendAlertMailBySes(billingInfo, retDoc, billingInfo.billingemail)
+      sendAlertMailBySes(billingInfo, "Found Error While Creating Account", billingInfo.billingemail)
       event.BillingActivationStatus=false;
   }
 
