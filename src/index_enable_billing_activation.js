@@ -46,6 +46,8 @@ var registerAccount = function(accId, params, event) {
     activationDate: datetime
   }
   var billingUrl = params.billingUrl+"?client_id="+ params.apiKey +"&client_secret="+params.secretKey;
+  console.log(billingUrl);
+  console.log(bodyjson);
   try{
     req({
       url: billingUrl, //URL to hit
