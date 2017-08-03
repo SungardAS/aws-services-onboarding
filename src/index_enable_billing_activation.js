@@ -57,16 +57,17 @@ var registerAccount = function(accId, params, event) {
         console.log("error:" +JSON.stringify(error));
         console.log("response:"+ JSON.stringify(response.body));
         console.log("body:"+ JSON.stringify(body));
-	if(error || (response && response.statusCode !=200)){
+        console.log("body:"+ JSON.stringify(response.statusCode));
+	if(error){
           event.BillingActivationStatus=false;
 	  sendAlertMailBySes(bodyjson, error, params.email)
         }else{
-          if(response.body.errorcode == "0"){
+          if(body.errorcode == "0"){
             event.BillingActivationStatus=true;
           }else{
             event.BillingActivationStatus=false;
 	    // send alrt mail to service now group
-	    sendAlertMailBySes(bodyjson, error, params.email)
+	    sendAlertMailBySes(bodyjson, body.message, params.email)
 	  }
 	}
     });
@@ -107,7 +108,8 @@ exports.handler = (event, context, callback) => {
       event.BillingActivationStatus=false;
   }
 
-  callback(null, event);
+  //callback(null, event);
+  callback(null, null);
 };
 //----------------------------------------------------------------------
 if (require.main === module) {
