@@ -94,10 +94,10 @@ exports.handler = (event, context, callback) => {
       accountId = retDoc.CreateAccountStatus.AccountId;
     }
     if(accountId){
-      // sending rquest to billing( rest call) for register account
+      // sending request to billing system(rest call) for register account
       registerAccount(accountId, billingInfo, event);
     } else{
-      console.log("customer account id not found:"+JSON.stringify(retDoc));
+      console.log("customer account id not found:"+JSON.stringify(retDoc));// its happened when account creation failed
       sendAlertMailBySes(billingInfo, retDoc.CreateAccountStatus.FailureReason, billingInfo.email)
       event.BillingActivationStatus=false;
     }
