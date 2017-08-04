@@ -5,13 +5,13 @@ const fs = require('fs');
 const alertMailTemplate = "./template/alertmail.txt";
 
 //----------------------------------------------------------------------
-var sendAlertMailBySes = function(params, errorMsg, email){
+var sendAlertMailBySes = function(params, errorMsg, from, to){
   var ses = new aws.SES();
   var emailParams = {
     Destination: {
-      ToAddresses : [email]
+      ToAddresses : [to]
     },
-    Source: email,
+    Source: from,
     Message: {
       Subject: {
         Data: 'MCAWS: Account Registration Failed with Billing System'
@@ -60,20 +60,20 @@ var registerAccount = function(accId, params, event) {
         console.log("body:"+ JSON.stringify(response.statusCode));
 	if(error){
           event.BillingActivationStatus=false;
-	  sendAlertMailBySes(bodyjson, error, params.billingemail)
+	  sendAlertMailBySes(bodyjson, error, params.billingFromEmail, params.billingToEmail)
         }else{
           if(response.body.errorcode == "0"){
             event.BillingActivationStatus=true;
           }else{
             event.BillingActivationStatus=false;
 	    // send alrt mail to service now group
-	    sendAlertMailBySes(bodyjson, response.body, params.billingemail)
+	    sendAlertMailBySes(bodyjson, response.body, params.billingFromEmail, params.billingToEmail)
 	  }
 	}
     });
   }catch(err){
     event.BillingActivationStatus=false;
-    sendAlertMailBySes(bodyjson, error, params.billingemail)
+    sendAlertMailBySes(bodyjson, error, params.billingFromEmail, params.billingToEmail)
   }
 }
 //----------------------------------------------------------------------
@@ -100,12 +100,12 @@ exports.handler = (event, context, callback) => {
     } else{
       console.log("customer account id not found:"+JSON.stringify(retDoc));// its happened when account creation failed
       let errmsg = "Found Error While Creating Account:"+ JSON.stringify(retDoc.CreateAccountStatus.FailureReason);
-      sendAlertMailBySes(billingInfo, errmsg, billingInfo.billingemail)
+      sendAlertMailBySes(billingInfo, errmsg, billingInfo.billingFromEmail,billingInfo.billingToEmail)
       event.BillingActivationStatus=false;
     }
   } else{
       console.log("customer account id not found");
-      sendAlertMailBySes(billingInfo, "Found Error While Creating Account", billingInfo.billingemail)
+      sendAlertMailBySes(billingInfo, "Found Error While Creating Account", billingInfo.billingFromEmail,billingInfo.billingToEmail)
       event.BillingActivationStatus=false;
   }
 
@@ -122,7 +122,7 @@ if (require.main === module) {
     awsDesc: 'Test MA-1513',
     activationDate: "Tue Aug 01 2017 06:48:46 GMT+0000 (UTC)" 
   }
-  sendAlertMailBySes(bodyjson, 'error', 'chandra.mishra@sungardas.com')
+  sendAlertMailBySes(bodyjson, 'error', 'chandra.mishra@sungardas.com','chandra.mishra@sungardas.com')
 }
 //----------------------------------------------------------------------
 
