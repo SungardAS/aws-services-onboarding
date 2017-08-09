@@ -9,7 +9,7 @@ var sendAlertMailBySes = function(params, errorMsg, from, to){
   var ses = new aws.SES();
   var emailParams = {
     Destination: {
-      ToAddresses : [to]
+      ToAddresses : to.split(',')
     },
     Source: from,
     Message: {
@@ -122,7 +122,7 @@ if (require.main === module) {
     awsDesc: 'Test MA-1513',
     activationDate: "Tue Aug 01 2017 06:48:46 GMT+0000 (UTC)" 
   }
-  sendAlertMailBySes(bodyjson, 'error', 'chandra.mishra@sungardas.com','chandra.mishra@sungardas.com')
+  sendAlertMailBySes(bodyjson, 'error', 'chandra.mishra@sungardas.com','chandra.mishra@sungardas.com,pratik.bhargava@sungardas.com,rajkumar.shivage@sungardas.com')
 }
 //----------------------------------------------------------------------
 
