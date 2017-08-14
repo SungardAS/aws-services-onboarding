@@ -50,7 +50,6 @@ function registerAccount(accId, params) {
     activationDate: datetime
   };
   const billingUrl = `${params.billingUrl}?client_id=${params.apiKey}&client_secret=${params.secretKey}`;
-  console.log(billingUrl);
   console.log(bodyjson);
   try {
      req({url: billingUrl, method: 'POST',json: bodyjson },(error, response, body) => {
@@ -94,11 +93,10 @@ exports.handler = (event, context, callback) => {
     } else {
       console.log(`customer account id not found: ${JSON.stringify(retDoc)}`);
       const errmsg = `Found Error While Creating Account:  ${JSON.stringify(retDoc.CreateAccountStatus.FailureReason)}`;
-      sendAlertMailBySes(billingInfo, errmsg, billingInfo);
+      console.log(errmsg);
     }
   } else {
     console.log('customer account id not found');
-    sendAlertMailBySes(billingInfo, 'Found Error While Creating Account');
   }
 
   callback(null, event);
