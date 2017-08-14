@@ -50,7 +50,6 @@ function registerAccount(accId, params) {
     activationDate: datetime
   };
   const billingUrl = `${params.billingUrl}?client_id=${params.apiKey}&client_secret=${params.secretKey}`;
-  console.log(bodyjson);
   try {
      req({url: billingUrl, method: 'POST',json: bodyjson },(error, response, body) => {
         console.log(`error:  ${JSON.stringify(error)}`);
@@ -72,7 +71,6 @@ function registerAccount(accId, params) {
 //----------------------------------------------------------------------
 exports.handler = (event, context, callback) => {
   // find account id
-  console.log(event);
   let accountId = null;
   let retDoc = event.account.result.body;
   const billingInfo = event.account.billingDetails;
