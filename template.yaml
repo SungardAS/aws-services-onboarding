@@ -47,6 +47,7 @@ Resources:
                       - "iam:*"
                       - "cloudformation:*"
                       - "logs:*"
+                      - "ses:*"
                     Resource: "*"
 
   PreMasterFederationLambdaFunction:
