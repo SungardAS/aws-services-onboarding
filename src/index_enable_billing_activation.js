@@ -40,7 +40,7 @@ function sendAlertMailBySes(params, errorMsg, billingData) {
 function registerAccount(accId, params) {
   const datetime = new Date();
   const bodyjson = {
-    sgId: params.SGID,
+    sgId: Number(params.SGID),
     offeringNum: params.OfferingNum,
     masterAwsId: params.masterAwsId,
     customerAwsId: accId,
