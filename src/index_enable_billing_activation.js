@@ -47,7 +47,7 @@ function registerAccount(accId, params) {
     masterAwsId: params.masterAwsId,
     customerAwsId: accId,
     customerAwsName: params.name,
-    type: params.type,
+    type: params.type.toLowerCase(),
     awsDesc: params.desc,
     activationDate: datetime
   };
