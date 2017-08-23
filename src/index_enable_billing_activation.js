@@ -1,5 +1,6 @@
 'use strict';
 
+const dateFormat = require('dateformat');
 const aws = require('aws-sdk');
 
 const req = require('request');
@@ -38,7 +39,8 @@ function sendAlertMailBySes(params, errorMsg, billingData) {
 }
 //----------------------------------------------------------------------
 function registerAccount(accId, params) {
-  const datetime = new Date();
+  const now = new Date();
+  const datetime = dateFormat(now, "mm-dd-yyyy")+"T"+dateFormat(now,"HH:MM:ss");
   const bodyjson = {
     sgId: Number(params.SGID),
     offeringNum: params.OfferingNum,
