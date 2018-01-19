@@ -43,8 +43,6 @@ baseHandler.post = function(params, callback) {
   console.log(params.default_configrules_to_enable);
 
   inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
-  inputDoc.configrules.rules = params.default_configrules_to_enable;
-  inputDoc.configrules.customerAccount = params.account.id;
   inputDoc.account.billingDetails = params.account;
 
   if (params.account.id) {
@@ -57,11 +55,25 @@ baseHandler.post = function(params, callback) {
   }
 
   inputDoc.federation.authorizer_user_guid = params.userGuid;
+  console.log("-----------------------------");
+  console.log(inputDoc);
+  console.log(params);
+  console.log("-----------------------------");
+  if(params.account.type == 'unmanaged')
+  {
+    inputDoc.configrules.rules = params.default_configrules_to_enable;
+    inputDoc.configrules.customerAccount = params.account.id;
+    inputDoc.health.cloudformationLambdaExecutionRole = params.cloudformation_lambda_execution_role_name;
+    inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
+    inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
+    inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
+  }else{
+       delete inputDoc.configrules
+       delete inputDoc.health
+       delete inputDoc.cloudtrail
+       delete inputDoc.alerts_destination
 
-  inputDoc.health.cloudformationLambdaExecutionRole = params.cloudformation_lambda_execution_role_name;
-  inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
-  inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
-  inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
+  }
 
   var input = {
     stateMachineArn: process.env.STATE_MACHINE_ARN,
