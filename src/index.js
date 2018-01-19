@@ -59,7 +59,7 @@ baseHandler.post = function(params, callback) {
   console.log(inputDoc);
   console.log(params);
   console.log("-----------------------------");
-  if(params.account.type == 'unmanaged')
+  if(params.account.type != 'unmanaged')
   {
     inputDoc.configrules.rules = params.default_configrules_to_enable;
     inputDoc.configrules.customerAccount = params.account.id;
