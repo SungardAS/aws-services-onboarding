@@ -518,6 +518,25 @@ Resources:
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Account",
               "InputPath": "$",
+              "Next": "PreNewAccountFederation"
+            },
+            "PreNewAccountFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Pre-New-Federation",
+              "InputPath": "$",
+              "Next": "NewAccountFederation"
+            },
+            "NewAccountFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Federation",
+              "InputPath": "$.federation",
+              "ResultPath": "$.credentials",
+              "Next": "SetNewAccountCredentials"
+            },
+            "SetNewAccountCredentials": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-New-Credentials",
+              "InputPath": "$",
               "Next": "SetFinalResultState"
             },
             "SetFinalResultState": {
