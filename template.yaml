@@ -211,7 +211,7 @@ Resources:
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
-          STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref OnBoardingStateMachineUnMan
+          STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref OnBoardingStateMachineForUnManaged
       Events:
         GetResource:
           Type: Api
@@ -474,7 +474,7 @@ Resources:
         }
       RoleArn: !GetAtt StateMachineIAMRole.Arn
 
-  OnBoardingStateMachineUnMan:
+  OnBoardingStateMachineForUnManaged:
     Type: AWS::StepFunctions::StateMachine
     Properties:
       DefinitionString: |-
