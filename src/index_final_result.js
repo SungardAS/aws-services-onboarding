@@ -5,7 +5,7 @@ exports.handler = (event, context, callback) => {
   }
   if(event.health){
     event.final_result.credentials = event.health.credentials;
-    event.final_result.health = event.health.result.body;
+    if(event.health.result) event.final_result.health = event.health.result.body;
   }
   callback(null, event.final_result);
 };
