@@ -53,12 +53,11 @@ baseHandler.post = function(params, callback) {
     inputDoc.account.httpMethod = "POST";
     inputDoc.account.body = params.account;
   }
-
   inputDoc.federation.authorizer_user_guid = params.userGuid;
-  console.log("-----------------------------");
-  console.log(inputDoc);
-  console.log(params);
-  console.log("-----------------------------");
+
+  var input = {
+    input: JSON.stringify(inputDoc)
+  };
   if(params.account.type != 'unmanaged')
   {
     inputDoc.configrules.rules = params.default_configrules_to_enable;
@@ -67,18 +66,11 @@ baseHandler.post = function(params, callback) {
     inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
     inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
     inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
+    stateMachineArn: process.env.STATE_MACHINE_ARN;
   }else{
-       delete inputDoc.configrules
-       delete inputDoc.health
-       delete inputDoc.cloudtrail
-       delete inputDoc.alerts_destination
-
+    stateMachineArn: process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
   }
 
-  var input = {
-    stateMachineArn: process.env.STATE_MACHINE_ARN,
-    input: JSON.stringify(inputDoc),
-  };
   console.log("======INPUT=====");
   console.log(input);
   if (params.execution_name) input.name = params.execution_name;
