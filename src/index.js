@@ -66,9 +66,9 @@ baseHandler.post = function(params, callback) {
     inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
     inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
     inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
-    input.stateMachineArn: process.env.STATE_MACHINE_ARN;
+    input.stateMachineArn= process.env.STATE_MACHINE_ARN;
   }else{
-    input.stateMachineArn: process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
+    input.stateMachineArn= process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
   }
 
   console.log("======INPUT=====");
