@@ -55,7 +55,7 @@ baseHandler.post = function(params, callback) {
   }
   inputDoc.federation.authorizer_user_guid = params.userGuid;
 
-  if(params.account.type != 'unmanaged')
+  if(params.account.type.toLowerCase() != 'craws')
   {
     inputDoc.configrules.rules = params.default_configrules_to_enable;
     inputDoc.configrules.customerAccount = params.account.id;
