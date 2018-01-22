@@ -63,7 +63,6 @@ baseHandler.post = function(params, callback) {
     inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
     inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
     inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
-    input.stateMachineArn= process.env.STATE_MACHINE_ARN;
     var input = {
       stateMachineArn: process.env.STATE_MACHINE_ARN,
       input: JSON.stringify(inputDoc)
