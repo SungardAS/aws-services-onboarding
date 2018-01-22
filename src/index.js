@@ -55,16 +55,8 @@ baseHandler.post = function(params, callback) {
   }
   inputDoc.federation.authorizer_user_guid = params.userGuid;
 
-  var input = {
-    input: JSON.stringify(inputDoc)
-  };
-  console.log("------------------")
-  console.log(params)
-  console.log(params.account.type)
-  console.log("------------------")
   if(params.account.type != 'unmanaged')
   {
-  console.log("111------------------")
     inputDoc.configrules.rules = params.default_configrules_to_enable;
     inputDoc.configrules.customerAccount = params.account.id;
     inputDoc.health.cloudformationLambdaExecutionRole = params.cloudformation_lambda_execution_role_name;
@@ -72,9 +64,15 @@ baseHandler.post = function(params, callback) {
     inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
     inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
     input.stateMachineArn= process.env.STATE_MACHINE_ARN;
+    var input = {
+      stateMachineArn: process.env.STATE_MACHINE_ARN,
+      input: JSON.stringify(inputDoc)
+    };
   }else{
-  console.log("222------------------")
-    input.stateMachineArn= process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
+    var input = {
+      stateMachineArn: process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN,
+      input: JSON.stringify(inputDoc)
+    };
   }
 
   console.log("======INPUT=====");
