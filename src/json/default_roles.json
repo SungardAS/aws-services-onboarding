@@ -1,0 +1,63 @@
+{
+	"managed": [{
+			"RoleName": "ReadOnly",
+			"PolicyArn": "arn:aws:iam::aws:policy/ReadOnlyAccess",
+			"federate": true
+		},
+		{
+			"RoleName": "UserAdmin",
+			"PolicyArn": "arn:aws:iam::aws:policy/IAMFullAccess",
+			"federate": true
+		},
+		{
+			"RoleName": "SysEng",
+			"PolicyArn": "arn:aws:iam::aws:policy/PowerUserAccess",
+			"federate": true
+		},
+		{
+			"RoleName": "DBAdmin",
+			"PolicyArn": "arn:aws:iam::aws:policy/job-function/DatabaseAdministrator",
+			"federate": true
+		},
+		{
+			"RoleName": "FullAdmin",
+			"PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
+			"federate": true
+		},
+		{
+			"RoleName": "DatadogAWSIntegrationRole",
+			"PolicyArn": "",
+			"federate": false
+		}, {
+			"RoleName": "adminRoleName",
+			"PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
+			"federate": true
+		}
+	],
+	"self_managed": [{
+			"RoleName": "ReadOnly",
+			"PolicyArn": "arn:aws:iam::aws:policy/ReadOnlyAccess",
+			"federate": true
+		},
+		{
+			"RoleName": "UserAdmin",
+			"PolicyArn": "arn:aws:iam::aws:policy/IAMFullAccess",
+			"federate": true
+		},
+		{
+			"RoleName": "SysEng",
+			"PolicyArn": "arn:aws:iam::aws:policy/PowerUserAccess",
+			"federate": true
+		},
+		{
+			"RoleName": "DBAdmin",
+			"PolicyArn": "arn:aws:iam::aws:policy/job-function/DatabaseAdministrator",
+			"federate": true
+		},
+		{
+			"RoleName": "FullAdmin",
+			"PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
+			"federate": true
+		}
+	]
+}

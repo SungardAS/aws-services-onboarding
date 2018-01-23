@@ -104,6 +104,15 @@ Resources:
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
+  CreateAwsIamRolesLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Create-Aws-Iam-Roles
+      Handler: index_create_aws_iam_roles.handler
+      Runtime: nodejs4.3
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
   FindRegionsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -377,6 +386,12 @@ Resources:
             "SetNewAccountCredentials": {
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-New-Credentials",
+              "InputPath": "$",
+              "Next": "CreateAwsIamRoles"
+            },
+            "CreateAwsIamRoles": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Create-Aws-Iam-Roles",
               "InputPath": "$",
               "Next": "SetupHealthAlert"
             },
