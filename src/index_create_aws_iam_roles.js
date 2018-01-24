@@ -1,5 +1,5 @@
 
-const awsIamRole = require('lib/awsIamRole.js');
+const awsIamRole = require('./lib/awsIamRole.js');
 
 
 exports.handler = function (event, context) {
@@ -10,7 +10,7 @@ exports.handler = function (event, context) {
     secretAccessKey: event.credentials.Credentials.SecretAccessKey,
     sessionToken: event.credentials.Credentials.SessionToken
   };
-  var options.accountId= event.final_result.account_id;
+  options.accountId= event.final_result.account_id;
   var type = event.billingDetails.type;
   console.log(options)
   var awsroles = JSON.parse(fs.readFileSync(__dirname + '/json/default_roles.json', {encoding:'utf8'}));
@@ -22,7 +22,9 @@ exports.handler = function (event, context) {
       Object.assign(options, role);
     console.log(options)
       awsIamRole.createRole(options, function(err, data) {
-      }
+        console.log(err)
+        console.log(data)
+      })
     }
   }
  callback(null, event);
