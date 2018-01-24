@@ -2,7 +2,7 @@ var fs = require('fs');
 const awsIamRole = require('./lib/awsIamRole.js');
 
 
-exports.handler = function (event, context) {
+exports.handler = function (event, context, callback) {
 
   console.log(JSON.stringify(event));
   var options = {
