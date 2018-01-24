@@ -12,10 +12,9 @@ exports.handler = function (event, context, callback) {
   };
   options.accountId= event.final_result.account_id;
   var type = event.account.billingDetails.type;
-  console.log(options)
   var awsroles = JSON.parse(fs.readFileSync(__dirname + '/json/default_roles.json', {encoding:'utf8'}));
   var dataDogPolicyDoc = JSON.parse(fs.readFileSync(__dirname + '/json/datadog-integration_policy.json', {encoding:'utf8'}));
-  if(event.billingDetails && event.billingDetails.type){
+  if(event.account.billingDetails && event.account.billingDetails.type){
     roles = awsroles[type.toLowerCase()];
     console.log(roles)
     for (const role in roles) {
@@ -26,6 +25,10 @@ exports.handler = function (event, context, callback) {
         console.log(data)
       })
     }
+  }else{
+    console.log("invalid account type")
+    console.log(type)
+
   }
  callback(null, event);
 }
