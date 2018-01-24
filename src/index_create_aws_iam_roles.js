@@ -1,4 +1,4 @@
-
+var fs = require('fs');
 const awsIamRole = require('./lib/awsIamRole.js');
 
 
