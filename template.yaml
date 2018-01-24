@@ -158,6 +158,15 @@ Resources:
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 300
+  SetManagedVpcPreconfigFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Set-ManagedVpcPreconfig
+      Handler: index_set_managedvpcpreconfig.handler
+      Runetime: nodejs4.3
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 300
 
   ApiGatewayApi:
     Type: AWS::Serverless::Api
@@ -377,6 +386,11 @@ Resources:
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-New-Credentials",
               "InputPath": "$",
+              "Next": "SetupHealthAlert"
+            },
+            "SetManagedVpcPreconfig": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-ManagedVpcPreconfig",
               "Next": "SetupHealthAlert"
             },
             "SetupHealthAlert": {
