@@ -19,7 +19,8 @@ exports.handler = function (event, context, callback) {
   //options.roleArn = awsroles.roleArn;
 
   if(event.account.billingDetails && event.account.billingDetails.type){
-    roles = awsroles[type.toLowerCase()];
+    roles = awsroles.roles[type.toLowerCase()];
+    console.log(roles)
     for (const role in roles) {
       Object.assign(options, roles[role]);
       console.log(options)
