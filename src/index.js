@@ -43,8 +43,6 @@ baseHandler.post = function(params, callback) {
   console.log(params.default_configrules_to_enable);
 
   inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
-  inputDoc.configrules.rules = params.default_configrules_to_enable;
-  inputDoc.configrules.customerAccount = params.account.id;
   inputDoc.account.billingDetails = params.account;
 
   if (params.account.id) {
@@ -55,18 +53,27 @@ baseHandler.post = function(params, callback) {
     inputDoc.account.httpMethod = "POST";
     inputDoc.account.body = params.account;
   }
-
   inputDoc.federation.authorizer_user_guid = params.userGuid;
 
-  inputDoc.health.cloudformationLambdaExecutionRole = params.cloudformation_lambda_execution_role_name;
-  inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
-  inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
-  inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
+  if(params.account.type.toLowerCase() != 'craws')
+  {
+    inputDoc.configrules.rules = params.default_configrules_to_enable;
+    inputDoc.configrules.customerAccount = params.account.id;
+    inputDoc.health.cloudformationLambdaExecutionRole = params.cloudformation_lambda_execution_role_name;
+    inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
+    inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
+    inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
+    var input = {
+      stateMachineArn: process.env.STATE_MACHINE_ARN,
+      input: JSON.stringify(inputDoc)
+    };
+  }else{
+    var input = {
+      stateMachineArn: process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN,
+      input: JSON.stringify(inputDoc)
+    };
+  }
 
-  var input = {
-    stateMachineArn: process.env.STATE_MACHINE_ARN,
-    input: JSON.stringify(inputDoc),
-  };
   console.log("======INPUT=====");
   console.log(input);
   if (params.execution_name) input.name = params.execution_name;

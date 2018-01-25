@@ -18,10 +18,10 @@ exports.handler = (event, context, callback) => {
   event.final_result.account_id = accountId;
 
   // set account id in alerts destination
-  event.alerts_destination.accountToAdd = accountId;
+  if(event.alerts_destination) event.alerts_destination.accountToAdd = accountId;
 
   // set account id in health alert
-  event.health.accountId = accountId;
+  if(event.health) event.health.accountId = accountId;
   console.log(event)
 
   callback(null, event);
