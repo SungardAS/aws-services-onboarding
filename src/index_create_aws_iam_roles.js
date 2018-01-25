@@ -19,8 +19,7 @@ exports.handler = function (event, context, callback) {
   options.assumeRolePolicyDocument = awsroles.assumeRolePolicyDocument;
   options.assumeRolePolicyDocument.Statement[0].Principal.AWS = "arn:aws:iam::442294194136:role/federate"
   options.onboardAccount = true;
-  options.externalId = uuid.v4();
-  options.adminRolePath = awsroles.adminRolePath;
+  options.path = awsroles.adminRolePath;
 
   if(event.account.billingDetails && event.account.billingDetails.type){
     roles = awsroles.roles[type.toLowerCase()];
@@ -29,16 +28,18 @@ exports.handler = function (event, context, callback) {
     for(i=0; i< roles.length; i++){
       var payload = {};
       Object.assign(payload, options, roles[i]);
+      payload.externalId = uuid.v4();
       if(payload.roleName == 'DatadogAWSIntegrationRole') payload.PolicyDocument = dataDogPolicyDoc;
       console.log("--------------")
       console.log(payload)
       console.log("--------------")
-      dbIamRoles.push(payload)
+      dbIamRoles.push({account:payload.account,externalId:payload.externalId,path:payload.path,roleName:payload.roleName})
       awsIamRole.createRole(payload, function(err, data) {
+      console.log("111--------------")
         console.log(err)
         console.log(data)
+      console.log("1111--------------")
       })
-      if(payload.roleName == 'DatadogAWSIntegrationRole' && payload.PolicyDocument) delete payload.PolicyDocument;
     }
     event.dbIamRoles = dbIamRoles;
   }else{
