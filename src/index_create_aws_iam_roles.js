@@ -22,9 +22,10 @@ exports.handler = function (event, context, callback) {
     roles = awsroles.roles[type.toLowerCase()];
     console.log(roles)
     for (const role in roles) {
-      Object.assign(options, roles[role]);
-      console.log(options)
-      awsIamRole.createRole(options, function(err, data) {
+      var payload = {};
+      Object.assign(payload, options, roles[role]);
+      console.log(payload)
+      awsIamRole.createRole(payload, function(err, data) {
         console.log(err)
         console.log(data)
       })
