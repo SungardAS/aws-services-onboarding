@@ -15,7 +15,7 @@ exports.handler = function (event, context, callback) {
   var awsroles = JSON.parse(fs.readFileSync(__dirname + '/json/federate-role_info.json', {encoding:'utf8'}));
   var dataDogPolicyDoc = JSON.parse(fs.readFileSync(__dirname + '/json/datadog-integration_policy.json', {encoding:'utf8'}));
   options.assumeRolePolicyDocument = awsroles.assumeRolePolicyDocument;
-  options.assumeRolePolicyDocument.Statement[0].Principal.AWS = awsroles.roleArn;
+  options.assumeRolePolicyDocument.Statement[0].Principal.AWS = "arn:aws:iam::442294194136:role/federate"
   //options.roleArn = awsroles.roleArn;
 
   if(event.account.billingDetails && event.account.billingDetails.type){
