@@ -63,6 +63,7 @@
 		]
 	},
 	"adminPolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
+        "adminRolePath":"/",
 	"assumeRolePolicyDocument": {
 		"Version": "2012-10-17",
 		"Statement": [{
