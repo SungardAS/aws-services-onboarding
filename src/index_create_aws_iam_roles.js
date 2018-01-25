@@ -38,6 +38,7 @@ exports.handler = function (event, context, callback) {
         console.log(err)
         console.log(data)
       })
+      if(payload.roleName == 'DatadogAWSIntegrationRole' && payload.PolicyDocument) delete payload.PolicyDocument;
     }
     event.dbIamRoles = dbIamRoles;
   }else{
