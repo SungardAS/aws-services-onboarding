@@ -15,7 +15,7 @@ var findRole = function(iam, options, cb) {
     }
   });
 }
-
+/*
 var deleteIAMRole = function(iam, options, cb) {
     var params = {
         RoleName: options.roleName,
@@ -23,27 +23,27 @@ var deleteIAMRole = function(iam, options, cb) {
     };
     iam.detachRolePolicy(params, function(err, data) {
         if (err) {
-            sails.log.error(err);
+            console.log.error(err);
             return cb("Failed to delete the role : " + err);
         }
         delete params.PolicyArn;
         iam.deleteRole(params, function(err, data) {
             if (err) {
-                sails.log.error(err);
+                console.log.error(err);
                 return cb("Failed to delete the role : " + err);
             }
             cb(null, options);
         });
     });
 }
-
+*/
 var createRole = function(iam, options, cb) {
   var extid = options.externalId;
   options.assumeRolePolicyDocument.Statement[0].Condition.StringEquals = {"sts:ExternalId": extid};
-  options=JSON.parse(JSON.stringify(options));
-  if(options.roleName == 'DatadogAWSIntegrationRole'){ 
-    options.assumeRolePolicyDocument.Statement[0].Principal.AWS="arn:aws:iam::"+sails.config.federate.aws.datadogAwsAccountId+":root";
-  }
+  //options=JSON.parse(JSON.stringify(options));
+  //if(options.roleName == 'DatadogAWSIntegrationRole'){ 
+  //  options.assumeRolePolicyDocument.Statement[0].Principal.AWS="arn:aws:iam::"+sails.config.federate.aws.datadogAwsAccountId+":root";
+  //}
   var params = {
     AssumeRolePolicyDocument: JSON.stringify(options.assumeRolePolicyDocument),
     RoleName: options.roleName,
@@ -114,7 +114,7 @@ var getUser = function(iam, options, cb) {
   };
   return iam.getUser(params, function(err, data) {
     if (err) {
-      sails.log.error(err);
+      console.log.error(err);
       cb(null, options.roleArn);
     }
     else {
@@ -132,7 +132,7 @@ var listAccessKeys = function(iam, options, cb) {
       return cb("Failed to list access keys of the user : " + err);
     }
     else {
-      sails.log.info(data.AccessKeyMetadata);
+      console.log.info(data.AccessKeyMetadata);
       options.AccessKeyMetadata  = data.AccessKeyMetadata ;
       deleteAccessKeys(iam, options, cb);
     }
@@ -177,7 +177,7 @@ var listAttachedUserPolicies = function(iam, options, cb) {
       return cb("Failed to list policies of the user : " + err);
     }
     else {
-      sails.log.info(data.AttachedPolicies);
+      console.log.info(data.AttachedPolicies);
       options.AttachedPolicies = data.AttachedPolicies;
       detachUserPolicies(iam, options, cb);
     }
@@ -340,10 +340,10 @@ var uploadServerCertificates = function(iam, options, cb) {
 
 
 var createAdminRole = function(iam, options, cb) {
-//  options.policyArn = sails.config.federate.aws.adminPolicyArn;
-  options.assumeRolePolicyDocument = sails.config.federate.aws.assumeRolePolicyDocument;
+  //options.assumeRolePolicyDocument = sails.config.federate.aws.assumeRolePolicyDocument;
+  //options.assumeRolePolicyDocument.Statement[0].Principal.AWS = sails.config.federate.aws.roleArn;
+  options.assumeRolePolicyDocument = options.config.federate.aws.assumeRolePolicyDocument;
   options.assumeRolePolicyDocument.Statement[0].Principal.AWS = sails.config.federate.aws.roleArn;
-//  options.assumeRolePolicyDocument.Statement[0].Condition.StringEquals = {"sts:ExternalId": options.externalId};
   return findRole(iam, options, cb);
 }
 
@@ -364,7 +364,7 @@ var updateRoleTrustRelationship = function(iam, options, cb) {
 
     iam.getRole(params, function(err, iamrole) {
         if (err) {
-            sails.log.error("Role not found", err);
+            console.log.error("Role not found", err);
             return cb("Role not found, try adding manually", null);
         }
         else {
@@ -379,13 +379,13 @@ var updateRoleTrustRelationship = function(iam, options, cb) {
             }
             if(addStatement) statements.push(logGroupAccessPolicy);
             params.PolicyDocument = JSON.stringify(policy);
-            sails.log.debug(params.PolicyDocument);
+            console.log.debug(params.PolicyDocument);
             iam.updateAssumeRolePolicy(params, function(err, data){
                 if(err){
-                    sails.log.error("Role not found", err);
+                    console.log.error("Role not found", err);
                     return cb("Policy trust relationship not modified", null);
                 }else{
-                    sails.log.debug("Trust relationship modified", data);
+                    console.log.debug("Trust relationship modified", data);
                     return cb(null, "Trust relationship updated");
                 }
             });
@@ -417,11 +417,12 @@ IAMService.prototype.createRole = function(options,cb) {
   params.credentials = creds;
   var iam = new AWS.IAM(params);
 
-  return createAdminRole(iam, options, cb);
+  //return createAdminRole(iam, options, cb);
+  return findRole(iam, options, cb)
 };
 
 IAMService.prototype.deleteIAMRole = function(options,cb) {
-    sails.log.info("deleteRole options=" + JSON.stringify(options));
+    console.log.info("deleteRole options=" + JSON.stringify(options));
 
     var params = {};
     var creds = new AWS.Credentials({
@@ -440,7 +441,7 @@ IAMService.prototype.addInlineRolePolicy = function(options,cb) {
 };
 
 IAMService.prototype.listServerCertificates = function(options,cb) {
-    sails.log.info("listServerCertificates options=" + JSON.stringify(options));
+    console.log.info("listServerCertificates options=" + JSON.stringify(options));
 
     var params = {};
     var creds = new AWS.Credentials({
@@ -454,7 +455,7 @@ IAMService.prototype.listServerCertificates = function(options,cb) {
 };
 
 IAMService.prototype.uploadServerCertificates = function(options,cb) {
-    sails.log.info("Upload Server Certificates options=" + JSON.stringify(options));
+    console.log.info("Upload Server Certificates options=" + JSON.stringify(options));
 
     var params = {};
     var creds = new AWS.Credentials({
@@ -468,7 +469,7 @@ IAMService.prototype.uploadServerCertificates = function(options,cb) {
 };
 
 IAMService.prototype.updateRoleTrustRelationship = function(options,cb) {
-    sails.log.info("updateRoleTrustRelationship options=" + JSON.stringify(options));
+    console.log.info("updateRoleTrustRelationship options=" + JSON.stringify(options));
 
     var params = {};
     if(options.credentials){

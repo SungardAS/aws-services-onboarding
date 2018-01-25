@@ -12,14 +12,17 @@ exports.handler = function (event, context, callback) {
   };
   options.accountId= event.final_result.account_id;
   var type = event.account.billingDetails.type;
-  var awsroles = JSON.parse(fs.readFileSync(__dirname + '/json/default_roles.json', {encoding:'utf8'}));
+  var awsroles = JSON.parse(fs.readFileSync(__dirname + '/json/federate-role_info.json', {encoding:'utf8'}));
   var dataDogPolicyDoc = JSON.parse(fs.readFileSync(__dirname + '/json/datadog-integration_policy.json', {encoding:'utf8'}));
+  options.assumeRolePolicyDocument = awsroles.assumeRolePolicyDocument;
+  options.assumeRolePolicyDocument.Statement[0].Principal.AWS = awsroles.roleArn;
+  //options.roleArn = awsroles.roleArn;
+
   if(event.account.billingDetails && event.account.billingDetails.type){
     roles = awsroles[type.toLowerCase()];
-    console.log(roles)
     for (const role in roles) {
       Object.assign(options, roles[role]);
-    console.log(options)
+      console.log(options)
       awsIamRole.createRole(options, function(err, data) {
         console.log(err)
         console.log(data)
