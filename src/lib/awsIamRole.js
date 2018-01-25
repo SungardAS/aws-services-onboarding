@@ -114,7 +114,7 @@ var getUser = function(iam, options, cb) {
   };
   return iam.getUser(params, function(err, data) {
     if (err) {
-      console.log.error(err);
+      console.log(err);
       cb(null, options.roleArn);
     }
     else {
