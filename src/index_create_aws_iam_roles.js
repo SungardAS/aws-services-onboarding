@@ -21,10 +21,13 @@ exports.handler = function (event, context, callback) {
   if(event.account.billingDetails && event.account.billingDetails.type){
     roles = awsroles.roles[type.toLowerCase()];
     console.log(roles)
-    for (const role in roles) {
+    for(i=0; i< roles.length; i++){
       var payload = {};
-      Object.assign(payload, options, roles[role]);
+      Object.assign(payload, options, roles[i]);
+      if(payload.roleName == 'DatadogAWSIntegrationRole') payload.PolicyDocument = dataDogPolicyDoc;
+      console.log("--------------")
       console.log(payload)
+      console.log("--------------")
       awsIamRole.createRole(payload, function(err, data) {
         console.log(err)
         console.log(data)
@@ -33,7 +36,6 @@ exports.handler = function (event, context, callback) {
   }else{
     console.log("invalid account type")
     console.log(type)
-
   }
  callback(null, event);
 }
