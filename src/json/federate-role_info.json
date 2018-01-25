@@ -26,11 +26,7 @@
 				"federate": true
 			},
 			{
-				"roleName": "DatadogAWSIntegrationRole",
-				"policyArn": "",
-				"federate": false
-			}, {
-				"roleName": "adminRoleName",
+				"roleName": "sgas-dev-admin",
 				"policyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
 				"federate": true
 			}
