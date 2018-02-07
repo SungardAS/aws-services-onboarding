@@ -22,17 +22,18 @@ exports.handler = function (event, context, callback) {
   options.path = awsroles.adminRolePath;
 
   if(event.account.billingDetails && event.account.billingDetails.type){
+    var dbIamRoles = [];
     roles = awsroles.roles[type.toLowerCase()];
-    var dbIamRoles = []
     var dbAwsAccount = {accountId:options.account,accountName:event.account.billingDetails.name,accountDescription:event.account.billingDetails.desc,email:event.account.billingDetails.email,guid:event.account.billingDetails.guid,accountType:event.account.billingDetails.type};
-    console.log(dbAwsAccount)
     for(i=0; i< roles.length; i++){
       var payload = {};
       Object.assign(payload, options, roles[i]);
       payload.externalId = uuid.v4();
-      if(payload.roleName == 'DatadogAWSIntegrationRole') payload.PolicyDocument = dataDogPolicyDoc;
-      console.log(payload)
-      if(dyload.federate){
+      if(payload.roleName == 'DatadogAWSIntegrationRole'){
+        payload.PolicyDocument = dataDogPolicyDoc;
+        payload.assumeRolePolicyDocument.Statement[0].Principal.AWS="arn:aws:iam::"+event.account.billingDetails.datadogAwsId+":root";
+      }
+      if(payload.federate){
         dbIamRoles.push({account:payload.account,externalId:payload.externalId,path:payload.path,roleName:payload.roleName})
       }
       awsIamRole.createRole(payload, function(err, data) {
