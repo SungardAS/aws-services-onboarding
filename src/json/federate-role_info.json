@@ -35,7 +35,7 @@
 				"federate": true
 			}
 		],
-		"self_managed": [{
+		"self-managed": [{
 				"roleName": "ReadOnly",
 				"policyArn": "arn:aws:iam::aws:policy/ReadOnlyAccess",
 				"federate": true
