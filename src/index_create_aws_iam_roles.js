@@ -29,6 +29,7 @@ exports.handler = function (event, context, callback) {
       var payload = {};
       Object.assign(payload, options, roles[i]);
       payload.externalId = uuid.v4();
+      payload=JSON.parse(JSON.stringify(payload));
       if(payload.roleName == 'DatadogAWSIntegrationRole'){
         payload.PolicyDocument = dataDogPolicyDoc;
         payload.assumeRolePolicyDocument.Statement[0].Principal.AWS="arn:aws:iam::"+event.account.billingDetails.datadogAwsId+":root";
