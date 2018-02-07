@@ -31,15 +31,13 @@ exports.handler = function (event, context, callback) {
       Object.assign(payload, options, roles[i]);
       payload.externalId = uuid.v4();
       if(payload.roleName == 'DatadogAWSIntegrationRole') payload.PolicyDocument = dataDogPolicyDoc;
-      console.log("--------------")
       console.log(payload)
-      console.log("--------------")
-      dbIamRoles.push({account:payload.account,externalId:payload.externalId,path:payload.path,roleName:payload.roleName})
+      if(dyload.federate){
+        dbIamRoles.push({account:payload.account,externalId:payload.externalId,path:payload.path,roleName:payload.roleName})
+      }
       awsIamRole.createRole(payload, function(err, data) {
-      console.log("111--------------")
         console.log(err)
         console.log(data)
-      console.log("1111--------------")
       })
     }
     event.dbIamRoles = dbIamRoles;
