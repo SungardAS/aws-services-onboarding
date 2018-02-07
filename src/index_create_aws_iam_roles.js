@@ -24,7 +24,7 @@ exports.handler = function (event, context, callback) {
   if(event.account.billingDetails && event.account.billingDetails.type){
     roles = awsroles.roles[type.toLowerCase()];
     var dbIamRoles = []
-    var dbAwsAccount = {accountId:options.account,name:event.account.billingDetails.name,description:event.account.billingDetails.desc,email:event.account.billingDetails.email,company_guid:event.account.billingDetails.guid,account_type:event.account.billingDetails.type};
+    var dbAwsAccount = {accountId:options.account,accountName:event.account.billingDetails.name,accountDescription:event.account.billingDetails.desc,email:event.account.billingDetails.email,guid:event.account.billingDetails.guid,accountType:event.account.billingDetails.type};
     console.log(dbAwsAccount)
     for(i=0; i< roles.length; i++){
       var payload = {};
