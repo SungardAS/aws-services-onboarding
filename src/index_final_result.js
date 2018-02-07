@@ -10,8 +10,5 @@ exports.handler = (event, context, callback) => {
   if(event.dbIamRoles){
     event.final_result.dbIamRoles = event.dbIamRoles;
   }
-  if(event.dbAwsAccount){
-    event.final_result.dbAwsAccount = event.dbAwsAccount;
-  }
   callback(null, event.final_result);
 };

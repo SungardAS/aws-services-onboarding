@@ -24,7 +24,7 @@ exports.handler = function (event, context, callback) {
   if(event.account.billingDetails && event.account.billingDetails.type){
     var dbIamRoles = [];
     roles = awsroles.roles[type.toLowerCase()];
-    var dbAwsAccount = {accountId:options.account,accountName:event.account.billingDetails.name,accountDescription:event.account.billingDetails.desc,email:event.account.billingDetails.email,guid:event.account.billingDetails.guid,accountType:event.account.billingDetails.type};
+    //var dbAwsAccount = {accountId:options.account,accountName:event.account.billingDetails.name,accountDescription:event.account.billingDetails.desc,email:event.account.billingDetails.email,guid:event.account.billingDetails.guid,accountType:event.account.billingDetails.type};
     for(i=0; i< roles.length; i++){
       var payload = {};
       Object.assign(payload, options, roles[i]);
@@ -43,7 +43,7 @@ exports.handler = function (event, context, callback) {
       })
     }
     event.dbIamRoles = dbIamRoles;
-    event.dbAwsAccount = dbAwsAccount;
+    //event.dbAwsAccount = dbAwsAccount;
   }else{
     console.log("invalid account type")
     console.log(type)
