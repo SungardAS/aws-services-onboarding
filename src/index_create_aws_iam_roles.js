@@ -27,7 +27,8 @@ exports.handler = function(event, context, callback) {
   options.path = awsroles.adminRolePath;
 
   if (event.account.billingDetails && event.account.billingDetails.type) {
-    options.assumeRolePolicyDocument.Statement[0].Principal.AWS = 'arn:aws:iam::'+event.account.billingDetails.masterAWSAccount+':role/federate';
+    options.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${event
+      .account.billingDetails.masterAWSMgmAccount}:role/federate`;
     const dbIamRoles = [];
     const roles = awsroles.roles[type.toLowerCase()];
     // var dbAwsAccount = {accountId:options.account,accountName:event.account.billingDetails.name,accountDescription:event.account.billingDetails.desc,email:event.account.billingDetails.email,guid:event.account.billingDetails.guid,accountType:event.account.billingDetails.type};
