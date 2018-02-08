@@ -1,0 +1,10 @@
+{
+  "rules": [
+    "encrypted-volumes",
+    "eip-attached",
+    "restricted-common-ports",
+    "restricted-ssh",
+    "sungard-security-group-checker",
+    "sungard-iam-userpolicy-checker"
+  ]
+}
