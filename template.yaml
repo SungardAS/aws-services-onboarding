@@ -119,6 +119,13 @@ Resources:
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
+      Environment:
+        Variables:
+          BILLING_TO_ALERT_EMAIL: !Ref BillingToAlertEmail
+          BILLING_FROM_ALERT_EMAIL: !Ref BillingFromAlertEmail
+          BILLING_SERVER: !Ref BillingServer
+          BILLING_API_KEY: !Ref BillingApiKey
+          BILLING_ACCESS_KEY: !Ref BillingAccessKey
   SetAccountLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -155,6 +162,10 @@ Resources:
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
+      Environment:
+        Variables:
+          MASTER_MGM_AWS_ID: !Ref MasterMgmAwsId
+          DATADOG_AWD_ID: !Ref DataDogAwsId
   FindRegionsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
