@@ -40,10 +40,6 @@ var deleteIAMRole = function(iam, options, cb) {
 var createRole = function(iam, options, cb) {
   var extid = options.externalId;
   options.assumeRolePolicyDocument.Statement[0].Condition.StringEquals = {"sts:ExternalId": extid};
-  //options=JSON.parse(JSON.stringify(options));
-  //if(options.roleName == 'DatadogAWSIntegrationRole'){ 
-  //  options.assumeRolePolicyDocument.Statement[0].Principal.AWS="arn:aws:iam::"+sails.config.federate.aws.datadogAwsAccountId+":root";
-  //}
   var params = {
     AssumeRolePolicyDocument: JSON.stringify(options.assumeRolePolicyDocument),
     RoleName: options.roleName,
