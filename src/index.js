@@ -52,11 +52,11 @@ baseHandler.post = function(params, callback) {
      "name": params.awsname,
      "desc": params.awsdesc,
      "email": params.email,
-     "type": params.account_type,
+     "type": params.account_type.toLowerCase(),
      "masterAwsId": params.masterBillingAWSAccount,
      "OfferingNum": params.offeringNum,
      "SGID": params.sgid,
-     "sgid": params.companyguid
+     "guid": params.companyguid
   }
   inputDoc.account.billingDetails = account;
 

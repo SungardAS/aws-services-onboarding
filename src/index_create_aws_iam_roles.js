@@ -5,14 +5,12 @@ const uuid = require('node-uuid');
 const awsIamRole = require('./lib/awsIamRole.js');
 
 exports.handler = function(event, context, callback) {
-  console.log(event);
   console.log(JSON.stringify(event));
   const options = {
     accessKeyId: event.credentials.Credentials.AccessKeyId,
     secretAccessKey: event.credentials.Credentials.SecretAccessKey,
     sessionToken: event.credentials.Credentials.SessionToken
   };
-  const type = event.account.billingDetails.type;
   const awsroles = JSON.parse(
     fs.readFileSync(`${__dirname}/json/federate-role_info.json`, {
       encoding: 'utf8'
@@ -28,13 +26,17 @@ exports.handler = function(event, context, callback) {
   options.assumeRolePolicyDocument = awsroles.assumeRolePolicyDocument;
   options.onboardAccount = true;
   options.path = awsroles.adminRolePath;
+  
 
-  if (event.account.billingDetails && event.account.billingDetails.type) {
-    options.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${event
-      .account.billingDetails.masterAWSMgmAccount}:role/federate`;
+  if (event.account && event.account.billingDetails) {
+    const accountData = event.account.billingDetails;
+    options.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${process.env.MASTER_MGM_AWS_ID}:role/federate`;
     const dbIamRoles = [];
-    const roles = awsroles.roles[type.toLowerCase()];
-    // var dbAwsAccount = {accountId:options.account,accountName:event.account.billingDetails.name,accountDescription:event.account.billingDetails.desc,email:event.account.billingDetails.email,guid:event.account.billingDetails.guid,accountType:event.account.billingDetails.type};
+    
+    const roles = awsroles.roles[type];
+    if(accountData.type=='managed') roles.push({roleName:process.env.ADMIN_ROLE_NAME,policyArn:awsroles.adminPolicyArn,federate:true});
+
+     var dbAwsAccount = {account:options.account,awsname:accountData.name,desc:accountData.desc,email:accountData.email,guid:accountData.guid,accountType:accountData.type};
     for (let i = 0; i < roles.length; i++) {
       let payload = {};
       Object.assign(payload, options, roles[i]);
@@ -42,8 +44,7 @@ exports.handler = function(event, context, callback) {
       payload = JSON.parse(JSON.stringify(payload));
       if (payload.roleName == 'DatadogAWSIntegrationRole') {
         payload.PolicyDocument = dataDogPolicyDoc;
-        payload.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${event
-          .account.billingDetails.datadogAwsId}:root`;
+        payload.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${process.env.DATADOG_AWD_ID}:root`;
       }
       if (payload.federate) {
         dbIamRoles.push({
@@ -59,7 +60,7 @@ exports.handler = function(event, context, callback) {
       });
     }
     event.dbIamRoles = dbIamRoles;
-    // event.dbAwsAccount = dbAwsAccount;
+    event.dbAwsAccount = dbAwsAccount;
   } else {
     console.log('invalid account type');
     console.log(type);
