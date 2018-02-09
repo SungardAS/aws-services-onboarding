@@ -1,3 +1,5 @@
+"use strict";
+
 const fs = require('fs');
 const uuid = require('node-uuid');
 const awsIamRole = require('./lib/awsIamRole.js');
