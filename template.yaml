@@ -15,6 +15,7 @@ Parameters:
     Description: user name of mcaws db
   DbPassword:
     Type: String
+    NoEcho: true
     Description: password of mcaws db
   DbHost:
     Type: String
@@ -27,9 +28,11 @@ Parameters:
     Description: Aws Id of Datadog Aws Account
   BillingAccessKey:
     Type: String
+    NoEcho: true
     Description: Access key of Billing System
-  BillingApiKey:
+  BillingSecretKey:
     Type: String
+    NoEcho: true
     Description: API key of Billing System
   BillingServer :
     Type: String
@@ -54,6 +57,7 @@ Parameters:
     Description: Codepipeline Service Role Name
   GitHubAccessToken:
     Type: String
+    NoEcho: true
     Description: Git hub access token
 
 Resources:
@@ -127,7 +131,7 @@ Resources:
           BILLING_TO_ALERT_EMAIL: !Ref BillingToAlertEmail
           BILLING_FROM_ALERT_EMAIL: !Ref BillingFromAlertEmail
           BILLING_SERVER: !Ref BillingServer
-          BILLING_API_KEY: !Ref BillingApiKey
+          BILLING_SECRET_KEY: !Ref BillingSecretKey
           BILLING_ACCESS_KEY: !Ref BillingAccessKey
   SetAccountLambdaFunction:
     Type: AWS::Serverless::Function
