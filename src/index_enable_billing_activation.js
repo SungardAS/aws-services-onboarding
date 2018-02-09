@@ -73,6 +73,7 @@ function registerAccount(accId, params) {
 //----------------------------------------------------------------------
 exports.handler = (event, context, callback) => {
   // find account id
+  console.log(event)
   let accountId = null;
   let retDoc = event.account.result.body;
   const billingInfo = event.account.billingDetails;
