@@ -45,7 +45,7 @@ baseHandler.post = function(params, callback) {
 
   //inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
   var masterBillingRoleArn = "arn:aws:iam::" + params.masterBillingAWSAccount + ":role/" + process.env.ADMIN_ROLE_NAME;
-  inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": "edd3fd8a-0e6f-497b-807b-bca24adccd0b"}]
+  inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": "73919e03-4c3b-4137-94dd-c509a0a6bb01"}]
   //inputDoc.account.billingDetails = params.account;
   var account = {
      "id": params.account,

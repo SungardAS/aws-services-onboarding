@@ -3,6 +3,7 @@ const uuid = require('node-uuid');
 const awsIamRole = require('./lib/awsIamRole.js');
 
 exports.handler = function(event, context, callback) {
+  console.log(event);
   console.log(JSON.stringify(event));
   const options = {
     accessKeyId: event.credentials.Credentials.AccessKeyId,
