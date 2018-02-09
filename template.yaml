@@ -37,10 +37,10 @@ Parameters:
   BillingServer :
     Type: String
     Description: billingServer Url
-  BillingFromAlertEmail:
+  FromEmail:
     Type: String
     Description: From Email id 
-  BillingToAlertEmail:
+  ToEmail:
     Type: String
     Description: To Email id 
   KinesisStreamArn :
@@ -49,10 +49,10 @@ Parameters:
   CwlKinesisRoleArn :
     Type: String
     Description: Cwl to kinesis role arn
-  CfnLambdaExecutionRole :
+  CfnLambdaExecRole :
     Type: String
     Description: Cloudformation lambda execution role name
-  CodePipelineServiceRole :
+  CodePipelineRole :
     Type: String
     Description: Codepipeline Service Role Name
   GitHubAccessToken:
@@ -128,8 +128,8 @@ Resources:
       Timeout: 60
       Environment:
         Variables:
-          BILLING_TO_ALERT_EMAIL: !Ref BillingToAlertEmail
-          BILLING_FROM_ALERT_EMAIL: !Ref BillingFromAlertEmail
+          BILLING_TO_ALERT_EMAIL: !Ref ToEmail
+          BILLING_FROM_ALERT_EMAIL: !Ref FromEmail
           BILLING_SERVER: !Ref BillingServer
           BILLING_SECRET_KEY: !Ref BillingSecretKey
           BILLING_ACCESS_KEY: !Ref BillingAccessKey
@@ -285,8 +285,8 @@ Resources:
           DB_USERNAME: !Ref DbUserName
           DB_HOST: !Ref DbHost
           GIT_HUB_ACCESS_TOKEN: !Ref GitHubAccessToken
-          CODE_PIPELINE_SERVICE_ROLE: !Ref CodePipelineServiceRole
-          CFN_LAMBDA_EXEC_ROLE: !Ref CfnLambdaExecutionRole
+          CODE_PIPELINE_SERVICE_ROLE: !Ref CodePipelineRole
+          CFN_LAMBDA_EXEC_ROLE: !Ref CfnLambdaExecRole
           CWL_KINESIS_ROLE_ARN: !Ref CwlKinesisRoleArn
           KINESIS_STREAM_ARN: !Ref KinesisStreamArn
           
