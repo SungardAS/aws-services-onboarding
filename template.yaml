@@ -16,6 +16,9 @@ Parameters:
   DbPassword:
     Type: String
     Description: password of mcaws db
+  DbHost:
+    Type: String
+    Description: Host of mcaws db
   MasterMgmAwsId:
     Type: String
     Description: AWS Id of Master Management Account
@@ -276,6 +279,7 @@ Resources:
           STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref OnBoardingStateMachineForUnManaged
           DB_PASSWORD: !Ref DbPassword
           DB_USERNAME: !Ref DbUserName
+          DB_HOST: !Ref DbHost
           GIT_HUB_ACCESS_TOKEN: !Ref GitHubAccessToken
           CODE_PIPELINE_SERVICE_ROLE: !Ref CodePipelineServiceRole
           CFN_LAMBDA_EXEC_ROLE: !Ref CfnLambdaExecutionRole
