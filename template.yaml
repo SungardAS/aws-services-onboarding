@@ -61,6 +61,38 @@ Parameters:
     Description: Git hub access token
 
 Resources:
+  EncryptionDecryptionKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: "Encryption and Decryption key for Lambda"
+      KeyPolicy:
+        Id: "LambdaEncDec"
+        Version: "2012-10-17"
+        Statement:
+          -
+            Sid: "Allow administration of the key"
+            Effect: "Allow"
+            Action:
+              - "kms:*"
+            Principal:
+              AWS: !Ref AWS::AccountId
+            Resource: '*'
+          -
+            Sid: "Allow Encryption Service to use this key"
+            Effect: "Allow"
+            Action:
+              - "kms:Encrypt"
+            Principal:
+              AWS: !GetAtt SlackLambdaFunctionIAMRole.Arn
+            Resource: '*'
+          -
+            Sid: "Allow Decryption Service to use this key"
+            Effect: "Allow"
+            Action:
+              - "kms:Decrypt"
+            Principal:
+              AWS: !GetAtt SlackLambdaFunctionIAMRole.Arn
+            Resource: '*'
   StateMachineLambdaFunctionIAMRole:
       Type: "AWS::IAM::Role"
       Properties:
@@ -128,6 +160,7 @@ Resources:
       Timeout: 60
       Environment:
         Variables:
+          KMS_KEY_ID: !Ref EncryptionDecryptionKey
           BILLING_TO_ALERT_EMAIL: !Ref ToEmail
           BILLING_FROM_ALERT_EMAIL: !Ref FromEmail
           BILLING_SERVER: !Ref BillingServer
@@ -279,6 +312,7 @@ Resources:
       Timeout: 60
       Environment:
         Variables:
+          KMS_KEY_ID: !Ref EncryptionDecryptionKey
           STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
           STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref OnBoardingStateMachineForUnManaged
           DB_PASSWORD: !Ref DbPassword
