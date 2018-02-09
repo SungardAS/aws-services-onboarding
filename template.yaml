@@ -23,10 +23,13 @@ Parameters:
   MasterMgmAwsId:
     Type: String
     Description: AWS Id of Master Management Account
+  AdminRoleName:
+    Type: String
+    Description: AWS admin role name
   DataDogAwsId:
     Type: String
     Description: Aws Id of Datadog Aws Account
-  BillingAccessKey:
+  BillingApiKey:
     Type: String
     NoEcho: true
     Description: Access key of Billing System
@@ -166,7 +169,7 @@ Resources:
           BILLING_FROM_ALERT_EMAIL: !Ref FromEmail
           BILLING_SERVER: !Ref BillingServer
           BILLING_SECRET_KEY: !Ref BillingSecretKey
-          BILLING_ACCESS_KEY: !Ref BillingAccessKey
+          BILLING_API_KEY: !Ref BillingApiKey
   SetAccountLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -207,6 +210,7 @@ Resources:
         Variables:
           MASTER_MGM_AWS_ID: !Ref MasterMgmAwsId
           DATADOG_AWD_ID: !Ref DataDogAwsId
+          ADMIN_ROLE_NAME: !Ref AdminRoleName
   FindRegionsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -313,17 +317,20 @@ Resources:
       Timeout: 60
       Environment:
         Variables:
-          KMS_KEY_ID: !Ref EncryptionDecryptionKey
           STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
           STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref OnBoardingStateMachineForUnManaged
+          KMS_KEY_ID: !Ref EncryptionDecryptionKey
           DB_PASSWORD: !Ref DbPassword
           DB_USERNAME: !Ref DbUserName
           DB_HOST: !Ref DbHost
+          SUBSC_FILTER_DEST: !Ref SubscriptionFilterDestinationArn
           GIT_HUB_ACCESS_TOKEN: !Ref GitHubAccessToken
           CODE_PIPELINE_SERVICE_ROLE: !Ref CodePipelineRole
           CFN_LAMBDA_EXEC_ROLE: !Ref CfnLambdaExecRole
           CWL_KINESIS_ROLE_ARN: !Ref CwlKinesisRoleArn
           KINESIS_STREAM_ARN: !Ref KinesisStreamArn
+          ADMIN_ROLE_NAME: !Ref AdminRoleName
+          MASTER_MGM_AWS_ID: !Ref MasterMgmAwsId
           
       Events:
         GetResource:

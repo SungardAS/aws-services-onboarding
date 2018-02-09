@@ -39,30 +39,55 @@ baseHandler.post = function(params, callback) {
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
 
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
+  var default_configrules = JSON.parse(fs.readFileSync(__dirname + '/json/default_config_rules.json', {encoding:'utf8'}));
 
-  console.log(params.default_configrules_to_enable);
+  console.log(default_configrules);
 
-  inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
-  inputDoc.account.billingDetails = params.account;
+  //inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
+  var masterBillingRoleArn = "arn:aws:iam::" + process.env.MASTER_AWS_ID + ":role/" + process.env.ADMIN_ROLE_NAME;
+  inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": "edd3fd8a-0e6f-497b-807b-bca24adccd0b"}]
+  //inputDoc.account.billingDetails = params.account;
+  var account = {
+     "id": params.account,
+     "name": params.awsname,
+     "desc": params.awsdesc,
+     "email": params.email,
+     "type": params.account_type,
+     "masterAwsId": params.masterBillingAWSAccount,
+     "OfferingNum": params.offeringNum,
+     "SGID": params.sgid,
+     "sgid": params.companyguid
+  }
+  inputDoc.account.billingDetails = account;
 
-  if (params.account.id) {
+  //if (params.account.id) {
+  if (account.id) {
     inputDoc.account.httpMethod = "GET";
-    inputDoc.account.queryStringParameters.accountId = params.account.id;
+    //inputDoc.account.queryStringParameters.accountId = params.account.id;
+    inputDoc.account.queryStringParameters.accountId = account.id;
   }
   else {
     inputDoc.account.httpMethod = "POST";
-    inputDoc.account.body = params.account;
+    
+    //inputDoc.account.body = params.account;
+    inputDoc.account.body = account;
   }
   inputDoc.federation.authorizer_user_guid = params.userGuid;
 
-  if(params.account.type.toLowerCase() != 'craws')
+  //if(params.account.type.toLowerCase() != 'craws')
+  if(account.type.toLowerCase() != 'craws')
   {
-    inputDoc.configrules.rules = params.default_configrules_to_enable;
+    //inputDoc.configrules.rules = params.default_configrules_to_enable;
+    inputDoc.configrules.rules = [];
     inputDoc.configrules.customerAccount = params.account.id;
-    inputDoc.health.cloudformationLambdaExecutionRole = params.cloudformation_lambda_execution_role_name;
-    inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
-    inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
-    inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
+    //inputDoc.health.cloudformationLambdaExecutionRole = params.cloudformation_lambda_execution_role_name;
+    inputDoc.health.cloudformationLambdaExecutionRole = process.env.CFN_LAMBDA_EXEC_ROLE
+    //inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
+    inputDoc.health.codePipelineServiceRole = process.env.CODE_PIPELINE_SERVICE_ROLE
+    //inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
+    inputDoc.health.gitHubPersonalAccessToken = process.env.GIT_HUB_ACCESS_TOKEN
+    //inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
+    inputDoc.health.subscriptionFilterDestinationArn = process.env.SUBSC_FILTER_DEST
     var input = {
       stateMachineArn: process.env.STATE_MACHINE_ARN,
       input: JSON.stringify(inputDoc)
@@ -76,7 +101,8 @@ baseHandler.post = function(params, callback) {
 
   console.log("======INPUT=====");
   console.log(input);
-  if (params.execution_name) input.name = params.execution_name;
+  //if (params.execution_name) input.name = params.execution_name;
+  input.name = "New-Account-Setup-For-" + params.awsname.replace(/ /g, '-')
   stepfunctions.startExecution(input, function(err, data) {
     if (err) {
       console.log(err, err.stack);
