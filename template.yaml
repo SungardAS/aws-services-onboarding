@@ -83,7 +83,7 @@ Resources:
             Action:
               - "kms:Encrypt"
             Principal:
-              AWS: !GetAtt SlackLambdaFunctionIAMRole.Arn
+              AWS: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
             Resource: '*'
           -
             Sid: "Allow Decryption Service to use this key"
@@ -91,7 +91,7 @@ Resources:
             Action:
               - "kms:Decrypt"
             Principal:
-              AWS: !GetAtt SlackLambdaFunctionIAMRole.Arn
+              AWS: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
             Resource: '*'
   StateMachineLambdaFunctionIAMRole:
       Type: "AWS::IAM::Role"
@@ -129,6 +129,7 @@ Resources:
                       - "cloudformation:*"
                       - "logs:*"
                       - "ses:*"
+                      - "kms:*"
                     Resource: "*"
 
   PreMasterFederationLambdaFunction:
