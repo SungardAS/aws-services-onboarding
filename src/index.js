@@ -1,6 +1,7 @@
 
 var fs = require('fs');
 var AWS = require('aws-sdk');
+var mysql = require('mysql');
 
 var baseHandler = require('aws-services-lib/lambda/base_handler.js')
 
@@ -45,7 +46,19 @@ baseHandler.post = function(params, callback) {
 
   //inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
   var masterBillingRoleArn = "arn:aws:iam::" + params.masterBillingAWSAccount + ":role/" + process.env.ADMIN_ROLE_NAME;
-  inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": "73919e03-4c3b-4137-94dd-c509a0a6bb01"}]
+
+  var con = mysql.createConnection({host: process.env.DB_HOST,user: process.env.DB_USER_NAME,password: process.env.DB_PASSWORD,database:'msaws'});
+  con.connect(function(err) {
+  if (err) throw err;
+    console.log("Connected!");
+    const sql = 'select * from awsiamrole where arn="'+masterBillingRoleArn+'"';
+    con.query(sql, function (err, data) {
+    if (err) throw err;
+      console.log("Result: " + data);
+      inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": data[0].externalId}]
+    });
+  });
+  if(con) con.end()
   //inputDoc.account.billingDetails = params.account;
   var account = {
      "id": params.account,
