@@ -36,7 +36,7 @@ exports.handler = function(event, context, callback) {
     const roles = awsroles.roles[type];
     if(accountData.type=='managed') roles.push({roleName:process.env.ADMIN_ROLE_NAME,policyArn:awsroles.adminPolicyArn,federate:true});
 
-     var dbAwsAccount = {account:options.account,awsname:accountData.name,desc:accountData.desc,email:accountData.email,guid:accountData.guid,accountType:accountData.type};
+     var dbAwsAccount = {awsid:options.account,name:accountData.name,description:accountData.desc,email:accountData.email,company_guid:accountData.guid,account_type:accountData.type};
     for (let i = 0; i < roles.length; i++) {
       let payload = {};
       Object.assign(payload, options, roles[i]);
@@ -48,10 +48,10 @@ exports.handler = function(event, context, callback) {
       }
       if (payload.federate) {
         dbIamRoles.push({
-          account: payload.account,
           externalId: payload.externalId,
           path: payload.path,
-          roleName: payload.roleName
+          name: payload.roleName,
+          arn:"arn:aws:iam::"+payload.account+":role/"+payload.roleName
         });
       }
       awsIamRole.createRole(payload, (err, data) => {

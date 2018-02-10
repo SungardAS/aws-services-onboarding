@@ -211,6 +211,21 @@ Resources:
           MASTER_MGM_AWS_ID: !Ref MasterMgmAwsId
           DATADOG_AWD_ID: !Ref DataDogAwsId
           ADMIN_ROLE_NAME: !Ref AdminRoleName
+  UpdateDbLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Update-Db
+      Handler: index_update_db.handler
+      Runtime: nodejs4.3
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+      Environment:
+        Variables:
+          KMS_KEY_ID: !Ref EncryptionDecryptionKey
+          DB_PASSWORD: !Ref DbPassword
+          DB_USERNAME: !Ref DbUserName
+          DB_HOST: !Ref DbHost
   FindRegionsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:

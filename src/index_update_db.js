@@ -19,7 +19,7 @@ exports.handler = function(event, context, callback) {
       if (accErr) throw accErr;
       if (dbAwsAccount.account_type != 'craws') {
         for (let idx = 0; idx < dbIamRoles.length; idx++) {
-          dbIamRoles[idx].account = accData.account;
+          dbIamRoles[idx].account = accData.insertId;
           const sql2 = 'insert into awsiamrole SET ?';
           con.query(sql2, dbIamRoles[idx], (roleErr, roleData) => {
             console.log(roleErr);

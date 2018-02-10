@@ -14,6 +14,7 @@
     "sleep": "^5.1.0",
     "request": "^2.58.0",
     "node-uuid": "^1.4.7",
-    "dateformat":"^2.0.0"
+    "dateformat":"^2.0.0",
+    "mysql": "^2.8.0"
   }
 }
