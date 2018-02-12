@@ -57,8 +57,8 @@ baseHandler.post = function(params, callback) {
        console.log('Decrypt passwd:');
        console.log(passwd);
        console.log(process.env.DB_HOST);
-       console.log(process.env.DB_USER_NAME);
-      var con = mysql.createConnection({host: process.env.DB_HOST,user: process.env.DB_USER_NAME,password: passwd, database:'msaws'});
+       console.log(process.env.DB_USERNAME);
+      var con = mysql.createConnection({host: process.env.DB_HOST,user: process.env.DB_USERNAME,password: passwd, database:'msaws'});
       con.connect(function(err) {
         if (err) throw err;
           console.log("Connected!");
