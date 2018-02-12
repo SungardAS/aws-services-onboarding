@@ -33,7 +33,7 @@ exports.handler = function(event, context, callback) {
     options.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${process.env.MASTER_MGM_AWS_ID}:role/federate`;
     const dbIamRoles = [];
     
-    const roles = awsroles.roles[type];
+    const roles = awsroles.roles[accountData.type];
     if(accountData.type=='managed') roles.push({roleName:process.env.ADMIN_ROLE_NAME,policyArn:awsroles.adminPolicyArn,federate:true});
 
      var dbAwsAccount = {awsid:options.account,name:accountData.name,description:accountData.desc,email:accountData.email,company_guid:accountData.guid,account_type:accountData.type};
