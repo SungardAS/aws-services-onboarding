@@ -59,11 +59,12 @@ baseHandler.post = function(params, callback) {
        console.log(passwd.Plaintext.toString('ascii'));
        console.log(process.env.DB_HOST);
        console.log(process.env.DB_USERNAME);
+       console.log(masterBillingRoleArn);
       var con = mysql.createConnection({host: process.env.DB_HOST,user: process.env.DB_USERNAME,password: passwd.Plaintext.toString('ascii'), database:'msaws'});
       con.connect(function(err) {
         if (err) throw err;
           console.log("Connected!");
-          const sql = 'select * from awsiamrole where arn="'+masterBillingRoleArn+'"';
+          const sql = "select * from awsiamrole where arn='"+masterBillingRoleArn+"'";
           con.query(sql, function (err, data) {
             if (err) throw err;
               console.log("Result: " + data);
