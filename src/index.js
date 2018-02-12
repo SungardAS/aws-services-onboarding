@@ -135,25 +135,25 @@ baseHandler.post = function(params, callback) {
     // inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
     inputDoc.health.subscriptionFilterDestinationArn =
       process.env.SUBSC_FILTER_DEST;
-    const inputStateMach = {
+    const input = {
       stateMachineArn: process.env.STATE_MACHINE_ARN,
       input: JSON.stringify(inputDoc)
     };
   } else {
-    const inputStateMach = {
+    const input = {
       stateMachineArn: process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN,
       input: JSON.stringify(inputDoc)
     };
   }
 
   console.log('======INPUT=====');
-  console.log(inputStateMach);
+  console.log(input);
   // if (params.execution_name) input.name = params.execution_name;
-  inputStateMach.name = `New-Account-Setup-For-${params.awsname.replace(
+  input.name = `New-Account-Setup-For-${params.awsname.replace(
     / /g,
     '-'
   )}`;
-  stepfunctions.startExecution(inputStateMach, (err, data) => {
+  stepfunctions.startExecution(input, (err, data) => {
     if (err) {
       console.log(err, err.stack);
       callback(err);
