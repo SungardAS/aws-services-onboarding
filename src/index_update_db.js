@@ -35,9 +35,9 @@ exports.handler = function(event, context, callback) {
               console.log(roleData);
             });
           }
+         if (con) con.end();
         }
       });
-    if (con) con.end();
     });
   });
   callback(null, event);
