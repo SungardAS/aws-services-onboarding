@@ -102,8 +102,6 @@ baseHandler.post = function(params, callback) {
           if(con) con.end()
       });
     }
-  })
-  sleep.sleep(5); //sleep for 5 seconds
     //if(params.account.type.toLowerCase() != 'craws')
     if(account.type.toLowerCase() != 'craws')
     {
@@ -146,4 +144,5 @@ baseHandler.post = function(params, callback) {
       callback(null, data);
     }
   });
+  })
 };
