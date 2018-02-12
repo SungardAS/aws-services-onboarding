@@ -223,6 +223,7 @@ Resources:
       Environment:
         Variables:
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
+          KMS_REGION: !Ref AWS::Region
           DB_PASSWORD: !Ref DbPassword
           DB_USERNAME: !Ref DbUserName
           DB_HOST: !Ref DbHost
@@ -335,6 +336,7 @@ Resources:
           STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
           STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref OnBoardingStateMachineForUnManaged
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
+          KMS_REGION: !Ref AWS::Region
           DB_PASSWORD: !Ref DbPassword
           DB_USERNAME: !Ref DbUserName
           DB_HOST: !Ref DbHost
