@@ -99,9 +99,6 @@ baseHandler.post = function(params, callback) {
               console.log("Result: " + data);
               inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": data[0].externalId}]
           });
-          if(con) con.end()
-      });
-    }
     //if(params.account.type.toLowerCase() != 'craws')
     if(account.type.toLowerCase() != 'craws')
     {
@@ -144,5 +141,8 @@ baseHandler.post = function(params, callback) {
       callback(null, data);
     }
   });
+          if(con) con.end()
+      });
+    }
   })
 };
