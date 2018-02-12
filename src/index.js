@@ -7,10 +7,12 @@ var sleep = require('sleep');
 var baseHandler = require('aws-services-lib/lambda/base_handler.js')
 
 function getRulesPayload(rule){
-  if(rule.owner == "CUSTOM_LAMBDA"){
-    rule.masterAccount = process.env.MASTER_MGM_AWS_ID;
-  }
-  cb(rule);
+  return new Promise(function(resolve,reject) {
+    if(rule.owner == "CUSTOM_LAMBDA"){
+      rule.masterAccount = process.env.MASTER_MGM_AWS_ID;
+    }
+    resolve(rule);
+  });
 }
 
 
