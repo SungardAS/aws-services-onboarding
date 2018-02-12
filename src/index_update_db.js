@@ -17,7 +17,7 @@ exports.handler = function(event, context, callback) {
     const con = mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USERNAME,
-      password: passwd,
+      password: passwd.Plaintext.toString('ascii'),
       database: 'msaws'
     });
     con.connect(dberr => {

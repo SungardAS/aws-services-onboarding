@@ -70,8 +70,8 @@ baseHandler.post = function(params, callback) {
               console.log("Result: " + data);
               inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": data[0].externalId}]
           });
+          if(con) con.end()
       });
-      if(con) con.end()
     }
   })
   //inputDoc.account.billingDetails = params.account;
