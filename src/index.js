@@ -6,35 +6,11 @@ var sleep = require('sleep');
 
 var baseHandler = require('aws-services-lib/lambda/base_handler.js')
 
-function getRulesPayload(ruleFunctionName, cb){
-    sails.models.configdefinition.findOne({name: ruleFunctionName}).populateAll().exec(function(err, rule) {
-       payload_json ={};
-       if (err) cb(false, err);
-       else{
-          var rule_1 = JSON.parse(JSON.stringify(rule));
-          payload_json.ruleFunctionName = ruleFunctionName;
-          payload_json.owner = rule_1.owner;
-          payload_json.resourceType = [];
-          payload_json.sourceID = rule_1.sourceID;
-          payload_json.desc = rule_1.description;
-          var types = rule_1.resourceTypes;
-          if(!types) reject(Error("ResourceTypes not found, check database"));
-          for( var idx=0 ; idx < types.length ; idx++ ){
-             payload_json.resourceType.push( types[idx].name);
-          }
-          if (rule_1.owner == "CUSTOM_LAMBDA"){
-            payload_json.masterAccount = sails.config.federate.aws.masterAWSAccount;
-            payload_json.functionName = rule_1.sourceID;
-            payload_json.principal = "config.amazonaws.com";
-            payload_json.action = "lambda:*";
-            payload_json.statementId = uuid.v4();
-            payload_json.messageType = "ConfigurationItemChangeNotification";
-          }
-          sails.log.info("************************getRules**********************");
-          sails.log.info(payload_json);
-          cb(true, payload_json);
-       }
-    });
+function getRulesPayload(rule){
+  if(rule.owner == "CUSTOM_LAMBDA"){
+    rule.masterAccount = process.env.MASTER_MGM_AWS_ID;
+  }
+  cb(rule);
 }
 
 
@@ -73,11 +49,11 @@ baseHandler.post = function(params, callback) {
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
 
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
-  var ruleFunctionNames = JSON.parse(fs.readFileSync(__dirname + '/json/default_config_rules.json', {encoding:'utf8'}));
+  var ruleJson = JSON.parse(fs.readFileSync(__dirname + '/json/default_config_rules.json', {encoding:'utf8'}));
   
 
   console.log("---------------");
-  console.log(ruleFunctionNames.rules);
+  console.log(ruleJson);
   console.log("---------------");
 
   var account = {
@@ -106,7 +82,7 @@ baseHandler.post = function(params, callback) {
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');
   const cipherText = { CiphertextBlob: encryptedBuf };
   const kms = new AWS.KMS({region:process.env.KMS_REGION});
-  Promise.all(ruleFunctionNames.rules.map(getRulesPayload)).then(function(configrules){
+  Promise.all(ruleJson.map(getRulesPayload)).then(function(configrules){
   cosnole.log(configrules);
   inputDoc.configrules.rules = configrules;
   kms.decrypt(cipherText, (err, passwd) => {
