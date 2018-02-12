@@ -37,8 +37,8 @@ exports.handler = function(event, context, callback) {
           }
         }
       });
-    });
     if (con) con.end();
+    });
   });
   callback(null, event);
 };
