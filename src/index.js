@@ -2,6 +2,7 @@
 var fs = require('fs');
 var AWS = require('aws-sdk');
 var mysql = require('mysql');
+var sleep = require('sleep');
 
 var baseHandler = require('aws-services-lib/lambda/base_handler.js')
 
@@ -101,6 +102,8 @@ baseHandler.post = function(params, callback) {
           if(con) con.end()
       });
     }
+  })
+  sleep.sleep(5); //sleep for 5 seconds
     //if(params.account.type.toLowerCase() != 'craws')
     if(account.type.toLowerCase() != 'craws')
     {
@@ -126,7 +129,6 @@ baseHandler.post = function(params, callback) {
         input: JSON.stringify(inputDoc)
       };
     }
-  })
 
   console.log("======INPUT=====");
   console.log(input);
