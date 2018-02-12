@@ -45,8 +45,6 @@ baseHandler.post = function(params, callback) {
 
   console.log(default_configrules);
 
-  //inputDoc.billing_master.roles = params.roles_to_federate_to_billing_master;
-  //inputDoc.account.billingDetails = params.account;
   var account = {
      "id": params.account,
      "name": params.awsname,
@@ -59,17 +57,12 @@ baseHandler.post = function(params, callback) {
      "guid": params.companyguid
   }
   inputDoc.account.billingDetails = account;
-
-  //if (params.account.id) {
   if (account.id) {
     inputDoc.account.httpMethod = "GET";
-    //inputDoc.account.queryStringParameters.accountId = params.account.id;
     inputDoc.account.queryStringParameters.accountId = account.id;
   }
   else {
     inputDoc.account.httpMethod = "POST";
-    
-    //inputDoc.account.body = params.account;
     inputDoc.account.body = account;
   }
   inputDoc.federation.authorizer_user_guid = params.userGuid;
@@ -80,15 +73,14 @@ baseHandler.post = function(params, callback) {
   const kms = new AWS.KMS({region:process.env.KMS_REGION});
   kms.decrypt(cipherText, (err, passwd) => {
     if (err) {
-       console.log('Decrypt error:', err);
-       return callback(err);
+      console.log('Decrypt error:', err);
+      return callback(err);
     } else {
-       
-       console.log('Decrypt passwd:');
-       console.log(passwd.Plaintext.toString('ascii'));
-       console.log(process.env.DB_HOST);
-       console.log(process.env.DB_USERNAME);
-       console.log(masterBillingRoleArn);
+      console.log('Decrypt passwd:');
+      console.log(passwd.Plaintext.toString('ascii'));
+      console.log(process.env.DB_HOST);
+      console.log(process.env.DB_USERNAME);
+      console.log(masterBillingRoleArn);
       var con = mysql.createConnection({host: process.env.DB_HOST,user: process.env.DB_USERNAME,password: passwd.Plaintext.toString('ascii'), database:'msaws'});
       con.connect(function(err) {
         if (err) throw err;
@@ -96,50 +88,39 @@ baseHandler.post = function(params, callback) {
           const sql = "select * from awsiamrole where arn='"+masterBillingRoleArn+"'";
           con.query(sql, function (err, data) {
             if (err) throw err;
-              console.log("Result: " + data);
-              inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": data[0].externalId}]
-    //if(params.account.type.toLowerCase() != 'craws')
-    if(account.type.toLowerCase() != 'craws')
-    {
-      //inputDoc.configrules.rules = params.default_configrules_to_enable;
-      inputDoc.configrules.rules = [];
-      inputDoc.configrules.customerAccount = params.account.id;
-      //inputDoc.health.cloudformationLambdaExecutionRole = params.cloudformation_lambda_execution_role_name;
-      inputDoc.health.cloudformationLambdaExecutionRole = process.env.CFN_LAMBDA_EXEC_ROLE
-      //inputDoc.health.codePipelineServiceRole = params.codepipeline_service_role_name;
-      inputDoc.health.codePipelineServiceRole = process.env.CODE_PIPELINE_SERVICE_ROLE
-      //inputDoc.health.gitHubPersonalAccessToken = params.gitHub_personal_access_token;
-      inputDoc.health.gitHubPersonalAccessToken = process.env.GIT_HUB_ACCESS_TOKEN
-      //inputDoc.health.subscriptionFilterDestinationArn = params.subscription_filter_destination_arn;
-      inputDoc.health.subscriptionFilterDestinationArn = process.env.SUBSC_FILTER_DEST
-
-      var input = {
-        stateMachineArn: process.env.STATE_MACHINE_ARN,
-        input: JSON.stringify(inputDoc)
-      };
-    } else {
-      var input = {
-        stateMachineArn: process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN,
-        input: JSON.stringify(inputDoc)
-      };
-    }
-
-  console.log("======INPUT=====");
-  console.log(input);
-  //if (params.execution_name) input.name = params.execution_name;
-  input.name = "New-Account-Setup-For-" + params.awsname.replace(/ /g, '-')
-  stepfunctions.startExecution(input, function(err, data) {
-    if (err) {
-      console.log(err, err.stack);
-      callback(err);
-    }
-    else {
-      console.log(data);
-      // {"executionArn":"arn:aws:states:us-east-1:1234:execution:machine_name:12345678-1234-1234-1234-123456789012",
-      //  "startDate":"2017-02-12T02:12:07.464Z"}
-      callback(null, data);
-    }
-  });
+            console.log("Result: " + data);
+            inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": data[0].externalId}]
+            if(account.type.toLowerCase() != 'craws')
+            {
+              inputDoc.configrules.rules = [];
+              inputDoc.configrules.customerAccount = params.account.id;
+              inputDoc.health.cloudformationLambdaExecutionRole = process.env.CFN_LAMBDA_EXEC_ROLE
+              inputDoc.health.codePipelineServiceRole = process.env.CODE_PIPELINE_SERVICE_ROLE
+              inputDoc.health.gitHubPersonalAccessToken = process.env.GIT_HUB_ACCESS_TOKEN
+              inputDoc.health.subscriptionFilterDestinationArn = process.env.SUBSC_FILTER_DEST
+              var input = {
+                stateMachineArn: process.env.STATE_MACHINE_ARN,
+                input: JSON.stringify(inputDoc)
+              };
+            } else {
+              var input = {
+                stateMachineArn: process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN,
+                input: JSON.stringify(inputDoc)
+              };
+            }
+            console.log("======INPUT=====");
+            console.log(input);
+            input.name = "New-Account-Setup-For-" + params.awsname.replace(/ /g, '-')
+            stepfunctions.startExecution(input, function(err, data) {
+              if (err) {
+                console.log(err, err.stack);
+                callback(err);
+              }
+              else {
+                console.log(data);
+                callback(null, data);
+              }
+            });
           });
           if(con) con.end()
       });
