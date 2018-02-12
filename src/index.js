@@ -54,11 +54,12 @@ baseHandler.post = function(params, callback) {
        console.log('Decrypt error:', err);
        return callback(err);
     } else {
+       
        console.log('Decrypt passwd:');
-       console.log(passwd.Plaintext);
+       console.log(passwd.Plaintext.toString('ascii'));
        console.log(process.env.DB_HOST);
        console.log(process.env.DB_USERNAME);
-      var con = mysql.createConnection({host: process.env.DB_HOST,user: process.env.DB_USERNAME,password: passwd.Plaintext, database:'msaws'});
+      var con = mysql.createConnection({host: process.env.DB_HOST,user: process.env.DB_USERNAME,password: passwd.Plaintext.toString('ascii'), database:'msaws'});
       con.connect(function(err) {
         if (err) throw err;
           console.log("Connected!");
