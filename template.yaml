@@ -321,6 +321,7 @@ Resources:
                     Effect: "Allow"
                     Action:
                       - "states:*"
+                      - "kms:*"
                     Resource: "*"
   ProxyLambdaFunction:
     Type: AWS::Serverless::Function
