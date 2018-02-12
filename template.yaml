@@ -522,6 +522,12 @@ Resources:
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Create-Aws-Iam-Roles",
               "InputPath": "$",
+              "Next": "UpdateDb"
+            },
+            "UpdateDb": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Update-Db",
+              "InputPath": "$",
               "Next": "SetupHealthAlert"
             },
             "SetupHealthAlert": {
