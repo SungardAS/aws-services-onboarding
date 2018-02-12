@@ -106,7 +106,7 @@ baseHandler.post = function(params, callback) {
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');
   const cipherText = { CiphertextBlob: encryptedBuf };
   const kms = new AWS.KMS({region:process.env.KMS_REGION});
-  Promise.all(ruleFunctionNames.rules.map(getRules)).then(function(configrules){
+  Promise.all(ruleFunctionNames.rules.map(getRulesPayload)).then(function(configrules){
   cosnole.log(configrules);
   inputDoc.configrules.rules = configrules;
   kms.decrypt(cipherText, (err, passwd) => {
