@@ -228,11 +228,11 @@ Resources:
       Timeout: 60
       VpcConfig:
             SecurityGroupIds:
-             - !ImportValue SG
+             - !ImportValue !Ref SG
             SubnetIds:
-             - !ImportValue Sbnt1
-             - !ImportValue Sbnt2
-             - !ImportValue Sbnt3
+             - !ImportValue !Ref Sbnt1
+             - !ImportValue !Ref Sbnt2
+             - !ImportValue !Ref Sbnt3
       Environment:
         Variables:
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
