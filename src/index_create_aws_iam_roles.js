@@ -54,9 +54,10 @@ exports.handler = function(event, context, callback) {
           arn:"arn:aws:iam::"+payload.account+":role/"+payload.roleName
         });
       }
+      console.log(payload);
       awsIamRole.createRole(payload, (err, data) => {
-        console.log(err);
-        console.log(data);
+        console.log("Error:",err);
+        console.log("Res:",data);
       });
     }
     event.dbIamRoles = dbIamRoles;
