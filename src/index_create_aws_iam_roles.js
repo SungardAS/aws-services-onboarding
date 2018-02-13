@@ -44,7 +44,7 @@ exports.handler = function(event, context, callback) {
       payload = JSON.parse(JSON.stringify(payload));
       if (payload.roleName == 'DatadogAWSIntegrationRole') {
         payload.PolicyDocument = dataDogPolicyDoc;
-        payload.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${process.env.DATADOG_AWD_ID}:root`;
+        payload.assumeRolePolicyDocument.Statement[0].Principal.AWS = "arn:aws:iam::"+process.env.DATADOG_AWD_ID+":root";
       }
       if (payload.federate) {
         dbIamRoles.push({
@@ -54,12 +54,14 @@ exports.handler = function(event, context, callback) {
           arn:"arn:aws:iam::"+payload.account+":role/"+payload.roleName
         });
       }
+      awsIamRole.createRole(payload, (err, data) => {
+      console.log("start----------------------");
       console.log(payload.assumeRolePolicyDocument.Statement);
       console.log(payload.assumeRolePolicyDocument.Statement[0].Principal);
       console.log(payload.assumeRolePolicyDocument.Statement[0].Principal.AWS);
-      awsIamRole.createRole(payload, (err, data) => {
         console.log("Error:",err);
         console.log("Res:",data);
+      console.log("end----------------------");
       });
     }
     event.dbIamRoles = dbIamRoles;
