@@ -82,8 +82,10 @@ baseHandler.post = function(params, callback) {
   if(account.type.toLowerCase() != 'craws')
   {
     inputDoc.configrules.customerAccount = params.account.id;
-    inputDoc.health.cloudformationLambdaExecutionRole = process.env.CFN_LAMBDA_EXEC_ROLE
-    inputDoc.health.codePipelineServiceRole = process.env.CODE_PIPELINE_SERVICE_ROLE
+    //inputDoc.health.cloudformationLambdaExecutionRole = process.env.CFN_LAMBDA_EXEC_ROLE
+    inputDoc.health.cloudformationLambdaExecutionRole = "cloudformation-lambda-execution-role"
+    //inputDoc.health.codePipelineServiceRole = process.env.CODE_PIPELINE_SERVICE_ROLE
+    inputDoc.health.codePipelineServiceRole = "AWS-CodePipeline-Service"
     inputDoc.health.gitHubPersonalAccessToken = process.env.GIT_HUB_ACCESS_TOKEN
     inputDoc.health.subscriptionFilterDestinationArn = process.env.SUBSC_FILTER_DEST
     var stateMachineArn = process.env.STATE_MACHINE_ARN

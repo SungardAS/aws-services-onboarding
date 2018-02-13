@@ -7,7 +7,7 @@ Parameters:
     Type: String
     Default: "/SungardAS/Alerts/Account"
     Description: Account Cloudwatch Log Group Name
-  SubscriptionFilterDestinationArn:
+  DestinationArn:
     Type: String
     Description: Subscription Filter Destination Arn
   DbUserName:
@@ -52,16 +52,22 @@ Parameters:
   CwlKinesisRoleArn :
     Type: String
     Description: Cwl to kinesis role arn
-  CfnLambdaExecRole :
-    Type: String
-    Description: Cloudformation lambda execution role name
-  CodePipelineRole :
-    Type: String
-    Description: Codepipeline Service Role Name
   GitHubAccessToken:
     Type: String
     NoEcho: true
     Description: Git hub access token
+  Sbnt1 :
+    Type: String
+    Description: Sunetid of vpc
+  Sbnt2 :
+    Type: String
+    Description: Sunetid of vpc
+  Sbnt3 :
+    Type: String
+    Description: Sunetid of vpc
+  SG :
+    Type: String
+    Description: Security group 
 
 Resources:
   EncryptionDecryptionKey:
@@ -220,6 +226,13 @@ Resources:
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
+      VpcConfig:
+            SecurityGroupIds:
+             - !ImportValue SG
+            SubnetIds:
+             - !ImportValue Sbnt1
+             - !ImportValue Sbnt2
+             - !ImportValue Sbnt3
       Environment:
         Variables:
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
@@ -341,10 +354,8 @@ Resources:
           DB_PASSWORD: !Ref DbPassword
           DB_USERNAME: !Ref DbUserName
           DB_HOST: !Ref DbHost
-          SUBSC_FILTER_DEST: !Ref SubscriptionFilterDestinationArn
+          SUBSC_FILTER_DEST: !Ref DestinationArn
           GIT_HUB_ACCESS_TOKEN: !Ref GitHubAccessToken
-          CODE_PIPELINE_SERVICE_ROLE: !Ref CodePipelineRole
-          CFN_LAMBDA_EXEC_ROLE: !Ref CfnLambdaExecRole
           CWL_KINESIS_ROLE_ARN: !Ref CwlKinesisRoleArn
           KINESIS_STREAM_ARN: !Ref KinesisStreamArn
           ADMIN_ROLE_NAME: !Ref AdminRoleName
@@ -415,7 +426,7 @@ Resources:
     Properties:
       LogGroupName: !Ref AccountLogGroupName
       FilterPattern: ""
-      DestinationArn: !Ref SubscriptionFilterDestinationArn
+      DestinationArn: !Ref DestinationArn
 
   StateMachineIAMRole:
       Type: "AWS::IAM::Role"
