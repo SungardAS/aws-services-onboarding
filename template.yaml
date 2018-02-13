@@ -345,6 +345,13 @@ Resources:
       CodeUri: ./src
       Role: !GetAtt ProxyLambdaFunctionIAMRole.Arn
       Timeout: 60
+      VpcConfig:
+            SecurityGroupIds:
+             - !Ref SG
+            SubnetIds:
+             - !Ref Sbnt1
+             - !Ref Sbnt2
+             - !Ref Sbnt3
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
