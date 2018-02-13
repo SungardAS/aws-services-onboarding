@@ -84,7 +84,7 @@ baseHandler.post = function(params, callback) {
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');
   const cipherText = { CiphertextBlob: encryptedBuf };
   const kms = new AWS.KMS({region:process.env.KMS_REGION});
-  cosnole.log("==============");
+  console.log("==============");
   Promise.all(ruleJson.map(getRulesPayload)).then(function(configrules){
   cosnole.log(configrules);
   inputDoc.configrules.rules = configrules;
@@ -94,7 +94,6 @@ baseHandler.post = function(params, callback) {
       return callback(err);
     } else {
       console.log('Decrypt passwd:');
-      console.log(passwd.Plaintext.toString('ascii'));
       console.log(process.env.DB_HOST);
       console.log(process.env.DB_USERNAME);
       console.log(masterBillingRoleArn);
