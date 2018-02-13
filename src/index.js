@@ -79,12 +79,22 @@ baseHandler.post = function(params, callback) {
     inputDoc.account.body = account;
   }
   inputDoc.federation.authorizer_user_guid = params.userGuid;
+  if(account.type.toLowerCase() != 'craws')
+  {
+    inputDoc.configrules.customerAccount = params.account.id;
+    inputDoc.health.cloudformationLambdaExecutionRole = process.env.CFN_LAMBDA_EXEC_ROLE
+    inputDoc.health.codePipelineServiceRole = process.env.CODE_PIPELINE_SERVICE_ROLE
+    inputDoc.health.gitHubPersonalAccessToken = process.env.GIT_HUB_ACCESS_TOKEN
+    inputDoc.health.subscriptionFilterDestinationArn = process.env.SUBSC_FILTER_DEST
+    var stateMachineArn = process.env.STATE_MACHINE_ARN
+  } else {
+    var stateMachineArn = process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
+  }
 
   var masterBillingRoleArn = "arn:aws:iam::" + params.masterBillingAWSAccount + ":role/" + process.env.ADMIN_ROLE_NAME;
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');
   const cipherText = { CiphertextBlob: encryptedBuf };
   const kms = new AWS.KMS({region:process.env.KMS_REGION});
-  console.log("==============");
   //Promise.all(ruleJson.map(getRulesPayload)).then(function(configrules){
   //cosnole.log(configrules);
   //inputDoc.configrules.rules = configrules;
@@ -106,44 +116,32 @@ baseHandler.post = function(params, callback) {
             if (err) throw err;
             console.log("Result: " + data);
             inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": data[0].externalId}]
-            if(account.type.toLowerCase() != 'craws')
-            {
-              Promise.all(ruleJson.map(getRulesPayload)).then(function(configrules){
-  		inputDoc.configrules.rules = configrules;
+              console.log("00000000000000")
+            Promise.all(ruleJson.map(getRulesPayload)).then(function(configrules){
+              console.log("111111111111")
+              console.log(configrules)
+              inputDoc.configrules.rules = configrules;
+              var input = {
+                stateMachineArn: stateMachineArn,
+                input: JSON.stringify(inputDoc),
+                name: "New-Account-Setup-For-" + params.awsname.replace(/ /g, '-')
+              };
+              console.log("======INPUT=====");
+              console.log(input);
+              stepfunctions.startExecution(input, function(err, data) {
+                if (err) {
+                  console.log(err, err.stack);
+                  callback(err);
+                }
+                else {
+                  console.log(data);
+                  callback(null, data);
+                }
               });
-              //inputDoc.configrules.rules = [];
-              inputDoc.configrules.customerAccount = params.account.id;
-              inputDoc.health.cloudformationLambdaExecutionRole = process.env.CFN_LAMBDA_EXEC_ROLE
-              inputDoc.health.codePipelineServiceRole = process.env.CODE_PIPELINE_SERVICE_ROLE
-              inputDoc.health.gitHubPersonalAccessToken = process.env.GIT_HUB_ACCESS_TOKEN
-              inputDoc.health.subscriptionFilterDestinationArn = process.env.SUBSC_FILTER_DEST
-              var input = {
-                stateMachineArn: process.env.STATE_MACHINE_ARN,
-                input: JSON.stringify(inputDoc)
-              };
-            } else {
-              var input = {
-                stateMachineArn: process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN,
-                input: JSON.stringify(inputDoc)
-              };
-            }
-            console.log("======INPUT=====");
-            console.log(input);
-            input.name = "New-Account-Setup-For-" + params.awsname.replace(/ /g, '-')
-            stepfunctions.startExecution(input, function(err, data) {
-              if (err) {
-                console.log(err, err.stack);
-                callback(err);
-              }
-              else {
-                console.log(data);
-                callback(null, data);
-              }
             });
           });
           if(con) con.end()
       });
     }
   })
-  //})
 };
