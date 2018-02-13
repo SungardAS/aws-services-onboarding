@@ -85,9 +85,9 @@ baseHandler.post = function(params, callback) {
   const cipherText = { CiphertextBlob: encryptedBuf };
   const kms = new AWS.KMS({region:process.env.KMS_REGION});
   console.log("==============");
-  Promise.all(ruleJson.map(getRulesPayload)).then(function(configrules){
-  cosnole.log(configrules);
-  inputDoc.configrules.rules = configrules;
+  //Promise.all(ruleJson.map(getRulesPayload)).then(function(configrules){
+  //cosnole.log(configrules);
+  //inputDoc.configrules.rules = configrules;
   kms.decrypt(cipherText, (err, passwd) => {
     if (err) {
       console.log('Decrypt error:', err);
@@ -108,7 +108,10 @@ baseHandler.post = function(params, callback) {
             inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": data[0].externalId}]
             if(account.type.toLowerCase() != 'craws')
             {
-              inputDoc.configrules.rules = [];
+              Promise.all(ruleJson.map(getRulesPayload)).then(function(configrules){
+  		inputDoc.configrules.rules = configrules;
+              });
+              //inputDoc.configrules.rules = [];
               inputDoc.configrules.customerAccount = params.account.id;
               inputDoc.health.cloudformationLambdaExecutionRole = process.env.CFN_LAMBDA_EXEC_ROLE
               inputDoc.health.codePipelineServiceRole = process.env.CODE_PIPELINE_SERVICE_ROLE
@@ -142,5 +145,5 @@ baseHandler.post = function(params, callback) {
       });
     }
   })
-  })
+  //})
 };
