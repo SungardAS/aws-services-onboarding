@@ -55,6 +55,7 @@ baseHandler.post = function(params, callback) {
   
 
 
+  console.log("444---------------");
   var account = {
      "id": params.account,
      "name": params.awsname,
@@ -66,6 +67,7 @@ baseHandler.post = function(params, callback) {
      "SGID": params.sgid,
      "guid": params.companyguid
   }
+  console.log("333---------------");
   inputDoc.account.billingDetails = account;
   if (account.id) {
     inputDoc.account.httpMethod = "GET";
@@ -76,6 +78,7 @@ baseHandler.post = function(params, callback) {
     inputDoc.account.body = account;
   }
   inputDoc.federation.authorizer_user_guid = params.userGuid;
+  console.log("222---------------");
   if(account.type.toLowerCase() != 'craws')
   {
     inputDoc.configrules.customerAccount = params.account.id;
@@ -90,6 +93,7 @@ baseHandler.post = function(params, callback) {
     var stateMachineArn = process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
   }
 
+  console.log("111---------------");
   var masterBillingRoleArn = "arn:aws:iam::" + params.masterBillingAWSAccount + ":role/" + process.env.ADMIN_ROLE_NAME;
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');
   const cipherText = { CiphertextBlob: encryptedBuf };
