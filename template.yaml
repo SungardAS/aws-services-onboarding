@@ -56,16 +56,10 @@ Parameters:
     Type: String
     NoEcho: true
     Description: Git hub access token
-  Sbnt1 :
+  Sbnts :
     Type: String
     Description: Sunetid of vpc
-  Sbnt2 :
-    Type: String
-    Description: Sunetid of vpc
-  Sbnt3 :
-    Type: String
-    Description: Sunetid of vpc
-  SG :
+  SGS :
     Type: String
     Description: Security group 
 
@@ -227,12 +221,9 @@ Resources:
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
       VpcConfig:
-            SecurityGroupIds:
-             - !Ref SG
-            SubnetIds:
-             - !Ref Sbnt1
-             - !Ref Sbnt2
-             - !Ref Sbnt3
+         SecurityGroupIds: !Split [ "," , !Ref SGS ]
+         SubnetIds: !Split [ "," , !Ref Sbnts ]
+
       Environment:
         Variables:
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
@@ -333,6 +324,7 @@ Resources:
                   -
                     Effect: "Allow"
                     Action:
+                      - "ec2:*"
                       - "states:*"
                       - "kms:*"
                     Resource: "*"
@@ -346,12 +338,9 @@ Resources:
       Role: !GetAtt ProxyLambdaFunctionIAMRole.Arn
       Timeout: 60
       VpcConfig:
-            SecurityGroupIds:
-             - !Ref SG
-            SubnetIds:
-             - !Ref Sbnt1
-             - !Ref Sbnt2
-             - !Ref Sbnt3
+            SecurityGroupIds: !Split [ "," , !Ref SGS ]
+            SubnetIds: !Split [ "," , !Ref Sbnts ]
+
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
