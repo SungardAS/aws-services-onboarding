@@ -27,7 +27,6 @@
 			},
 			{
 				"roleName": "DatadogAWSIntegrationRole",
-				"policyArn": "",
 				"federate": false
 			} 
 		],
