@@ -54,9 +54,6 @@ baseHandler.post = function(params, callback) {
   var ruleJson = JSON.parse(fs.readFileSync(__dirname + '/json/default_config_rules.json', {encoding:'utf8'}));
   
 
-  console.log("---------------");
-  console.log(ruleJson);
-  console.log("---------------");
 
   var account = {
      "id": params.account,
@@ -97,6 +94,9 @@ baseHandler.post = function(params, callback) {
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');
   const cipherText = { CiphertextBlob: encryptedBuf };
   const kms = new AWS.KMS({region:process.env.KMS_REGION});
+  console.log("---------------");
+  console.log(inputDoc);
+  console.log("---------------");
   //Promise.all(ruleJson.map(getRulesPayload)).then(function(configrules){
   //cosnole.log(configrules);
   //inputDoc.configrules.rules = configrules;
