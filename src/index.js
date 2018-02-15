@@ -93,39 +93,31 @@ baseHandler.post = function(params, callback) {
       console.log(process.env.DB_HOST);
       console.log(process.env.DB_USERNAME);
       console.log(masterBillingRoleArn);
-      //var con = mysql.createConnection({host: process.env.DB_HOST,user: process.env.DB_USERNAME,password: passwd.Plaintext.toString('ascii'), database:'msaws'});
-      //con.connect(function(err) {
       mcawsModels.AwsIamRole(process.env.DB_USERNAME,passwd.Plaintext.toString('ascii'),process.env.DB_HOST,'msaws', function(resp) {
         resp.findOne({where: {arn: masterBillingRoleArn} }).then(roleResp => {
-           const data = roleResp.dataValues;
-        //if (err) throw err;
-        //  console.log("Connected!");
-        //  const sql = "select * from awsiamrole where arn='"+masterBillingRoleArn+"'";
-        //  con.query(sql, function (err, data) {
-        //    if (err) throw err;
-            console.log("Result: " + data);
-            inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": data[0].externalId}]
-            Promise.all(ruleJson.map(getRulesPayload)).then(function(configrules){
-              inputDoc.configrules.rules = configrules;
-              var input = {
-                stateMachineArn: stateMachineArn,
-                input: JSON.stringify(inputDoc),
-                name: "New-Account-Setup-For-" + params.awsname.replace(/ /g, '-')
-              };
-              console.log("======INPUT=====");
-              console.log(input);
-              stepfunctions.startExecution(input, function(err, data) {
-                if (err) {
-                  console.log(err, err.stack);
-                  callback(err);
-                }
-                else {
-                  console.log(data);
-                  callback(null, data);
-                }
-              });
+          const data = roleResp.dataValues;
+          inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": data.externalId}]
+          Promise.all(ruleJson.map(getRulesPayload)).then(function(configrules){
+            inputDoc.configrules.rules = configrules;
+            var input = {
+              stateMachineArn: stateMachineArn,
+              input: JSON.stringify(inputDoc),
+              name: "New-Account-Setup-For-" + params.awsname.replace(/ /g, '-')
+            };
+            console.log("======INPUT=====");
+            console.log(input);
+            stepfunctions.startExecution(input, function(err, data) {
+              if (err) {
+                console.log(err, err.stack);
+                callback(err);
+              }
+              else {
+                console.log(data);
+                callback(null, data);
+              }
             });
           });
+        });
           //if(con) con.end()
       });
     }
