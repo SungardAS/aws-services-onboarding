@@ -95,9 +95,9 @@ baseHandler.post = function(params, callback) {
       console.log(masterBillingRoleArn);
       //var con = mysql.createConnection({host: process.env.DB_HOST,user: process.env.DB_USERNAME,password: passwd.Plaintext.toString('ascii'), database:'msaws'});
       //con.connect(function(err) {
-      mcawsModels.AwsIamRole(process.env.DB_USERNAME,passwd.Plaintext.toString('ascii'),process.env.DB_HOST,'mcaws', function(err, resp) {
-        if (err) throw err;
-        mcawsModels.AwsIamRole.findOne({where: {arn: masterBillingRoleArn} }).then(data => {
+      mcawsModels.AwsIamRole(process.env.DB_USERNAME,passwd.Plaintext.toString('ascii'),process.env.DB_HOST,'msaws', function(resp) {
+        resp.findOne({where: {arn: masterBillingRoleArn} }).then(roleResp => {
+           const data = roleResp.dataValues;
         //if (err) throw err;
         //  console.log("Connected!");
         //  const sql = "select * from awsiamrole where arn='"+masterBillingRoleArn+"'";

@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 
 function getDbOrmObj(user, passwd, host, dbname){
+  console.log(user, passwd, host, dbname)
   const dbObj = new Sequelize(dbname, user, passwd, {host: host, dialect:'mysql'})
   return dbObj;
 }
@@ -22,7 +23,7 @@ mcawsModels.prototype.AwsAccount = function(user, passwd, host, dbname, cb) {
      account_type: {type: Sequelize.STRING}
   },  
   {freezeTableName: true});
-  return AwsAccount
+  cb(AwsAccount)
 };
 
 mcawsModels.prototype.AwsIamRole = function(user, passwd, host, dbname, cb) {
@@ -33,10 +34,10 @@ mcawsModels.prototype.AwsIamRole = function(user, passwd, host, dbname, cb) {
       name: {type: Sequelize.STRING},
       path: {type: Sequelize.STRING},
       externalId: {type: Sequelize.STRING},
-      account: {type: Sequelize.Integer}
+      account: {type: Sequelize.INTEGER}
    },
    {freezeTableName: true});
-  return AwsIamRole
+  cb(AwsIamRole)
 };
 
 module.exports = new mcawsModels();
