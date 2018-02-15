@@ -55,13 +55,8 @@ exports.handler = function(event, context, callback) {
         });
       }
       awsIamRole.createRole(payload, (err, data) => {
-      console.log("start----------------------");
-      console.log(payload);
-      console.log(payload.assumeRolePolicyDocument.Statement[0].Principal);
-      console.log(payload.assumeRolePolicyDocument.Statement[0].Principal.AWS);
         console.log("Error:",err);
         console.log("Res:",data);
-      console.log("end----------------------");
       });
     }
     event.dbIamRoles = dbIamRoles;
