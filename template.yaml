@@ -663,12 +663,6 @@ Resources:
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Account",
               "InputPath": "$.account",
               "ResultPath": "$.account.result",
-              "Next": "EnableBillingActivation"
-            },
-            "EnableBillingActivation": {
-              "Type": "Task",
-              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Enable-Billing-Activation",
-              "InputPath": "$",
               "Next": "SetAccount"
             },
             "SetAccount": {
@@ -693,6 +687,18 @@ Resources:
             "SetNewAccountCredentials": {
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-New-Credentials",
+              "InputPath": "$",
+              "Next": "CreateAwsIamRoles"
+            },
+            "CreateAwsIamRoles": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Create-Aws-Iam-Roles",
+              "InputPath": "$",
+              "Next": "UpdateDb"
+            },
+            "UpdateDb": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Update-Db",
               "InputPath": "$",
               "Next": "SetFinalResultState"
             },
