@@ -38,10 +38,11 @@ exports.handler = function(event, context, callback) {
             });
         console.log("200000000");
           }
-        console.log("300000000");
+          mcawsDbObj.Con();
+          console.log("300000000");
         }
         console.log("400000000");
-        mcawsDbObj.Con();
+        if(dbAwsAccount.account_type != 'craws') mcawsDbObj.Con();
 
       })
       .catch(err => console.log(err));
