@@ -23,15 +23,16 @@ exports.handler = function(event, context, callback) {
       'msaws'
     );
     mcawsDbObj.AwsAccount(resp1 => {
-      resp1.create(dbAwsAccount).then(accData => {
+      return resp1.create(dbAwsAccount).then(accData => {
         console.log("000000000");
         if (dbAwsAccount.account_type != 'craws') {
           for (let idx = 0; idx < dbIamRoles.length; idx++) {
             dbIamRoles[idx].account = accData.dataValues.id;
             mcawsDbObj.AwsIamRole(resp2 => {
-              resp2.create(dbIamRoles[idx]).then(roleData => {
+              return resp2.create(dbIamRoles[idx]).then(roleData => {
                 console.log(roleData);
-              });
+              }).then(() => console.log('role updationDone :)'))
+              .catch(err => console.log(err));
         console.log("100000000");
             });
         console.log("200000000");
@@ -39,7 +40,8 @@ exports.handler = function(event, context, callback) {
         console.log("300000000");
         }
         console.log("400000000");
-      });
+      }).then(() => console.log('Account updationDone :)'))
+      .catch(err => console.log(err));
         console.log("500000000");
     });
         console.log("600000000");
