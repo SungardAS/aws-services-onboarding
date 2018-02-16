@@ -3,7 +3,7 @@ var fs = require('fs');
 var AWS = require('aws-sdk');
 //var mysql = require('mysql');
 var sleep = require('sleep');
-const mcawsModels = require('./models/mcawsModels.js');
+const McawsModels = require('./models/mcawsModels.js');
 
 var baseHandler = require('aws-services-lib/lambda/base_handler.js')
 
@@ -93,8 +93,8 @@ baseHandler.post = function(params, callback) {
       console.log(process.env.DB_HOST);
       console.log(process.env.DB_USERNAME);
       console.log(masterBillingRoleArn);
-      const mcawsDbObj = new mcawsModels(process.env.DB_USERNAME,passwd.Plaintext.toString('ascii'),process.env.DB_HOST,'msaws');
-      mcawsModels.AwsIamRole(function(resp) {
+      const mcawsDbObj = new McawsModels(process.env.DB_USERNAME,passwd.Plaintext.toString('ascii'),process.env.DB_HOST,'msaws');
+      mcawsDbObj.AwsIamRole(function(resp) {
         resp.findOne({where: {arn: masterBillingRoleArn} }).then(roleResp => {
           const data = roleResp.dataValues;
           inputDoc.billing_master.roles = [{"roleArn": "arn:aws:iam::"+process.env.MASTER_MGM_AWS_ID+":role/federate"},{"roleArn": masterBillingRoleArn, "externalId": data.externalId}]
