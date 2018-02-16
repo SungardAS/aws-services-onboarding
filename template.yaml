@@ -219,7 +219,7 @@ Resources:
       Runtime: nodejs4.3
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
-      Timeout: 120
+      Timeout: 300
       VpcConfig:
          SecurityGroupIds: !Split [ "," , !Ref SGS ]
          SubnetIds: !Split [ "," , !Ref Sbnts ]
