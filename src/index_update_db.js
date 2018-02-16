@@ -40,7 +40,9 @@ exports.handler = function(event, context, callback) {
         console.log("300000000");
         }
         console.log("400000000");
-      }).then(() => console.log('Account updationDone :)'))
+        return;
+
+      })
       .catch(err => console.log(err));
         console.log("500000000");
     });
