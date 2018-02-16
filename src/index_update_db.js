@@ -23,6 +23,7 @@ exports.handler = function(event, context, callback) {
       'msaws'
     );
     mcawsDbObj.AwsAccount(resp1 => {
+      resp1.sync().then(() => {
       return resp1.create(dbAwsAccount).then(accData => {
         console.log("000000000");
         if (dbAwsAccount.account_type != 'craws') {
@@ -45,6 +46,7 @@ exports.handler = function(event, context, callback) {
       })
       .catch(err => console.log(err));
         console.log("500000000");
+    });
     });
         console.log("600000000");
   });
