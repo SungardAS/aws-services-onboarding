@@ -5,13 +5,13 @@ const Sequelize = require('sequelize');
 function getDbOrmObj(user, passwd, host, dbname) {
   console.log(user, passwd, host, dbname);
   const dbObj = new Sequelize(dbname, user, passwd, {
-    host,
-    dialect: 'mysql',
-    pool: {
-      max: 5,
-      min: 0,
-      idle: 30000
-    }
+    host:host,
+    dialect: 'mysql'
+    //pool: {
+    //  max: 5,
+    //  min: 0,
+    //  idle: 30000
+    //}
   });
   return dbObj;
 }
@@ -50,5 +50,9 @@ mcawsModels.prototype.AwsIamRole = function(cb) {
   );
   cb(AwsIamRole);
 };
+
+mcawsModels.prototype.Con = function() {
+  this.sequelize.close();
+}
 
 module.exports = mcawsModels;

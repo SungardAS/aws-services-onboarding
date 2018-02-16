@@ -41,9 +41,7 @@ exports.handler = function(event, context, callback) {
         console.log("300000000");
         }
         console.log("400000000");
- 	callback(null, event);
-        return
-        //process.exit();
+        mcawsDbObj.Con();
 
       })
       .catch(err => console.log(err));
@@ -52,5 +50,6 @@ exports.handler = function(event, context, callback) {
     });
         console.log("600000000");
   });
+ 	callback(null, event);
         console.log("700000000");
 };
