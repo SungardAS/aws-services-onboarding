@@ -34,17 +34,16 @@ exports.handler = function(event, context, callback) {
                   resp2
                     .create(dbIamRoles[idx])
                     .then(roleData => {
-                      console.log(roleData);
-                    })
-                    .then(() => {
                       console.log('role updation Done :)');
-                      if (idx == dbIamRoles.length - 1) mcawsDbObj.Con();
+                      console.log(roleData);
+                      if (idx == dbIamRoles.length - 1) mcawsDbObj.CloseConnection();
                     })
                     .catch(errRole => console.log(errRole))
                 );
               }
+            } else {
+              mcawsDbObj.CloseConnection();
             }
-            if (dbAwsAccount.account_type == 'craws') mcawsDbObj.Con();
           })
           .catch(errAcc => console.log(errAcc))
       );
