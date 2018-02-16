@@ -23,36 +23,32 @@ exports.handler = function(event, context, callback) {
       'msaws'
     );
     mcawsDbObj.AwsAccount(resp1 => {
-      resp1.sync().then(() => {
-      return resp1.create(dbAwsAccount).then(accData => {
-        console.log("000000000");
-        if (dbAwsAccount.account_type != 'craws') {
-          for (let idx = 0; idx < dbIamRoles.length; idx++) {
-            dbIamRoles[idx].account = accData.dataValues.id;
-            mcawsDbObj.AwsIamRole(resp2 => {
-              return resp2.create(dbIamRoles[idx]).then(roleData => {
-                console.log(roleData);
-              }).then(() => {
-                  console.log('role updationDone :)');
-                  if(idx == dbIamRoles.length-1) mcawsDbObj.Con();
-              })
-              .catch(err => console.log(err));
-        console.log("100000000");
-            });
-        console.log("200000000");
-          }
-          console.log("300000000");
-        }
-        console.log("400000000");
-        if(dbAwsAccount.account_type == 'craws') mcawsDbObj.Con();
-
-      })
-      .catch(err => console.log(err));
-        console.log("500000000");
+      resp1.sync().then(() =>
+        resp1
+          .create(dbAwsAccount)
+          .then(accData => {
+            if (dbAwsAccount.account_type != 'craws') {
+              for (let idx = 0; idx < dbIamRoles.length; idx++) {
+                dbIamRoles[idx].account = accData.dataValues.id;
+                mcawsDbObj.AwsIamRole(resp2 =>
+                  resp2
+                    .create(dbIamRoles[idx])
+                    .then(roleData => {
+                      console.log(roleData);
+                    })
+                    .then(() => {
+                      console.log('role updation Done :)');
+                      if (idx == dbIamRoles.length - 1) mcawsDbObj.Con();
+                    })
+                    .catch(errRole => console.log(errRole))
+                );
+              }
+            }
+            if (dbAwsAccount.account_type == 'craws') mcawsDbObj.Con();
+          })
+          .catch(errAcc => console.log(errAcc))
+      );
     });
-    });
-        console.log("600000000");
   });
- 	callback(null, event);
-        console.log("700000000");
+  callback(null, event);
 };
