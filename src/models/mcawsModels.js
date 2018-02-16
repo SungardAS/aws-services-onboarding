@@ -10,7 +10,7 @@ function getDbOrmObj(user, passwd, host, dbname) {
     pool: {
       max: 5,
       min: 0,
-      idle: 5000
+      idle: 30000
     }
   });
   return dbObj;
