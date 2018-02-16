@@ -41,7 +41,9 @@ exports.handler = function(event, context, callback) {
         console.log("300000000");
         }
         console.log("400000000");
-        process.exit();
+ 	callback(null, event);
+        return
+        //process.exit();
 
       })
       .catch(err => console.log(err));
@@ -51,5 +53,4 @@ exports.handler = function(event, context, callback) {
         console.log("600000000");
   });
         console.log("700000000");
- callback(null, event);
 };
