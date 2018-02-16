@@ -24,6 +24,7 @@ exports.handler = function(event, context, callback) {
     );
     mcawsDbObj.AwsAccount(resp1 => {
       resp1.create(dbAwsAccount).then(accData => {
+        console.log("000000000");
         if (dbAwsAccount.account_type != 'craws') {
           for (let idx = 0; idx < dbIamRoles.length; idx++) {
             dbIamRoles[idx].account = accData.dataValues.id;
@@ -31,11 +32,18 @@ exports.handler = function(event, context, callback) {
               resp2.create(dbIamRoles[idx]).then(roleData => {
                 console.log(roleData);
               });
+        console.log("100000000");
             });
+        console.log("200000000");
           }
+        console.log("300000000");
         }
+        console.log("400000000");
       });
-  callback(null, event);
+        console.log("500000000");
     });
+        console.log("600000000");
   });
+        console.log("000000000");
+ callback(null, event);
 };
