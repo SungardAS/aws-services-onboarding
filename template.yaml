@@ -22,7 +22,7 @@ Parameters:
     Description: Host of mcaws db
   MasterMgmAwsId:
     Type: String
-    Description: AWS Id of Master Management Account
+    Description: AWS Id of Management Account
   AdminRoleName:
     Type: String
     Description: AWS admin role name
