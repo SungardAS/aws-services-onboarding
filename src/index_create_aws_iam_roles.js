@@ -33,8 +33,8 @@ exports.handler = function(event, context, callback) {
       .env.MASTER_MGM_AWS_ID}:role/federate`;
     const dbIamRoles = [];
 
-    const roles = awsroles.roles[accountData.type];
-    if (accountData.type == 'managed')
+    const roles = awsroles.roles[accountData.type.toLowerCase()];
+    if (accountData.type.toLowerCase() == 'managed')
       roles.push({
         roleName: process.env.ADMIN_ROLE_NAME,
         policyArn: awsroles.adminPolicyArn,
@@ -49,7 +49,7 @@ exports.handler = function(event, context, callback) {
       company_guid: accountData.guid,
       account_type: accountData.type
     };
-    if (dbAwsAccount.account_type != 'craws') {
+    if (dbAwsAccount.account_type.toLowerCase() != 'craws') {
       for (let i = 0; i < roles.length; i++) {
         let payload = {};
         Object.assign(payload, options, roles[i]);

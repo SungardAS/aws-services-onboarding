@@ -27,7 +27,7 @@ exports.handler = function(event, context, callback) {
         resp1
           .create(dbAwsAccount)
           .then(accData => {
-            if (dbAwsAccount.account_type != 'craws') {
+            if (dbAwsAccount.account_type.toLowerCase() != 'craws') {
               for (let idx = 0; idx < dbIamRoles.length; idx++) {
                 dbIamRoles[idx].account = accData.dataValues.id;
                 mcawsDbObj.AwsIamRole(resp2 =>

@@ -51,7 +51,7 @@ baseHandler.post = function(params, callback) {
      "name": params.awsname,
      "desc": params.awsdesc,
      "email": params.email,
-     "type": params.account_type.toLowerCase(),
+     "type": params.account_type,
      "masterAwsId": params.masterBillingAWSAccount,
      "OfferingNum": params.offeringNum,
      "SGID": params.sgid,
