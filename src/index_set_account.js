@@ -4,6 +4,7 @@ exports.handler = (event, context, callback) => {
   // find account id
   var accountId = null;
   var retDoc = event.account.result.body;
+  console.log(retDoc)
   if (typeof(retDoc) == 'string') {
     retDoc = JSON.parse(retDoc);
   }

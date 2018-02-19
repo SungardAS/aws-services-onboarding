@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const fs = require('fs');
 const uuid = require('node-uuid');
@@ -11,7 +11,6 @@ exports.handler = function(event, context, callback) {
     secretAccessKey: event.credentials.Credentials.SecretAccessKey,
     sessionToken: event.credentials.Credentials.SessionToken
   };
-  const type = event.account.billingDetails.type;
   const awsroles = JSON.parse(
     fs.readFileSync(`${__dirname}/json/federate-role_info.json`, {
       encoding: 'utf8'
@@ -28,40 +27,57 @@ exports.handler = function(event, context, callback) {
   options.onboardAccount = true;
   options.path = awsroles.adminRolePath;
 
-  if (event.account.billingDetails && event.account.billingDetails.type) {
-    options.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${event
-      .account.billingDetails.masterAWSMgmAccount}:role/federate`;
+  if (event.account && event.account.billingDetails) {
+    const accountData = event.account.billingDetails;
+    options.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${process
+      .env.MASTER_MGM_AWS_ID}:role/federate`;
     const dbIamRoles = [];
-    const roles = awsroles.roles[type.toLowerCase()];
-    // var dbAwsAccount = {accountId:options.account,accountName:event.account.billingDetails.name,accountDescription:event.account.billingDetails.desc,email:event.account.billingDetails.email,guid:event.account.billingDetails.guid,accountType:event.account.billingDetails.type};
-    for (let i = 0; i < roles.length; i++) {
-      let payload = {};
-      Object.assign(payload, options, roles[i]);
-      payload.externalId = uuid.v4();
-      payload = JSON.parse(JSON.stringify(payload));
-      if (payload.roleName == 'DatadogAWSIntegrationRole') {
-        payload.PolicyDocument = dataDogPolicyDoc;
-        payload.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${event
-          .account.billingDetails.datadogAwsId}:root`;
-      }
-      if (payload.federate) {
-        dbIamRoles.push({
-          account: payload.account,
-          externalId: payload.externalId,
-          path: payload.path,
-          roleName: payload.roleName
+
+    const roles = awsroles.roles[accountData.type.toLowerCase()];
+    if (accountData.type.toLowerCase() == 'managed')
+      roles.push({
+        roleName: process.env.ADMIN_ROLE_NAME,
+        policyArn: awsroles.adminPolicyArn,
+        federate: true
+      });
+
+    const dbAwsAccount = {
+      awsid: options.account,
+      name: accountData.name,
+      description: accountData.desc,
+      email: accountData.email,
+      company_guid: accountData.guid,
+      account_type: accountData.type
+    };
+    if (dbAwsAccount.account_type.toLowerCase() != 'craws') {
+      for (let i = 0; i < roles.length; i++) {
+        let payload = {};
+        Object.assign(payload, options, roles[i]);
+        payload.externalId = uuid.v4();
+        payload = JSON.parse(JSON.stringify(payload));
+        if (payload.roleName == 'DatadogAWSIntegrationRole') {
+          payload.PolicyDocument = dataDogPolicyDoc;
+          payload.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${process
+            .env.DATADOG_AWD_ID}:root`;
+        }
+        if (payload.federate) {
+          dbIamRoles.push({
+            externalId: payload.externalId,
+            path: payload.path,
+            name: payload.roleName,
+            arn: `arn:aws:iam::${payload.account}:role/${payload.roleName}`
+          });
+        }
+        awsIamRole.createRole(payload, (err, data) => {
+          console.log('Error:', err);
+          console.log('Res:', data);
         });
       }
-      awsIamRole.createRole(payload, (err, data) => {
-        console.log(err);
-        console.log(data);
-      });
     }
     event.dbIamRoles = dbIamRoles;
-    // event.dbAwsAccount = dbAwsAccount;
+    event.dbAwsAccount = dbAwsAccount;
   } else {
-    console.log('invalid account type');
-    console.log(type);
+    console.log('insufficeint data for create roles');
   }
   callback(null, event);
 };

@@ -13,6 +13,7 @@ exports.handler = (event, context, callback) => {
   event.configrules.headers.Credentials = codedCredentials;
 
   console.log(codedCredentials);
+  console.log(event);
 
   callback(null, event);
 };

@@ -76,6 +76,13 @@ exports.handler = (event, context, callback) => {
   let accountId = null;
   let retDoc = event.account.result.body;
   const billingInfo = event.account.billingDetails;
+  billingInfo.billingUrl = process.env.BILLING_SERVER
+  billingInfo.apiKey = process.env.BILLING_API_KEY
+  billingInfo.secretKey = process.env.BILLING_SECRET_KEY
+  billingInfo.billingFromEmail = process.env.BILLING_FROM_ALERT_EMAIL
+  billingInfo.billingToEmail = process.env.BILLING_TO_ALERT_EMAIL
+  console.log(billingInfo)
+
   if (typeof retDoc === 'string') {
     retDoc = JSON.parse(retDoc);
   }
