@@ -22,16 +22,16 @@ exports.handler = function(event, context, callback) {
       process.env.DB_HOST,
       'msaws'
     );
-    mcawsDbObj.AwsAccount(resp1 => {
-      resp1.sync().then(() =>
-        resp1
+    mcawsDbObj.AwsAccount(accResp => {
+      accResp.sync().then(() =>
+        accResp
           .create(dbAwsAccount)
           .then(accData => {
             if (dbAwsAccount.account_type.toLowerCase() != 'craws') {
               for (let idx = 0; idx < dbIamRoles.length; idx++) {
                 dbIamRoles[idx].account = accData.dataValues.id;
-                mcawsDbObj.AwsIamRole(resp2 =>
-                  resp2
+                mcawsDbObj.AwsIamRole(iamResp =>
+                  iamResp
                     .create(dbIamRoles[idx])
                     .then(roleData => {
                       console.log('role updation Done :)');

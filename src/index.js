@@ -1,8 +1,6 @@
 
 var fs = require('fs');
 var AWS = require('aws-sdk');
-//var mysql = require('mysql');
-var sleep = require('sleep');
 const McawsModels = require('./models/mcawsModels.js');
 
 var baseHandler = require('aws-services-lib/lambda/base_handler.js')
