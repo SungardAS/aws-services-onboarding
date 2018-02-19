@@ -1,0 +1,83 @@
+{
+	"roles": {
+		"managed": [{
+				"roleName": "ReadOnly",
+				"policyArn": "arn:aws:iam::aws:policy/ReadOnlyAccess",
+				"federate": true
+			},
+			{
+				"roleName": "UserAdmin",
+				"policyArn": "arn:aws:iam::aws:policy/IAMFullAccess",
+				"federate": true
+			},
+			{
+				"roleName": "SysEng",
+				"policyArn": "arn:aws:iam::aws:policy/PowerUserAccess",
+				"federate": true
+			},
+			{
+				"roleName": "DBAdmin",
+				"policyArn": "arn:aws:iam::aws:policy/job-function/DatabaseAdministrator",
+				"federate": true
+			},
+			{
+				"roleName": "FullAdmin",
+				"policyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
+				"federate": true
+			},
+			{
+				"roleName": "DatadogAWSIntegrationRole",
+				"policyArn": "",
+				"federate": false
+			}, {
+				"roleName": "sgas-dev-admin",
+				"policyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
+				"federate": true
+			}
+		],
+		"self-managed": [{
+				"roleName": "ReadOnly",
+				"policyArn": "arn:aws:iam::aws:policy/ReadOnlyAccess",
+				"federate": true
+			},
+			{
+				"roleName": "UserAdmin",
+				"policyArn": "arn:aws:iam::aws:policy/IAMFullAccess",
+				"federate": true
+			},
+			{
+				"roleName": "SysEng",
+				"policyArn": "arn:aws:iam::aws:policy/PowerUserAccess",
+				"federate": true
+			},
+			{
+				"roleName": "DBAdmin",
+				"policyArn": "arn:aws:iam::aws:policy/job-function/DatabaseAdministrator",
+				"federate": true
+			},
+			{
+				"roleName": "FullAdmin",
+				"policyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
+				"federate": true
+			}
+		]
+	},
+	"adminPolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
+        "adminRolePath":"/",
+	"assumeRolePolicyDocument": {
+		"Version": "2012-10-17",
+		"Statement": [{
+			"Sid": "",
+			"Effect": "Allow",
+			"Principal": {
+				"AWS": null
+			},
+			"Action": "sts:AssumeRole",
+			"Condition": {
+				"StringEquals": {
+					"sts:ExternalId": null
+				}
+			}
+		}]
+	}
+}

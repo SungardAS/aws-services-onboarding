@@ -22,6 +22,7 @@ exports.handler = (event, context, callback) => {
     console.log(event);
     callback(null, event);
   }).catch(function(err) {
+    console.log(err)
     callback(err);
   });
 };
