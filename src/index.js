@@ -69,7 +69,7 @@ baseHandler.post = function(params, callback) {
   inputDoc.federation.authorizer_user_guid = params.userGuid;
   if(account.type.toLowerCase() != 'craws')
   {
-    inputDoc.configrules.customerAccount = params.account.id;
+    inputDoc.configrules.customerAccount = account.id;
     inputDoc.health.cloudformationLambdaExecutionRole = "cloudformation-lambda-execution-role"
     inputDoc.health.codePipelineServiceRole = "AWS-CodePipeline-Service"
     inputDoc.health.gitHubPersonalAccessToken = process.env.GIT_HUB_ACCESS_TOKEN
@@ -78,6 +78,8 @@ baseHandler.post = function(params, callback) {
   } else {
     var stateMachineArn = process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
   }
+
+  console.log(inputDoc)
 
   var masterBillingRoleArn = "arn:aws:iam::" + params.masterBillingAWSAccount + ":role/" + process.env.ADMIN_ROLE_NAME;
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');
