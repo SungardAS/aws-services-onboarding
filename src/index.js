@@ -55,7 +55,8 @@ baseHandler.post = function(params, callback) {
      "masterAwsId": params.masterBillingAWSAccount,
      "OfferingNum": params.offeringNum,
      "SGID": params.sgid,
-     "guid": params.companyguid
+     "guid": params.companyguid,
+     "checkStatus": true,
   }
   inputDoc.account.billingDetails = account;
   if (account.id) {
