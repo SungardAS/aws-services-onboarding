@@ -40,7 +40,10 @@ function sendAlertMailBySes(params, errorMsg, billingData) {
 //----------------------------------------------------------------------
 function registerAccount(accId, params) {
   const now = new Date();
-  const datetime = dateFormat(now, "mm-dd-yyyy")+"T"+dateFormat(now,"HH:MM:ss");
+  const datetime = `${dateFormat(now, 'mm-dd-yyyy')}T${dateFormat(
+    now,
+    'HH:MM:ss'
+  )}`;
   const bodyjson = {
     sgId: Number(params.SGID),
     offeringNum: params.OfferingNum,
@@ -53,7 +56,9 @@ function registerAccount(accId, params) {
   };
   const billingUrl = `${params.billingUrl}?client_id=${params.apiKey}&client_secret=${params.secretKey}`;
   try {
-     req({url: billingUrl, method: 'POST',json: bodyjson },(error, response, body) => {
+    req(
+      { url: billingUrl, method: 'POST', json: bodyjson },
+      (error, response, body) => {
         console.log(`error:  ${JSON.stringify(error)}`);
         console.log(`response: ${JSON.stringify(response.body)}`);
         console.log(`body: ${JSON.stringify(body)}`);
@@ -65,7 +70,8 @@ function registerAccount(accId, params) {
         } else {
           sendAlertMailBySes(bodyjson, response.body, params);
         }
-     });
+      }
+    );
   } catch (err) {
     sendAlertMailBySes(bodyjson, err, params);
   }
@@ -76,12 +82,11 @@ exports.handler = (event, context, callback) => {
   let accountId = null;
   let retDoc = event.account.result.body;
   const billingInfo = event.account.billingDetails;
-  billingInfo.billingUrl = process.env.BILLING_SERVER
-  billingInfo.apiKey = process.env.BILLING_API_KEY
-  billingInfo.secretKey = process.env.BILLING_SECRET_KEY
-  billingInfo.billingFromEmail = process.env.BILLING_FROM_ALERT_EMAIL
-  billingInfo.billingToEmail = process.env.BILLING_TO_ALERT_EMAIL
-  console.log(billingInfo)
+  billingInfo.billingUrl = "https://"+process.env.BILLING_SERVER+"/mawsbilling/api/1.0.0/billing/maws";
+  billingInfo.apiKey = process.env.BILLING_API_KEY;
+  billingInfo.secretKey = process.env.BILLING_SECRET_KEY;
+  billingInfo.billingFromEmail = process.env.BILLING_FROM_ALERT_EMAIL;
+  billingInfo.billingToEmail = process.env.BILLING_TO_ALERT_EMAIL;
 
   if (typeof retDoc === 'string') {
     retDoc = JSON.parse(retDoc);
@@ -99,7 +104,9 @@ exports.handler = (event, context, callback) => {
       registerAccount(accountId, billingInfo);
     } else {
       console.log(`customer account id not found: ${JSON.stringify(retDoc)}`);
-      const errmsg = `Found Error While Creating Account:  ${JSON.stringify(retDoc.CreateAccountStatus.FailureReason)}`;
+      const errmsg = `Found Error While Creating Account:  ${JSON.stringify(
+        retDoc.CreateAccountStatus.FailureReason
+      )}`;
       console.log(errmsg);
     }
   } else {
