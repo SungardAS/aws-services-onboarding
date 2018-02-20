@@ -87,7 +87,6 @@ exports.handler = (event, context, callback) => {
   billingInfo.secretKey = process.env.BILLING_SECRET_KEY;
   billingInfo.billingFromEmail = process.env.BILLING_FROM_ALERT_EMAIL;
   billingInfo.billingToEmail = process.env.BILLING_TO_ALERT_EMAIL;
-  console.log(billingInfo);
 
   if (typeof retDoc === 'string') {
     retDoc = JSON.parse(retDoc);
