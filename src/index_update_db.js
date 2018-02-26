@@ -4,7 +4,6 @@ const AWS = require('aws-sdk');
 const McawsModels = require('./models/mcawsModels.js');
 
 exports.handler = function(event, context, callback) {
-  console.log(JSON.stringify(event));
   const dbIamRoles = event.dbIamRoles;
   const dbAwsAccount = event.dbAwsAccount;
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');

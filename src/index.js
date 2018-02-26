@@ -78,19 +78,16 @@ baseHandler.post = function(params, callback) {
     var stateMachineArn = process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
   }
 
-  console.log(inputDoc)
 
   var masterBillingRoleArn = "arn:aws:iam::" + params.masterBillingAWSAccount + ":role/" + process.env.ADMIN_ROLE_NAME;
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');
   const cipherText = { CiphertextBlob: encryptedBuf };
   const kms = new AWS.KMS({region:process.env.KMS_REGION});
-  console.log(inputDoc);
   kms.decrypt(cipherText, (err, passwd) => {
     if (err) {
       console.log('Decrypt error:', err);
       return callback(err);
     } else {
-      console.log('Decrypt passwd:');
       console.log(process.env.DB_HOST);
       console.log(process.env.DB_USERNAME);
       console.log(masterBillingRoleArn);
