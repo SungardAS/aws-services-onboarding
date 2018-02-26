@@ -88,8 +88,6 @@ baseHandler.post = function(params, callback) {
       console.log('Decrypt error:', err);
       return callback(err);
     } else {
-      console.log(process.env.DB_HOST);
-      console.log(process.env.DB_USERNAME);
       console.log(masterBillingRoleArn);
       const mcawsDbObj = new McawsModels(process.env.DB_USERNAME,passwd.Plaintext.toString('ascii'),process.env.DB_HOST,'msaws');
       mcawsDbObj.AwsIamRole(function(resp) {
