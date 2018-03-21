@@ -20,6 +20,8 @@ exports.handler = (event, context) => {
 }
 
 baseHandler.get = function(params, callback) {
+
+  console.log("Inside get handler with params=", params);
   
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
   var input = {
@@ -39,6 +41,8 @@ baseHandler.get = function(params, callback) {
 
 baseHandler.post = function(params, callback) {
 
+  console.log("Inside post handler with params=", params);
+
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
 
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
@@ -56,6 +60,9 @@ baseHandler.post = function(params, callback) {
      "guid": params.companyguid,
      "checkStatus": true,
   }
+
+  console.log("account=", account);
+
   inputDoc.account.billingDetails = account;
   if (account.id) {
     inputDoc.account.httpMethod = "GET";
@@ -78,17 +85,20 @@ baseHandler.post = function(params, callback) {
     var stateMachineArn = process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
   }
 
+  console.log("inputDoc=", inputDoc);
+  console.log("stateMachineArn=", stateMachineArn);
 
   var masterBillingRoleArn = "arn:aws:iam::" + params.masterBillingAWSAccount + ":role/" + process.env.ADMIN_ROLE_NAME;
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');
   const cipherText = { CiphertextBlob: encryptedBuf };
   const kms = new AWS.KMS({region:process.env.KMS_REGION});
+  console.log("calling KMS decrypt");
   kms.decrypt(cipherText, (err, passwd) => {
     if (err) {
       console.log('Decrypt error:', err);
       return callback(err);
     } else {
-      console.log(masterBillingRoleArn);
+      console.log("masterBillingRoleArn=", masterBillingRoleArn);
       const mcawsDbObj = new McawsModels(process.env.DB_USERNAME,passwd.Plaintext.toString('ascii'),process.env.DB_HOST,'msaws');
       mcawsDbObj.AwsIamRole(function(resp) {
         resp.findOne({where: {arn: masterBillingRoleArn} }).then(roleResp => {
