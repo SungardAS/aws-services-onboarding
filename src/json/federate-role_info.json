@@ -28,7 +28,12 @@
 			{
 				"roleName": "DatadogAWSIntegrationRole",
 				"federate": false
-			} 
+			}, 
+			{
+				"roleName": "NetworkAdmin",
+				"policyArn": "arn:aws:iam::aws:policy/job-function/NetworkAdministrator",
+				"federate": true
+			}
 		],
 		"self-managed": [{
 				"roleName": "ReadOnly",
