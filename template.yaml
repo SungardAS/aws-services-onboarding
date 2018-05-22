@@ -61,7 +61,7 @@ Parameters:
     Description: Security group 
   AccessAlertEmail:
     Type: String
-    Description: Console Access Alert to Email id
+    Description: Email ID to send the Console Sign-in alerts to
 
 Resources:
   EncryptionDecryptionKey:

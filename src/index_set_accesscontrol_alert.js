@@ -21,7 +21,7 @@ exports.handler = function(event,context, callback) {
         emailAddress : process.env.ACCESSCONTROL_TO_ALERT_EMAIL,
         AccountId: AccountId,
         region: region,
-    ////    roleArn: 'arn:aws:iam::442294194136:role/kameshLambdaTest',
+    //  roleArn: 'arn:aws:iam::442294194136:role/awsEventTest',
         topicArn: null,
         sourceArn: null
     };
@@ -43,14 +43,12 @@ exports.handler = function(event,context, callback) {
           var policy = JSON.parse(snsPolicy);
           topicPolicy.Statement.push(policy);
           var strPolicy = JSON.stringify(topicPolicy);
-      	  console.log(strPolicy);         // successful response
+      	  console.log(strPolicy);         
       	  input.AttributeValue = strPolicy;
           aws_topic.setTopicAttributes(input);
     }
   
     var flows = [
-    //    {func:aws_topic.createTopic, success:aws_topic.addPermission, failure:failed, error:errored},
-    //    {func:aws_topic.addPermission, success:aws_topic.subscribeEmail, failure: failed, error: errored},
         {func:aws_topic.findTopic, success:aws_topic.subscribeEmail, failure:aws_topic.createTopic, error:errored},
         {func:aws_topic.createTopic, success:aws_topic.subscribeEmail, failure:failed, error:errored},
         {func:aws_topic.subscribeEmail, success:cloudwatchevents.createRule, failure:failed, error:errored},
