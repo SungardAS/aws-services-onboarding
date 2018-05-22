@@ -3,16 +3,16 @@ exports.handler = function(event,context, callback) {
     console.log(event);
     var accountInfo = event.account.billingDetails;
     console.log(accountInfo);
-    if(accountInfo.type.lower() === 'managed') {
+    if(accountInfo.type.toLowerCase() === 'managed') {
     var uuid = require("uuid");
     var id = uuid.v4();
     var aws_topic = new(require('aws-services-lib/aws/topic.js'))();
     var cloudwatchevents = new(require('aws-services-lib/aws/cloudwatchlog.js'))();
     var AccountId= accountInfo.id;
     var region=event.region;
-    var snsPolicy = '{"Sid":"Allow_Publish_Events","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sns:Publish","Resource":"arn:aws:sns:'+region+':'+AccountId+':accesstlertopic"}';
+    var snsPolicy = '{"Sid":"Allow_Publish_Events","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sns:Publish","Resource":"arn:aws:sns:'+region+':'+AccountId+':ConsoleSignInAlertTopic"}';
     var input = {
-        topicName:"accesstlertopic",
+        topicName:"ConsoleSignInAlertTopic",
         ruleName: "ConsoleLoginAlertRule",
         ruleDescription: "Alert on Console Login",
         eventPattern:'{"detail-type":["AWS Console Sign In via CloudTrail"]}',
@@ -24,7 +24,6 @@ exports.handler = function(event,context, callback) {
     ////    roleArn: 'arn:aws:iam::442294194136:role/kameshLambdaTest',
         topicArn: null,
         sourceArn: null
-      //creds:creds
     };
     console.log(input);
     console.log("------------------------------------------") ;
