@@ -4,7 +4,8 @@ exports.handler = function(event,context, callback) {
     var accountInfo = event.account.billingDetails;
     console.log(accountInfo);
     if(accountInfo.type.lower() === 'managed') {
-
+    var uuid = require("uuid");
+    var id = uuid.v4();
     var aws_topic = new(require('aws-services-lib/aws/topic.js'))();
     var cloudwatchevents = new(require('aws-services-lib/aws/cloudwatchlog.js'))();
     var AccountId= accountInfo.id;
@@ -16,7 +17,7 @@ exports.handler = function(event,context, callback) {
         ruleDescription: "Alert on Console Login",
         eventPattern:'{"detail-type":["AWS Console Sign In via CloudTrail"]}',
         ruleState:"ENABLED",
-        targetId:"100002111",
+        targetId: id,
         emailAddress : process.env.ACCESSCONTROL_TO_ALERT_EMAIL,
         AccountId: AccountId,
         region: region,
@@ -40,8 +41,8 @@ exports.handler = function(event,context, callback) {
   
     function appendPolicy (input, callback) {
           var topicPolicy = JSON.parse(input.attributes.Policy);
-          var snsPolicy = JSON.parse(snsPolicy);
-          topicPolicy.Statement.push(x);
+          var policy = JSON.parse(snsPolicy);
+          topicPolicy.Statement.push(policy);
           var strPolicy = JSON.stringify(topicPolicy);
       	  console.log(strPolicy);         // successful response
       	  input.AttributeValue = strPolicy;
