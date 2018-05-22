@@ -4,7 +4,7 @@ exports.handler = function(event,context, callback) {
     var accountInfo = event.account.billingDetails;
     console.log(accountInfo);
     if(accountInfo.type.toLowerCase() === 'managed') {
-    var uuid = require("uuid");
+    var uuid = require('node-uuid');
     var id = uuid.v4();
     var aws_topic = new(require('aws-services-lib/aws/topic.js'))();
     var cloudwatchevents = new(require('aws-services-lib/aws/cloudwatchlog.js'))();
