@@ -59,6 +59,9 @@ Parameters:
   SGS :
     Type: String
     Description: Security group 
+  AccessAlertEmail:
+    Type: String
+    Description: Console Access Alert to Email id
 
 Resources:
   EncryptionDecryptionKey:
@@ -282,6 +285,18 @@ Resources:
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 300
+  SetAccessControlAlertLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Set-Access-Control-Alert
+      Handler: index_set_accessontrol_alert.handler
+      Runtime: nodejs4.3
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 300
+      Environment:
+        Variables:
+          ACCESSCONTROL_TO_ALERT_EMAIL: !Ref AccessAlertEmail
 
   ApiGatewayApi:
     Type: AWS::Serverless::Api
@@ -595,7 +610,18 @@ Resources:
                       "End": true
                     }
                   }
-                }
+                },
+                {
+                  "StartAt": "AWSEventConsoleAccessRuleState",
+                  "States": {
+                    "AWSEventConsoleAccessRuleState": {
+                      "Type" : "Task",
+                      "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Access-Control-Alert",
+                      "InputPath": "$",
+                      "ResultPath": "$.awsevent.result",
+                      "End": true
+                    }
+                  }
               ]
             },
             "ConfigRulesActionState": {
