@@ -619,7 +619,7 @@ Resources:
                     "AWSConsoleSignInAlertState": {
                       "Type" : "Task",
                       "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Console-Sign-In-Alert",
-                      "InputPath": "$.awsevent",
+                      "InputPath": "$",
                       "ResultPath": "$.awsevent.result",
                       "End": true
                     }
