@@ -1,6 +1,6 @@
 exports.handler = function(event,context, callback) {
-    console.log(event);
- //   var accountInfo = event.account.billingDetails;
+    console.log(JSON.stringify(event));
+    
     var accountInfo = event;
 
     if(accountInfo.accountType.toLowerCase() === 'managed') {
@@ -15,11 +15,11 @@ exports.handler = function(event,context, callback) {
 console.log("***************** "+region);
     	var snsPolicy = '{"Sid":"Allow_Publish_Events","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sns:Publish","Resource":"arn:aws:sns:'+region+':'+AccountId+':ConsoleSignInAlertTopic"}';
 
-/*	var creds = new aws.Credentials({
-		accessKeyId: event.credentials.Credentials.AccessKeyId,
-    		secretAccessKey: event.credentials.Credentials.SecretAccessKey,
-    		sessionToken: event.credentials.Credentials.SessionToken 
-  	}); */
+	var creds = new aws.Credentials({
+		accessKeyId: accountInfo.Credentials.AccessKeyId,
+    		secretAccessKey: accountInfo.Credentials.SecretAccessKey,
+    		sessionToken: accountInfo.Credentials.SessionToken 
+  	}); 
 
     	var input = {
         	topicName:"ConsoleSignInAlertTopic",
@@ -33,8 +33,7 @@ console.log("***************** "+region);
         	region: region,
     		roleArn: null,
         	topicArn: null,
-		creds: accountInfo.Credentials
-	//	creds: creds
+		creds: creds
     	};
     console.log(input);
     console.log("------------------------------------------") ;
