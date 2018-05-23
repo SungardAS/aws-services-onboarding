@@ -13,22 +13,19 @@ exports.handler = function(event,context, callback) {
     	var AccountId= accountInfo.id;
     	var region=event.region;
     	var snsPolicy = '{"Sid":"Allow_Publish_Events","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sns:Publish","Resource":"arn:aws:sns:'+region+':'+AccountId+':ConsoleSignInAlertTopic"}';
-
-	var credentials = null;
-  	if (event.headers.credentials) {
-    		credentials = JSON.parse(new Buffer(event.headers.credentials, 'base64').toString())
-  	}
-  	else if (event.headers.Credentials) {
+//console.log(event.credentials.Credentials);
+/*	var credentials = null;
+  	if (event.headers.Credentials) {
     		credentials = JSON.parse(new Buffer(event.headers.Credentials, 'base64').toString())
   	}
-  console.log(credentials);
+  console.log(credentials); */
 	var creds = new AWS.Credentials({
-	/*	accessKeyId: event.credentials.Credentials.AccessKeyId,
+		accessKeyId: event.credentials.Credentials.AccessKeyId,
     		secretAccessKey: event.credentials.Credentials.SecretAccessKey,
-    		sessionToken: event.credentials.Credentials.SessionToken  */
-		accessKeyId: credentials.AccessKeyId,
+    		sessionToken: event.credentials.Credentials.SessionToken 
+/*		accessKeyId: credentials.AccessKeyId,
       		secretAccessKey: credentials.SecretAccessKey,
-      		sessionToken: credentials.SessionToken
+      		sessionToken: credentials.SessionToken */
   	});
 
     	var input = {

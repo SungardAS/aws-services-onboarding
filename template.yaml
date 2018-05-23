@@ -291,7 +291,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: SungardAS-Onboarding-Set-Console-Sign-In-Alert
-      Handler: index_set_accesscontrol_alert.handler
+      Handler: index_set_console_signin_alert.handler
       Runtime: nodejs4.3
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
@@ -620,7 +620,7 @@ Resources:
                       "Type" : "Task",
                       "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Console-Sign-In-Alert",
                       "InputPath": "$",
-                      "ResultPath": "$.awsevent.result",
+                      "ResultPath": "$.awsevents.result",
                       "End": true
                     }
                   }
