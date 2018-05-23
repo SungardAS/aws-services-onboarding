@@ -1,24 +1,25 @@
 exports.handler = function(event,context, callback) {
-    var aws = require("aws-sdk");
     console.log(event);
-    var accountInfo = event.account.billingDetails;
+ //   var accountInfo = event.account.billingDetails;
+    var accountInfo = event;
 
-    if(accountInfo.type.toLowerCase() === 'managed') {
+    if(accountInfo.accountType.toLowerCase() === 'managed') {
 
+        var aws = require("aws-sdk");
 	var uuid = require('node-uuid');
 	var id = uuid.v4();
     	var aws_topic = new(require('aws-services-lib/aws/topic.js'))();
     	var cloudwatchevents = new(require('aws-services-lib/aws/cloudwatchevents.js'))();
-    	var AccountId= accountInfo.id;
-    	var region=event.region;
+    	var AccountId = accountInfo.customerAccount;
+    	var region = accountInfo.region;
 console.log("***************** "+region);
     	var snsPolicy = '{"Sid":"Allow_Publish_Events","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sns:Publish","Resource":"arn:aws:sns:'+region+':'+AccountId+':ConsoleSignInAlertTopic"}';
 
-	var creds = new aws.Credentials({
+/*	var creds = new aws.Credentials({
 		accessKeyId: event.credentials.Credentials.AccessKeyId,
     		secretAccessKey: event.credentials.Credentials.SecretAccessKey,
     		sessionToken: event.credentials.Credentials.SessionToken 
-  	});
+  	}); */
 
     	var input = {
         	topicName:"ConsoleSignInAlertTopic",
@@ -32,7 +33,8 @@ console.log("***************** "+region);
         	region: region,
     		roleArn: null,
         	topicArn: null,
-		creds: creds
+		creds: accountInfo.Credentials
+	//	creds: creds
     	};
     console.log(input);
     console.log("------------------------------------------") ;
@@ -72,5 +74,5 @@ console.log("***************** "+region);
     	cloudwatchevents.flows = flows;
     	flows[0].func(input);
     }
-// callback(null, event);
+ callback(null, event);
 };

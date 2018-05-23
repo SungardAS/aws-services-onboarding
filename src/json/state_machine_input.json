@@ -132,6 +132,9 @@
     "rules": []
   },
   "awsevents": {
+    "customerAccount": null,
+    "accountType": null,
+    "Credentials": null,
     "region": null,
     "result": null
   },
