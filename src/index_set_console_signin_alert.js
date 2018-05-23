@@ -19,7 +19,7 @@ exports.handler = function(event,context, callback) {
     		credentials = JSON.parse(new Buffer(event.headers.Credentials, 'base64').toString())
   	}
   console.log(credentials); */
-	var creds = new AWS.Credentials({
+	var creds = new aws.Credentials({
 		accessKeyId: event.credentials.Credentials.AccessKeyId,
     		secretAccessKey: event.credentials.Credentials.SecretAccessKey,
     		sessionToken: event.credentials.Credentials.SessionToken 
