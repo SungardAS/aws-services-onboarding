@@ -2,7 +2,6 @@ exports.handler = function(event,context, callback) {
     var aws = require("aws-sdk");
     console.log(event);
     var accountInfo = event.account.billingDetails;
-    console.log(accountInfo);
 
     if(accountInfo.type.toLowerCase() === 'managed') {
 
@@ -12,20 +11,13 @@ exports.handler = function(event,context, callback) {
     	var cloudwatchevents = new(require('aws-services-lib/aws/cloudwatchevents.js'))();
     	var AccountId= accountInfo.id;
     	var region=event.region;
+console.log("***************** "+region);
     	var snsPolicy = '{"Sid":"Allow_Publish_Events","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sns:Publish","Resource":"arn:aws:sns:'+region+':'+AccountId+':ConsoleSignInAlertTopic"}';
-//console.log(event.credentials.Credentials);
-/*	var credentials = null;
-  	if (event.headers.Credentials) {
-    		credentials = JSON.parse(new Buffer(event.headers.Credentials, 'base64').toString())
-  	}
-  console.log(credentials); */
+
 	var creds = new aws.Credentials({
 		accessKeyId: event.credentials.Credentials.AccessKeyId,
     		secretAccessKey: event.credentials.Credentials.SecretAccessKey,
     		sessionToken: event.credentials.Credentials.SessionToken 
-/*		accessKeyId: credentials.AccessKeyId,
-      		secretAccessKey: credentials.SecretAccessKey,
-      		sessionToken: credentials.SessionToken */
   	});
 
     	var input = {
@@ -38,7 +30,7 @@ exports.handler = function(event,context, callback) {
         	emailAddress : process.env.ACCESSCONTROL_TO_ALERT_EMAIL,
         	AccountId: AccountId,
         	region: region,
-    		//  roleArn: 'arn:aws:iam::442294194136:role/awsEventTest',
+    		roleArn: null,
         	topicArn: null,
 		creds: creds
     	};
@@ -80,5 +72,5 @@ exports.handler = function(event,context, callback) {
     	cloudwatchevents.flows = flows;
     	flows[0].func(input);
     }
- callback(null, event);
+// callback(null, event);
 };
