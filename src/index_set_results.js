@@ -8,7 +8,7 @@ console.log(JSON.stringify(event[0]));
   event[0].final_result.awsconfig[event[0].awsconfig.body.region] = awsconfigResult.result;
 //  var awseventsResult = JSON.parse(event[0].awsevents.result.body);
   console.log("*****************");
-  console.log((JSON.stringify(event[0].awsevents.result));
+  console.log(JSON.stringify(event[0].awsevents.result));
   event[0].final_result.awsevents[event[0].awsevents.body.region] = 'true';
   callback(null, event[0]);
 };
