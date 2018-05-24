@@ -2,13 +2,6 @@ exports.handler = function(event,context) {
     console.log(JSON.stringify(event));
     
     var accountInfo = event;
-    
-    function createResponse(statusCode, body){
-  	return {
-    		statusCode: statusCode,
-    		body: body
-  	}
-    };
 
     if(accountInfo.accountType.toLowerCase() === 'managed') {
 
@@ -43,16 +36,16 @@ exports.handler = function(event,context) {
     	};
     
     	function succeeded(input) {
-       	  	context.done(null,createResponse(200,true));
+       	  	context.done(null,true);
     	}
     	function failed(input) {
-        	context.done(null,createResponse(500,false));
+        	context.done(null,false);
     	}
     	function errored(err) {
         	context.fail(err, null);
     	}
 
-    	function appendPolicy (input, callback) {
+    	function appendPolicy (input) {
           var topicPolicy = JSON.parse(input.attributes.Policy);
           var policy = JSON.parse(snsPolicy);
           topicPolicy.Statement.push(policy);
@@ -69,7 +62,8 @@ exports.handler = function(event,context) {
         	{func:cloudwatchevents.createRule, success:cloudwatchevents.createTarget, failure:failed, error:errored},
         	{func:cloudwatchevents.createTarget, success:aws_topic.getTopicAttributes, failure:failed, error:errored},
         	{func:aws_topic.getTopicAttributes, success:appendPolicy, failure: failed, error: errored},
-        	{func:appendPolicy, success:succeeded, error:errored}
+        	{func:appendPolicy, success:aws_topic.setTopicAttributes,failure: failed, error:errored},
+        	{func:aws_topic.setTopicAttributes, success:succeeded, error:errored}
         
     	];
 
