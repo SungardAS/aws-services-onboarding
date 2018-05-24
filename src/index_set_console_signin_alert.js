@@ -1,4 +1,4 @@
-exports.handler = function(event,context, callback) {
+exports.handler = function(event,context) {
     console.log(JSON.stringify(event));
     
     var accountInfo = event;
@@ -11,7 +11,7 @@ exports.handler = function(event,context, callback) {
     	var aws_topic = new(require('aws-services-lib/aws/topic.js'))();
     	var cloudwatchevents = new(require('aws-services-lib/aws/cloudwatchevents.js'))();
     	var AccountId = accountInfo.customerAccount;
-    	var region = accountInfo.region;
+    	var region = accountInfo.body.region;
 console.log("***************** "+region);
     	var snsPolicy = '{"Sid":"Allow_Publish_Events","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sns:Publish","Resource":"arn:aws:sns:'+region+':'+AccountId+':ConsoleSignInAlertTopic"}';
 
@@ -39,10 +39,10 @@ console.log("***************** "+region);
     console.log("------------------------------------------") ;
     
     	function succeeded(input) {
-        	context.done(null, true);
+        	context.done(null, {result: true});
     	}
     	function failed(input) {
-        	context.done(null, false);
+        	context.done(null, {result:false});
     	}
     	function errored(err) {
         	context.fail(err, null);
@@ -73,5 +73,4 @@ console.log("***************** "+region);
     	cloudwatchevents.flows = flows;
     	flows[0].func(input);
     }
- callback(null, event);
 };

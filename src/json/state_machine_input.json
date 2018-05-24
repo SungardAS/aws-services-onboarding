@@ -135,7 +135,9 @@
     "customerAccount": null,
     "accountType": null,
     "Credentials": null,
-    "region": null,
+    "body": {
+      "region": null
+    },
     "result": null
   },
   "final_result": {
