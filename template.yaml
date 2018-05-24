@@ -624,7 +624,7 @@ Resources:
                       "End": true
                     }
                   }
-		}
+                }
               ]
             },
             "ConfigRulesActionState": {
