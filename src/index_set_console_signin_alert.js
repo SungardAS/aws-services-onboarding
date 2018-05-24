@@ -3,6 +3,13 @@ exports.handler = function(event,context) {
     
     var accountInfo = event;
 
+    function createResponse(statusCode, body){
+  	var response = {
+	    statusCode: statusCode,
+	    body: body
+  	}
+    };
+
     if(accountInfo.accountType.toLowerCase() === 'managed') {
 
         var aws = require("aws-sdk");
@@ -12,7 +19,6 @@ exports.handler = function(event,context) {
     	var cloudwatchevents = new(require('aws-services-lib/aws/cloudwatchevents.js'))();
     	var AccountId = accountInfo.customerAccount;
     	var region = accountInfo.body.region;
-console.log("***************** "+region);
     	var snsPolicy = '{"Sid":"Allow_Publish_Events","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sns:Publish","Resource":"arn:aws:sns:'+region+':'+AccountId+':ConsoleSignInAlertTopic"}';
 
 	var creds = new aws.Credentials({
@@ -35,11 +41,13 @@ console.log("***************** "+region);
         	topicArn: null,
 		creds: creds
     	};
-    console.log(input);
-    console.log("------------------------------------------") ;
     
     	function succeeded(input) {
-        	context.done(null, {result: true});
+	  var response = {
+            statusCode: 200,
+            body: true
+          }
+       	  context.succeed(response);
     	}
     	function failed(input) {
         	context.done(null, {result:false});
@@ -47,7 +55,7 @@ console.log("***************** "+region);
     	function errored(err) {
         	context.fail(err, null);
     	}
-  
+
     	function appendPolicy (input, callback) {
           var topicPolicy = JSON.parse(input.attributes.Policy);
           var policy = JSON.parse(snsPolicy);
