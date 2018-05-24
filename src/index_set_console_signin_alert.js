@@ -3,13 +3,6 @@ exports.handler = function(event,context) {
     
     var accountInfo = event;
 
-    function createResponse(statusCode, body){
-  	var response = {
-	    statusCode: statusCode,
-	    body: body
-  	}
-    };
-
     if(accountInfo.accountType.toLowerCase() === 'managed') {
 
         var aws = require("aws-sdk");
@@ -42,11 +35,7 @@ exports.handler = function(event,context) {
 		creds: creds
     	};
     
-    	function succeeded(input) {
-	  var response = {
-            statusCode: 200,
-            body: true
-          }
+/*    	function succeeded(input) {
        	  context.succeed(response);
     	}
     	function failed(input) {
@@ -55,6 +44,10 @@ exports.handler = function(event,context) {
     	function errored(err) {
         	context.fail(err, null);
     	}
+*/
+	function succeeded(input) { callback(null, {result: true}); }
+  	function failed(input) { callback(null, {result: false}); }
+  	function errored(err) { callback(err, null); }
 
     	function appendPolicy (input, callback) {
           var topicPolicy = JSON.parse(input.attributes.Policy);
