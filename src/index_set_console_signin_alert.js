@@ -1,4 +1,4 @@
-exports.handler = function(event,context) {
+exports.handler = function(event,callback) {
     console.log(JSON.stringify(event));
     
     var accountInfo = event;
