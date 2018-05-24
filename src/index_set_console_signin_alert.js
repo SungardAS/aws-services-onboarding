@@ -1,7 +1,14 @@
-exports.handler = function(event,callback) {
+exports.handler = function(event,context) {
     console.log(JSON.stringify(event));
     
     var accountInfo = event;
+    
+    function createResponse(statusCode, body){
+  	return {
+    		statusCode: statusCode,
+    		body: body
+  	}
+    };
 
     if(accountInfo.accountType.toLowerCase() === 'managed') {
 
@@ -12,7 +19,7 @@ exports.handler = function(event,callback) {
     	var cloudwatchevents = new(require('aws-services-lib/aws/cloudwatchevents.js'))();
     	var AccountId = accountInfo.customerAccount;
     	var region = accountInfo.body.region;
-    	var snsPolicy = '{"Sid":"Allow_Publish_Events","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sns:Publish","Resource":"arn:aws:sns:'+region+':'+AccountId+':ConsoleSignInAlertTopic"}';
+    	var snsPolicy = '{"Sid":"Allow_Publish_Events_'+id+'","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sns:Publish","Resource":"arn:aws:sns:'+region+':'+AccountId+':ConsoleSignInAlertTopic"}';
 
 	var creds = new aws.Credentials({
 		accessKeyId: accountInfo.Credentials.AccessKeyId,
@@ -35,19 +42,15 @@ exports.handler = function(event,callback) {
 		creds: creds
     	};
     
-/*    	function succeeded(input) {
-       	  context.succeed(response);
+    	function succeeded(input) {
+       	  	context.done(null,createResponse(200,true));
     	}
     	function failed(input) {
-        	context.done(null, {result:false});
+        	context.done(null,createResponse(500,false));
     	}
     	function errored(err) {
         	context.fail(err, null);
     	}
-*/
-	function succeeded(input) { callback(null, {result: true}); }
-  	function failed(input) { callback(null, {result: false}); }
-  	function errored(err) { callback(err, null); }
 
     	function appendPolicy (input, callback) {
           var topicPolicy = JSON.parse(input.attributes.Policy);
