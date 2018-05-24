@@ -587,7 +587,7 @@ Resources:
             },
             "Parallel": {
               "Type": "Parallel",
-              "Next": "AWSConsoleSignInAlertState",
+              "Next": "ConfigRulesActionState",
               "Branches": [
                 {
                   "StartAt": "CloudtrailActionState",
@@ -612,15 +612,20 @@ Resources:
                       "End": true
                     }
                   }
-                }
+                },
+                {
+                  "StartAt": "AWSConsoleSignInAlertState",
+                  "States": {
+                    "AWSConsoleSignInAlertState": {
+                      "Type" : "Task",
+               	      "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Console-Sign-In-Alert",
+                      "InputPath": "$.awsevents",
+                      "ResultPath": "$.awsevents.result",
+                      "End": true
+                    }
+                  }
+		}
               ]
-            },
-            "AWSConsoleSignInAlertState": {
-               "Type" : "Task",
-               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Console-Sign-In-Alert",
-               "InputPath": "$[0].awsevents",
-               "ResultPath": "$[0].awsevents.result",
-               "Next": "ConfigRulesActionState"
             },
             "ConfigRulesActionState": {
               "Type": "Task",
