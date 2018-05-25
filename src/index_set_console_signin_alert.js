@@ -27,7 +27,7 @@ exports.handler = function(event,context) {
         	eventPattern:'{"detail-type":["AWS Console Sign In via CloudTrail"]}',
         	ruleState:"ENABLED",
         	targetId: id,
-        	emailAddress : process.env.ACCESSCONTROL_TO_ALERT_EMAIL,
+        	emailAddress : process.env.Notification_Email,
         	AccountId: AccountId,
         	region: region,
     		roleArn: null,
