@@ -59,7 +59,7 @@ Parameters:
   SGS :
     Type: String
     Description: Security group 
-  Notification_Email:
+  NotificationEmail:
     Type: String
     Description: Email ID to send the Console Sign-in alerts to
 
@@ -298,7 +298,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          Notification_Email: !Ref Notification_Email 
+          NotificationEmail: !Ref NotificationEmail 
 
   ApiGatewayApi:
     Type: AWS::Serverless::Api

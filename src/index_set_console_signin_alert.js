@@ -1,5 +1,4 @@
 exports.handler = function(event,context) {
-    console.log(JSON.stringify(event));
     
     var accountInfo = event;
 
@@ -27,7 +26,7 @@ exports.handler = function(event,context) {
         	eventPattern:'{"detail-type":["AWS Console Sign In via CloudTrail"]}',
         	ruleState:"ENABLED",
         	targetId: id,
-        	emailAddress : process.env.Notification_Email,
+        	emailAddress : process.env.NotificationEmail,
         	AccountId: AccountId,
         	region: region,
     		roleArn: null,
@@ -36,7 +35,7 @@ exports.handler = function(event,context) {
     	};
     
     	function succeeded(input) {
-       	  	context.done(null,true);
+		context.done(null,true);
     	}
     	function failed(input) {
         	context.done(null,false);
