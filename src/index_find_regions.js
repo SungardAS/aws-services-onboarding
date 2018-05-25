@@ -15,6 +15,7 @@ exports.handler = (event, context, callback) => {
       "SecretAccessKey": event.credentials.Credentials.SecretAccessKey,
       "SessionToken": event.credentials.Credentials.SessionToken
     }
+    event.awsevents.Credentials = credentials;
     credentials = new Buffer(JSON.stringify(credentials)).toString('base64');
     event.cloudtrail.headers.Credentials = credentials;
     event.awsconfig.headers.Credentials = credentials;

@@ -69,6 +69,7 @@ baseHandler.post = function(params, callback) {
   if(account.type.toLowerCase() != 'craws')
   {
     inputDoc.configrules.customerAccount = account.id;
+    inputDoc.awsevents.accountType = account.type;
     inputDoc.health.cloudformationLambdaExecutionRole = "cloudformation-lambda-execution-role"
     inputDoc.health.codePipelineServiceRole = "AWS-CodePipeline-Service"
     inputDoc.health.gitHubPersonalAccessToken = process.env.GIT_HUB_ACCESS_TOKEN

@@ -59,6 +59,9 @@ Parameters:
   SGS :
     Type: String
     Description: Security group 
+  Notification_Email:
+    Type: String
+    Description: Email ID to send the Console Sign-in alerts to
 
 Resources:
   EncryptionDecryptionKey:
@@ -130,6 +133,8 @@ Resources:
                       - "logs:*"
                       - "ses:*"
                       - "kms:*"
+                      - "events:*"
+                      - "sns:*"
                     Resource: "*"
 
   PreMasterFederationLambdaFunction:
@@ -282,6 +287,18 @@ Resources:
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 300
+  SetConsoleSignInAlertLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Set-Console-Sign-In-Alert
+      Handler: index_set_console_signin_alert.handler
+      Runtime: nodejs4.3
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 300
+      Environment:
+        Variables:
+          Notification_Email: !Ref Notification_Email 
 
   ApiGatewayApi:
     Type: AWS::Serverless::Api
@@ -570,7 +587,7 @@ Resources:
             },
             "Parallel": {
               "Type": "Parallel",
-              "Next": "ConfigRulesActionState",
+              "Next": "AWSConsoleSignInAlertState",
               "Branches": [
                 {
                   "StartAt": "CloudtrailActionState",
@@ -597,6 +614,13 @@ Resources:
                   }
                 }
               ]
+            },
+            "AWSConsoleSignInAlertState": {
+               "Type" : "Task",
+               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Console-Sign-In-Alert",
+               "InputPath": "$[0].awsevents",
+               "ResultPath": "$[0].awsevents.result",
+               "Next": "ConfigRulesActionState"
             },
             "ConfigRulesActionState": {
               "Type": "Task",

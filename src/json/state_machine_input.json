@@ -131,12 +131,22 @@
     "result": null,
     "rules": []
   },
+  "awsevents": {
+    "customerAccount": null,
+    "accountType": null,
+    "Credentials": null,
+    "body": {
+      "region": null
+    },
+    "result": null
+  },
   "final_result": {
     "account_id": null,
     "alerts_destination": {},
     "cloudtrail": {},
     "awsconfig": {},
     "health": null,
-    "configrules": {}
+    "configrules": {},
+    "awsevents": {}
   }
 }
