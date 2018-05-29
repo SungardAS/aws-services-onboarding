@@ -38,14 +38,14 @@ exports.handler = function(event, context, callback) {
                 dbIamRoles[idx].account = accData.dataValues.id;
                 mcawsDbObj.AwsIamRole(iamResp =>
                   iamResp.findOne({
-                     where: dbIamRoles[idx]
+                     where: {arn: dbIamRoles[idx].arn}
                   })
                   .then(resultData =>{
                     if(resultData) {
                        console.log("IAM Role entry is already there.");
                        return resultData;
                     }
-                    else return iamResp.create({arn: dbIamRoles[idx].arn}); 
+                    else return iamResp.create(dbIamRoles[idx]);
                   })
                     .then(roleData => {
                       console.log('role updation Done :)');
