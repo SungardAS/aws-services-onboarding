@@ -3,7 +3,6 @@
 const Sequelize = require('sequelize');
 
 function getDbOrmObj(user, passwd, host, dbname) {
-  console.log(user, passwd, host, dbname);
   const dbObj = new Sequelize(dbname, user, passwd, {
     host:host,
     dialect: 'mysql',
