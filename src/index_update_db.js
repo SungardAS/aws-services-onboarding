@@ -45,7 +45,7 @@ exports.handler = function(event, context, callback) {
                        console.log("IAM Role entry is already there.");
                        return resultData;
                     }
-                    else return iamResp.create(dbIamRoles[idx]);
+                    else return iamResp.create({arn: dbIamRoles[idx].arn}); 
                   })
                     .then(roleData => {
                       console.log('role updation Done :)');
