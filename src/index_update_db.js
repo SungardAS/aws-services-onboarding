@@ -23,21 +23,23 @@ exports.handler = function(event, context, callback) {
     );
     mcawsDbObj.AwsAccount(accResp => {
       accResp.sync().then(() =>
-        accResp.findAll({
-			where: dbAwsAccount
-		}).then(resultData => {
-			if (resultData.length >= 1) throw "Already data present in database, skipping insert.";
-			else return true;
-		}).then(() =>
-		accResp
-          .create(dbAwsAccount))
+        accResp
+          .create(dbAwsAccount)
           .then(accData => {
             if (dbAwsAccount.account_type.toLowerCase() != 'craws') {
               for (let idx = 0; idx < dbIamRoles.length; idx++) {
                 dbIamRoles[idx].account = accData.dataValues.id;
                 mcawsDbObj.AwsIamRole(iamResp =>
-                  iamResp
-                    .create(dbIamRoles[idx])
+                  iamResp.findOne({
+                     where: dbIamRoles[idx]
+                  })
+                  .then(resultData =>{
+                    if(resultData) {
+                       console.log("Found IAM Role entry, skipping entry");
+                       return resultData;
+                    }
+                    else return iamResp.create(dbIamRoles[idx]);
+                  })
                     .then(roleData => {
                       console.log('role updation Done :)');
                       console.log(roleData);
