@@ -23,8 +23,14 @@ exports.handler = function(event, context, callback) {
     );
     mcawsDbObj.AwsAccount(accResp => {
       accResp.sync().then(() =>
-        accResp
-          .create(dbAwsAccount)
+        accResp.findAll({
+			where: dbAwsAccount
+		}).then(resultData => {
+			if (resultData.length >= 1) throw "Already data present in database, skipping insert.";
+			else return true;
+		}).then(() =>
+		accResp
+          .create(dbAwsAccount))
           .then(accData => {
             if (dbAwsAccount.account_type.toLowerCase() != 'craws') {
               for (let idx = 0; idx < dbIamRoles.length; idx++) {
