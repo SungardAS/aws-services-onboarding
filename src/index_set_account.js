@@ -23,6 +23,9 @@ exports.handler = (event, context, callback) => {
 
   // set account id in health alert
   if(event.health) event.health.accountId = accountId;
+
+  // set account id in console login alert
+  if(event.awsevents) event.awsevents.customerAccount = accountId;
   console.log(event)
 
   callback(null, event);

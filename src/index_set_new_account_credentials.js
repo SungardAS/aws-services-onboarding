@@ -6,6 +6,7 @@ exports.handler = (event, context, callback) => {
     "SessionToken": event.credentials.Credentials.SessionToken
   }
   event.health.credentials = credentials;
+  event.awsevents.Credentials = credentials;
 
   var codedCredentials = new Buffer(JSON.stringify(credentials)).toString('base64');
   event.cloudtrail.headers.Credentials = codedCredentials;
