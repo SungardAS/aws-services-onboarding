@@ -39,4 +39,5 @@ exports.handler = function(event, context, callback) {
         }
     });
     console.log('End of lambda');
+    callback(null, event);
 };
