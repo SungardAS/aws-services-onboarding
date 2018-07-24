@@ -233,18 +233,6 @@ Resources:
           DB_PASSWORD: !Ref DbPassword
           DB_USERNAME: !Ref DbUserName
           DB_HOST: !Ref DbHost
-  TriggerCloudCheckerLambdaFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: SungardAS-Onboarding-TriggerCloudChecker
-      Handler: index_trigger_cloudchecker_sf.handler
-      Runtime: nodejs4.3
-      CodeUri: ./src
-      Role: !GetAtt ProxyLambdaFunctionIAMRole.Arn
-      Timeout: 70
-      VpcConfig:
-         SecurityGroupIds: !Split [ "," , !Ref SGS ]
-         SubnetIds: !Split [ "," , !Ref Sbnts ]
   FindRegionsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
