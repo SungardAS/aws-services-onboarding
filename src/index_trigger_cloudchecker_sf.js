@@ -5,6 +5,7 @@ const AWS = require('aws-sdk');
 exports.handler = function(event, context, callback) {
     /*************
     This lambda needs the following mandatory parameters in events:
+        - accountTag
         - cloudCheckerSfArn
         - dbAwsAccount
             - awsid
@@ -21,9 +22,9 @@ exports.handler = function(event, context, callback) {
         accountTag: event.accountTag,
         customerAccountId: acc_id,
         customerAccountName: acc_name
-    }
+    };
     let params = {
-        stateMachineArn: cldchk_stpfn_arn,
+        stateMachineArn: cloudchecker_sf_arn,
         name: execution_name,
         input: JSON.stringify(execution_input)
     };
