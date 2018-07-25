@@ -549,6 +549,11 @@ Resources:
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Update-Db",
               "InputPath": "$",
+              "Next": "TriggerCloudCheckr"
+            },
+            "TriggerCloudCheckr": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-TriggerCloudCheckr",
               "Next": "SetupHealthAlert"
             },
             "SetupHealthAlert": {
