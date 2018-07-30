@@ -549,7 +549,23 @@ Resources:
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Update-Db",
               "InputPath": "$",
-              "Next": "TriggerCloudCheckr"
+              "Next": "CloudcheckrChoiceState"
+            },
+            "CloudcheckrChoiceState": {
+              "Type" : "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.cloudcheckr.enableCloudCheckr",
+                  "StringEquals": "true",
+                  "Next": "TriggerCloudCheckr"
+                },
+                {
+                  "Variable": "$.cloudcheckr.enableCloudCheckr",
+                  "StringEquals": "false",
+                  "Next": "SetupHealthAlert"
+                }
+              ],
+              "Default": "SetupHealthAlert"
             },
             "TriggerCloudCheckr": {
               "Type" : "Task",
