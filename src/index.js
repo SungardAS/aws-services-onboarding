@@ -56,6 +56,7 @@ baseHandler.post = function(params, callback) {
      "guid": params.companyguid,
      "checkStatus": true,
   }
+
   inputDoc.account.billingDetails = account;
   if (account.id) {
     inputDoc.account.httpMethod = "GET";
@@ -74,6 +75,7 @@ baseHandler.post = function(params, callback) {
     inputDoc.health.codePipelineServiceRole = "AWS-CodePipeline-Service"
     inputDoc.health.gitHubPersonalAccessToken = process.env.GIT_HUB_ACCESS_TOKEN
     inputDoc.health.subscriptionFilterDestinationArn = process.env.SUBSC_FILTER_DEST
+    inputDoc.cloudcheckr = params.cloudcheckr;
     var stateMachineArn = process.env.STATE_MACHINE_ARN
   } else {
     var stateMachineArn = process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
