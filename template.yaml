@@ -555,12 +555,12 @@ Resources:
               "Type" : "Choice",
               "Choices": [
                 {
-                  "Variable": "$.cloudcheckr.isCloudcheckrEnabled",
+                  "Variable": "$.cloudcheckr.enableCloudCheckr",
                   "StringEquals": "true",
                   "Next": "TriggerCloudCheckr"
                 },
                 {
-                  "Variable": "$.cloudcheckr.isCloudcheckrEnabled",
+                  "Variable": "$.cloudcheckr.enableCloudCheckr",
                   "StringEquals": "false",
                   "Next": "SetupHealthAlert"
                 }
