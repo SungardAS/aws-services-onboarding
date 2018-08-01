@@ -577,6 +577,13 @@ Resources:
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Setup-Health",
               "InputPath": "$.health",
               "ResultPath": "$.health.result",
+              "Next": "CloudtrailActionState"
+            },
+            "CloudtrailActionState": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-east-1:622821376834:function:SungardAS-CloudTrail",
+              "InputPath": "$.cloudtrail",
+              "ResultPath": "$.cloudtrail.result",
               "Next": "FindRegionsState"
             },
             "FindRegionsState": {
@@ -604,50 +611,27 @@ Resources:
             "NextRegionState": {
               "Type" : "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Next-Region",
-              "Next": "Parallel"
+              "Next": "AWSConfigActionState"
             },
-            "Parallel": {
-              "Type": "Parallel",
-              "Next": "AWSConsoleSignInAlertState",
-              "Branches": [
-                {
-                  "StartAt": "CloudtrailActionState",
-                  "States": {
-                    "CloudtrailActionState": {
-                      "Type" : "Task",
-                      "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-CloudTrail",
-                      "InputPath": "$.cloudtrail",
-                      "ResultPath": "$.cloudtrail.result",
-                      "End": true
-                    }
-                  }
-                },
-                {
-                  "StartAt": "AWSConfigActionState",
-                  "States": {
-                    "AWSConfigActionState": {
-                      "Type" : "Task",
-                      "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-AWSConfig",
-                      "InputPath": "$.awsconfig",
-                      "ResultPath": "$.awsconfig.result",
-                      "End": true
-                    }
-                  }
-                }
-              ]
+            "AWSConfigActionState": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-AWSConfig",
+              "InputPath": "$.awsconfig",
+              "ResultPath": "$.awsconfig.result",
+              "Next": "AWSConsoleSignInAlertState"
             },
             "AWSConsoleSignInAlertState": {
                "Type" : "Task",
                "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Console-Sign-In-Alert",
-               "InputPath": "$[0].awsevents",
-               "ResultPath": "$[0].awsevents.result",
+               "InputPath": "$.awsevents",
+               "ResultPath": "$.awsevents.result",
                "Next": "ConfigRulesActionState"
             },
             "ConfigRulesActionState": {
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-ConfigRules",
-              "InputPath": "$[0].configrules",
-              "ResultPath": "$[0].configrules.result",
+              "InputPath": "$.configrules",
+              "ResultPath": "$.configrules.result",
               "Next": "SetResultsState"
             },
             "SetResultsState": {
