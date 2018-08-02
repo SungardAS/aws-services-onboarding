@@ -611,14 +611,34 @@ Resources:
               "Next": "AWSConsoleSignInAlertState",
               "Branches": [
                 {
-                  "StartAt": "CloudtrailActionState",
+                  "StartAt": "CloudtrailChoiceState",
                   "States": {
+                    "CloudtrailChoiceState": {
+                      "Type" : "Choice",
+                      "Choices": [
+                        {
+                          "Variable": "$.cloudtrail.body.region",
+                          "StringEquals": "us-east-1",
+                          "Next": "CloudtrailActionState"
+                        },
+                        {
+                          "Variable": "$.cloudtrail.body.region",
+                          "StringEquals": "us-west-2",
+                          "Next": "CloudtrailActionState"
+                        }
+                      ],
+                      "Default": "Done"
+                    },
                     "CloudtrailActionState": {
                       "Type" : "Task",
                       "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-CloudTrail",
                       "InputPath": "$.cloudtrail",
                       "ResultPath": "$.cloudtrail.result",
                       "End": true
+                    },
+                    "Done": {
+                    "Type": "Pass",
+                    "End": true
                     }
                   }
                 },
