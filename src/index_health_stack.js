@@ -22,6 +22,10 @@ exports.handler = function (event, context) {
     sessionToken: input.credentials.SessionToken
   });
 
+  event.cloudtrail.queryStringParameters.region = process.env.AWS_DEFAULT_REGION;
+  event.cloudtrail.body.region = process.env.AWS_DEFAULT_REGION;
+  event.cloudtrail.headers.Credentials = creds;
+
   // create cloudformation and codepipeline roles first if not exist
   createRole(creds, input.cloudformationLambdaExecutionRole, function(err, data) {
     if (err) {

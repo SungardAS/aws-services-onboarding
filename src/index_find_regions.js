@@ -17,7 +17,8 @@ exports.handler = (event, context, callback) => {
     }
     event.awsevents.Credentials = credentials;
     credentials = new Buffer(JSON.stringify(credentials)).toString('base64');
-    event.cloudtrail.headers.Credentials = credentials;
+    var cloudtrailResult = JSON.parse(event.cloudtrail.result.body);
+    event.final_result.cloudtrail[event.cloudtrail.body.region] = cloudtrailResult.result;
     event.awsconfig.headers.Credentials = credentials;
     event.configrules.headers.Credentials = credentials;
     console.log(event);
