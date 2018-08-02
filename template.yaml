@@ -549,6 +549,27 @@ Resources:
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Update-Db",
               "InputPath": "$",
+              "Next": "CloudcheckrChoiceState"
+            },
+            "CloudcheckrChoiceState": {
+              "Type" : "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.cloudcheckr.enableCloudCheckr",
+                  "StringEquals": "true",
+                  "Next": "TriggerCloudCheckr"
+                },
+                {
+                  "Variable": "$.cloudcheckr.enableCloudCheckr",
+                  "StringEquals": "false",
+                  "Next": "SetupHealthAlert"
+                }
+              ],
+              "Default": "SetupHealthAlert"
+            },
+            "TriggerCloudCheckr": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-TriggerCloudCheckr",
               "Next": "SetupHealthAlert"
             },
             "SetupHealthAlert": {
@@ -590,14 +611,34 @@ Resources:
               "Next": "AWSConsoleSignInAlertState",
               "Branches": [
                 {
-                  "StartAt": "CloudtrailActionState",
+                  "StartAt": "CloudtrailChoiceState",
                   "States": {
+                    "CloudtrailChoiceState": {
+                      "Type" : "Choice",
+                      "Choices": [
+                        {
+                          "Variable": "$.cloudtrail.body.region",
+                          "StringEquals": "us-east-1",
+                          "Next": "CloudtrailActionState"
+                        },
+                        {
+                          "Variable": "$.cloudtrail.body.region",
+                          "StringEquals": "us-west-2",
+                          "Next": "CloudtrailActionState"
+                        }
+                      ],
+                      "Default": "PassCloudtrailActionState"
+                    },
                     "CloudtrailActionState": {
                       "Type" : "Task",
                       "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-CloudTrail",
                       "InputPath": "$.cloudtrail",
                       "ResultPath": "$.cloudtrail.result",
                       "End": true
+                    },
+                    "PassCloudtrailActionState": {
+                    "Type": "Pass",
+                    "End": true
                     }
                   }
                 },
