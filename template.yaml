@@ -627,7 +627,7 @@ Resources:
                           "Next": "CloudtrailActionState"
                         }
                       ],
-                      "Default": "Done"
+                      "Default": "PassCloudtrailActionState"
                     },
                     "CloudtrailActionState": {
                       "Type" : "Task",
@@ -636,7 +636,7 @@ Resources:
                       "ResultPath": "$.cloudtrail.result",
                       "End": true
                     },
-                    "Done": {
+                    "PassCloudtrailActionState": {
                     "Type": "Pass",
                     "End": true
                     }
