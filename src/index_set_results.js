@@ -5,6 +5,8 @@ exports.handler = (event, context, callback) => {
     var cloudtrailResult = JSON.parse(event[0].cloudtrail.result.body);
     event[0].final_result.cloudtrail[event[0].cloudtrail.body.region] = cloudtrailResult.result;
   }
+  else
+    event[0].final_result.cloudtrail[event[0].cloudtrail.body.region] = false;
   var awsconfigResult = JSON.parse(event[1].awsconfig.result.body);
   event[0].final_result.awsconfig[event[0].awsconfig.body.region] = awsconfigResult.result;
   var awseventsResult = JSON.stringify(event[0].awsevents.result);
