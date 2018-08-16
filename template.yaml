@@ -142,7 +142,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Pre-Master-Federation
       Handler: index_pre_master_account_federation.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
@@ -151,7 +151,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Set-Master-Credentials
       Handler: index_set_master_account_credentials.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
@@ -160,7 +160,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Enable-Billing-Activation
       Handler: index_enable_billing_activation.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
@@ -177,7 +177,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Set-Account
       Handler: index_set_account.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
@@ -186,7 +186,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Pre-New-Federation
       Handler: index_pre_new_account_federation.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
@@ -195,7 +195,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Set-New-Credentials
       Handler: index_set_new_account_credentials.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
@@ -204,7 +204,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Create-Aws-Iam-Roles
       Handler: index_create_aws_iam_roles.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
@@ -218,7 +218,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Update-Db
       Handler: index_update_db.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 70
@@ -238,7 +238,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Find-Regions
       Handler: index_find_regions.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
@@ -247,7 +247,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Next-Region
       Handler: index_next_region.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
@@ -256,7 +256,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Set-Results
       Handler: index_set_results.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
@@ -265,7 +265,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Final-Result
       Handler: index_final_result.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 60
@@ -274,7 +274,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Setup-Health
       Handler: index_health_stack.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 300
@@ -283,7 +283,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Add-Account-To-Destination
       Handler: index_alerts_destination.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 300
@@ -292,7 +292,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Set-Console-Sign-In-Alert
       Handler: index_set_console_signin_alert.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
       Timeout: 300
@@ -348,7 +348,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-Proxy
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt ProxyLambdaFunctionIAMRole.Arn
       Timeout: 60
@@ -418,7 +418,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Onboarding-CloudwatchLogs
       Handler: index_cloudwatchlogs.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: ./src
       Role: !GetAtt AlertLambdaFunctionIAMRole.Arn
       Timeout: 300
@@ -549,7 +549,23 @@ Resources:
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Update-Db",
               "InputPath": "$",
-              "Next": "TriggerCloudCheckr"
+              "Next": "CloudcheckrChoiceState"
+            },
+            "CloudcheckrChoiceState": {
+              "Type" : "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.cloudcheckr.enableCloudCheckr",
+                  "StringEquals": "true",
+                  "Next": "TriggerCloudCheckr"
+                },
+                {
+                  "Variable": "$.cloudcheckr.enableCloudCheckr",
+                  "StringEquals": "false",
+                  "Next": "SetupHealthAlert"
+                }
+              ],
+              "Default": "SetupHealthAlert"
             },
             "TriggerCloudCheckr": {
               "Type" : "Task",
@@ -595,14 +611,34 @@ Resources:
               "Next": "AWSConsoleSignInAlertState",
               "Branches": [
                 {
-                  "StartAt": "CloudtrailActionState",
+                  "StartAt": "CloudtrailChoiceState",
                   "States": {
+                    "CloudtrailChoiceState": {
+                      "Type" : "Choice",
+                      "Choices": [
+                        {
+                          "Variable": "$.cloudtrail.body.region",
+                          "StringEquals": "us-east-1",
+                          "Next": "CloudtrailActionState"
+                        },
+                        {
+                          "Variable": "$.cloudtrail.body.region",
+                          "StringEquals": "us-west-2",
+                          "Next": "CloudtrailActionState"
+                        }
+                      ],
+                      "Default": "PassCloudtrailActionState"
+                    },
                     "CloudtrailActionState": {
                       "Type" : "Task",
                       "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-CloudTrail",
                       "InputPath": "$.cloudtrail",
                       "ResultPath": "$.cloudtrail.result",
                       "End": true
+                    },
+                    "PassCloudtrailActionState": {
+                    "Type": "Pass",
+                    "End": true
                     }
                   }
                 },

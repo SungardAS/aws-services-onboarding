@@ -40,10 +40,12 @@
       "Credentials": null
     },
     "queryStringParameters": {
-      "region": null
+      "region": null,
+      "multiRegion": true
     },
     "body": {
-      "region": null
+      "region": null,
+      "multiRegion": true
     },
     "result": null
   },
