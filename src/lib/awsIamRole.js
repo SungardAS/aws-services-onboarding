@@ -39,7 +39,9 @@ var deleteIAMRole = function(iam, options, cb) {
 */
 var createRole = function(iam, options, cb) {
   var extid = options.externalId;
-  options.assumeRolePolicyDocument.Statement[0].Condition.StringEquals = {"sts:ExternalId": extid};
+  if (options.externalId !== null) {
+    options.assumeRolePolicyDocument.Statement[0].Condition.StringEquals = {"sts:ExternalId": extid};
+  }
   var params = {
     AssumeRolePolicyDocument: JSON.stringify(options.assumeRolePolicyDocument),
     RoleName: options.roleName,
