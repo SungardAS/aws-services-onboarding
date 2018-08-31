@@ -62,12 +62,12 @@
 			}
 		],
 		"craws": [{
-				"roleName": "SCFullAdmin",
+				"roleName": "sgas_sc_admin",
 				"policyArn": "arn:aws:iam::aws:policy/AWSServiceCatalogAdminFullAccess",
 				"federate": true
 			},
 			{
-				"roleName": "R2COpsAdmin",
+				"roleName": "FullAdmin",
 				"policyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
 				"federate": true
 			}
