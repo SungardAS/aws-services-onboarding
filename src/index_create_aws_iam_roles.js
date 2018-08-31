@@ -75,8 +75,8 @@ exports.handler = function(event, context, callback) {
         console.log('Res:', data);
       });
     }
+    event.dbIamRoles = dbIamRoles;
+    event.dbAwsAccount = dbAwsAccount;
   }
-  event.dbIamRoles = dbIamRoles;
-  event.dbAwsAccount = dbAwsAccount;
   callback(null, event);
 };
