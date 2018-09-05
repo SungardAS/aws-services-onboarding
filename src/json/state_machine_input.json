@@ -1,5 +1,6 @@
 {
   "credentials": null,
+  "current_region": null,
   "billing_master": {
     "roles":[]
   },
