@@ -142,7 +142,14 @@
     },
     "result": null
   },
-  "share_portfolio_params": null,
+  "share_portfolio_params": {
+    "aws_region_id": null,
+    "aws_account_id": null,
+    "role_details": {
+      "role_name": null,
+      "external_id": null
+    }
+  },
   "final_result": {
     "account_id": null,
     "alerts_destination": {},
