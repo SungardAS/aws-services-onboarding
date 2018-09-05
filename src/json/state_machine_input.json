@@ -142,6 +142,7 @@
     },
     "result": null
   },
+  "share_portfolio_params": null,
   "final_result": {
     "account_id": null,
     "alerts_destination": {},
