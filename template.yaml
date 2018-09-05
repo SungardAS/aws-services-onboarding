@@ -743,6 +743,26 @@ Resources:
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Update-Db",
               "InputPath": "$",
+              "Next": "InvokeSharePortfolio"
+            },
+            "InvokeSharePortfolio": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:cbr-invoke-sharedportfolio",
+              "InputPath": "$",
+              "Next": "CheckSharePortfilioStatus"
+            },
+            "CheckSharePortfilioStatus": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:cbr-check-sharedportfolio-invocation",
+              "InputPath": "$",
+              "Retry": [
+                {
+                  "ErrorEquals": ["States.TaskFailed"],
+                  "IntervalSeconds": 5,
+                  "MaxAttempts": 120,
+                  "BackoffRate": 1.0
+                }
+              ],
               "Next": "SetFinalResultState"
             },
             "SetFinalResultState": {

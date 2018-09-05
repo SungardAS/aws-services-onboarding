@@ -62,6 +62,13 @@ exports.handler = function(event, context, callback) {
         payload.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${process
           .env.DATADOG_AWD_ID}:root`;
       }
+      // Collect share portfolio params data for stepfunction invocation
+      if (payload.roleName == 'sgas_sc_admin') {
+        event.share_portfolio_params.aws_region_id = 'us-east-1';
+        event.share_portfolio_params.aws_account_id = payload.account;
+        event.share_portfolio_params.role_details.role_name = payload.roleName;
+        event.share_portfolio_params.role_details.external_id = payload.externalId;
+      }
       if (payload.federate) {
         dbIamRoles.push({
           externalId: payload.externalId,
