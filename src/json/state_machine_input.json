@@ -1,5 +1,6 @@
 {
   "credentials": null,
+  "current_region": null,
   "billing_master": {
     "roles":[]
   },
@@ -141,6 +142,14 @@
       "region": null
     },
     "result": null
+  },
+  "share_portfolio_params": {
+    "aws_region_id": null,
+    "aws_account_id": null,
+    "role_details": {
+      "role_name": null,
+      "external_id": null
+    }
   },
   "final_result": {
     "account_id": null,

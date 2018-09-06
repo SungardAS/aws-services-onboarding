@@ -26,6 +26,9 @@ Parameters:
   AdminRoleName:
     Type: String
     Description: AWS admin role name
+  SCAdminRoleName:
+    Type: String
+    Description: AWS Service Catalog admin role name
   DataDogAwsId:
     Type: String
     Description: Aws Id of Datadog Aws Account
@@ -213,6 +216,7 @@ Resources:
           MASTER_MGM_AWS_ID: !Ref MasterMgmAwsId
           DATADOG_AWD_ID: !Ref DataDogAwsId
           ADMIN_ROLE_NAME: !Ref AdminRoleName
+          SC_ADMIN_ROLE_NAME: !Ref SCAdminRoleName
   UpdateDbLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -743,6 +747,26 @@ Resources:
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Update-Db",
               "InputPath": "$",
+              "Next": "InvokeSharePortfolio"
+            },
+            "InvokeSharePortfolio": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:cbr-invoke-sharedportfolio",
+              "InputPath": "$",
+              "Next": "CheckSharePortfilioStatus"
+            },
+            "CheckSharePortfilioStatus": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:cbr-check-sharedportfolio-invocation",
+              "InputPath": "$",
+              "Retry": [
+                {
+                  "ErrorEquals": ["States.TaskFailed"],
+                  "IntervalSeconds": 5,
+                  "MaxAttempts": 120,
+                  "BackoffRate": 1.0
+                }
+              ],
               "Next": "SetFinalResultState"
             },
             "SetFinalResultState": {
