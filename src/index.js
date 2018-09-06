@@ -69,6 +69,7 @@ baseHandler.post = function(params, callback) {
   inputDoc.federation.authorizer_user_guid = params.userGuid;
   if(account.type.toLowerCase() != 'craws')
   {
+    inputDoc.current_region = process.env.AWS_DEFAULT_REGION;
     inputDoc.configrules.customerAccount = account.id;
     inputDoc.awsevents.accountType = account.type;
     inputDoc.health.cloudformationLambdaExecutionRole = "cloudformation-lambda-execution-role"
