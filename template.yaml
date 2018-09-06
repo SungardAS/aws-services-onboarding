@@ -581,8 +581,18 @@ Resources:
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Setup-Health",
               "InputPath": "$.health",
               "ResultPath": "$.health.result",
+              "Next": "TriggerPreconfig"
+            },
+
+            "TriggerPreconfig": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:ManagedVpcPreConfig-Trigger-StateMachine ",
+              "InputPath": "$",
+              "ResultPath": "$",
               "Next": "FindRegionsState"
             },
+
+
             "FindRegionsState": {
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Find-Regions",
