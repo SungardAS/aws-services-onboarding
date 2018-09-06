@@ -34,12 +34,20 @@ exports.handler = function(event, context, callback) {
     const dbIamRoles = [];
 
     const roles = awsroles.roles[accountData.type.toLowerCase()];
-    if (accountData.type.toLowerCase() == 'managed')
+    if (accountData.type.toLowerCase() == 'managed') {
       roles.push({
         roleName: process.env.ADMIN_ROLE_NAME,
         policyArn: awsroles.adminPolicyArn,
         federate: true
       });
+    } else if (accountData.type.toLowerCase() == 'craws') {
+      // Add Service Catalog admin role
+      roles.push({
+        roleName: process.env.SC_ADMIN_ROLE_NAME,
+        policyArn: awsroles.scAdminPolicyArn,
+        federate: true
+      });
+    }
 
     const dbAwsAccount = {
       awsid: options.account,
@@ -63,7 +71,7 @@ exports.handler = function(event, context, callback) {
           .env.DATADOG_AWD_ID}:root`;
       }
       // Collect share portfolio params data for stepfunction invocation
-      if (payload.roleName == 'sgas_sc_admin') {
+      if (payload.roleName == process.env.SC_ADMIN_ROLE_NAME) {
         event.share_portfolio_params.aws_region_id = event.current_region;
         event.share_portfolio_params.aws_account_id = payload.account;
         event.share_portfolio_params.role_details.role_name = payload.roleName;
