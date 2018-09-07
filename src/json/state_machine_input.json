@@ -118,6 +118,24 @@
       ]
     }
   },
+  "managedvpcpreconfig": {
+  "credentials": null,
+  "federation": {
+    "roles": [
+      
+    ],
+    "authorizer_user_guid": null,
+    "durationSeconds": 0
+  },
+  "manageVpcPreConfig": {
+    "account": "",
+    "region": ""
+  },
+  "output": {
+    "status": null
+  }
+},
+
   "configrules": {
     "path": "/configrules",
     "httpMethod": "POST",
