@@ -119,6 +119,27 @@
       ]
     }
   },
+  "vpcpreconfig":{  
+    "credentials":null,
+    "federation":{  
+       "roles":[  
+
+       ],
+       "authorizer_user_guid":null,
+       "durationSeconds":0
+    },
+    "managedVpcPreConfig":{  
+       "account":null,
+       "region":null,
+       "regions":[  
+          "us-east-1",
+          "us-west-2"
+       ]
+    },
+    "dbStatus":[  
+
+    ]
+ },
   "configrules": {
     "path": "/configrules",
     "httpMethod": "POST",
