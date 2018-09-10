@@ -128,7 +128,7 @@
        "authorizer_user_guid":null,
        "durationSeconds":0
     },
-    "manageVpcPreConfig":{  
+    "managedVpcPreConfig":{  
        "account":null,
        "region":null,
        "regions":[  
