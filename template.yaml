@@ -745,13 +745,6 @@ Resources:
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Account",
               "InputPath": "$",
-              "Next": "AddAccountToAlertDestinations"
-            },
-            "AddAccountToAlertDestinations": {
-              "Type": "Task",
-              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Add-Account-To-Destination",
-              "InputPath": "$.alerts_destination",
-              "ResultPath": "$.alerts_destination.result",
               "Next": "PreNewAccountFederation"
             },
             "PreNewAccountFederation": {
