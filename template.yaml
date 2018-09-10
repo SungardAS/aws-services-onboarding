@@ -586,7 +586,7 @@ Resources:
 
             "TriggerPreconfig": {
               "Type": "Task",
-              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:ManagedVpcPreConfig-Trigger-StateMachine ",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:ManagedVpcPreConfig-Trigger-StateMachine",
               "InputPath": "$",
               "ResultPath": "$",
               "Next": "FindRegionsState"
