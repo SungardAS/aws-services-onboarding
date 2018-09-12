@@ -49,9 +49,9 @@ exports.handler = function(event, context, callback) {
                 .then(roleData => {
                   console.log('role updation Done :)');
                   console.log(roleData);
-                  if (idx == dbIamRoles.length - 1) mcawsDbObj.CloseConnection();
                 })
                 .catch(errRole => console.log(errRole))
+                .finally(() => mcawsDbObj.CloseConnection())
               );
             }
           })
