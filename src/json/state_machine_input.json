@@ -1,5 +1,6 @@
 {
   "credentials": null,
+  "current_region": null,
   "billing_master": {
     "roles":[]
   },
@@ -118,6 +119,27 @@
       ]
     }
   },
+  "vpcpreconfig":{  
+    "credentials":null,
+    "federation":{  
+       "roles":[  
+
+       ],
+       "authorizer_user_guid":null,
+       "durationSeconds":0
+    },
+    "managedVpcPreConfig":{  
+       "account":null,
+       "region":null,
+       "regions":[  
+          "us-east-1",
+          "us-west-2"
+       ]
+    },
+    "dbStatus":[  
+
+    ]
+ },
   "configrules": {
     "path": "/configrules",
     "httpMethod": "POST",
@@ -141,6 +163,14 @@
       "region": null
     },
     "result": null
+  },
+  "share_portfolio_params": {
+    "aws_region_id": null,
+    "aws_account_id": null,
+    "role_details": {
+      "role_name": null,
+      "external_id": null
+    }
   },
   "final_result": {
     "account_id": null,

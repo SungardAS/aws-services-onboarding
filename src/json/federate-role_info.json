@@ -60,9 +60,16 @@
 				"policyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
 				"federate": true
 			}
+		],
+		"craws": [{
+				"roleName": "FullAdmin",
+				"policyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
+				"federate": true
+			}
 		]
 	},
 	"adminPolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess",
+	"scAdminPolicyArn": "arn:aws:iam::aws:policy/AWSServiceCatalogAdminFullAccess",
         "adminRolePath":"/",
 	"assumeRolePolicyDocument": {
 		"Version": "2012-10-17",

@@ -33,30 +33,26 @@ exports.handler = function(event, context, callback) {
              else return accResp.create(dbAwsAccount);
          })
           .then(accData => {
-            if (dbAwsAccount.account_type.toLowerCase() != 'craws') {
-              for (let idx = 0; idx < dbIamRoles.length; idx++) {
-                dbIamRoles[idx].account = accData.dataValues.id;
-                mcawsDbObj.AwsIamRole(iamResp =>
-                  iamResp.findOne({
-                     where: {arn: dbIamRoles[idx].arn}
-                  })
-                  .then(resultData =>{
-                    if(resultData) {
-                       console.log("IAM Role entry is already there.");
-                       return resultData;
-                    }
-                    else return iamResp.create(dbIamRoles[idx]);
-                  })
-                    .then(roleData => {
-                      console.log('role updation Done :)');
-                      console.log(roleData);
-                      if (idx == dbIamRoles.length - 1) mcawsDbObj.CloseConnection();
-                    })
-                    .catch(errRole => console.log(errRole))
-                );
-              }
-            } else {
-              mcawsDbObj.CloseConnection();
+            for (let idx = 0; idx < dbIamRoles.length; idx++) {
+              dbIamRoles[idx].account = accData.dataValues.id;
+              mcawsDbObj.AwsIamRole(iamResp =>
+                iamResp.findOne({
+                   where: {arn: dbIamRoles[idx].arn}
+                })
+                .then(resultData =>{
+                  if(resultData) {
+                     console.log("IAM Role entry is already there.");
+                     return resultData;
+                  }
+                  else return iamResp.create(dbIamRoles[idx]);
+                })
+                .then(roleData => {
+                  console.log('role updation Done :)');
+                  console.log(roleData);
+                })
+                .catch(errRole => console.log(errRole))
+                .finally(() => mcawsDbObj.CloseConnection())
+              );
             }
           })
           .catch(errAcc => console.log(errAcc))

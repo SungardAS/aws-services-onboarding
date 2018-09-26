@@ -58,6 +58,7 @@ baseHandler.post = function(params, callback) {
   }
 
   inputDoc.account.billingDetails = account;
+  inputDoc.current_region = process.env.AWS_DEFAULT_REGION;
   if (account.id) {
     inputDoc.account.httpMethod = "GET";
     inputDoc.account.queryStringParameters.accountId = account.id;
