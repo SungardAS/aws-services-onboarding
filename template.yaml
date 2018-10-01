@@ -229,7 +229,6 @@ Resources:
       VpcConfig:
          SecurityGroupIds: !Split [ "," , !Ref SGS ]
          SubnetIds: !Split [ "," , !Ref Sbnts ]
-
       Environment:
         Variables:
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
@@ -581,9 +580,19 @@ Resources:
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Setup-Health",
               "InputPath": "$.health",
               "ResultPath": "$.health.result",
-              "Next": "TriggerPreconfig"
+              "Next": "IsManagedAccount"
             },
-
+            "IsManagedAccount": {
+              "Type" : "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.dbAwsAccount.account_type",
+                  "StringEquals": "Managed",
+                  "Next": "TriggerPreconfig"
+                }
+              ],
+              "Default": "FindRegionsState"
+            },
             "TriggerPreconfig": {
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:ManagedVpcPreConfig-Trigger-StateMachine",
@@ -591,8 +600,6 @@ Resources:
               "ResultPath": "$",
               "Next": "FindRegionsState"
             },
-
-
             "FindRegionsState": {
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Find-Regions",
