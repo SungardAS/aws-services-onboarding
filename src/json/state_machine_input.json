@@ -1,6 +1,9 @@
 {
   "credentials": null,
   "current_region": null,
+  "dradminRole": {
+    "name": "dradmin"
+  },
   "billing_master": {
     "roles":[]
   },
