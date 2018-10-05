@@ -4,7 +4,7 @@ const AWS = require('aws-sdk');
 const McawsModels = require('./models/mcawsModels.js');
 let mcawsDbObj = null;
 
-function addDradminRole(dbAwsAccount, dradminRole,
+function addDradminRole(dbAwsAccount, drAdminRole,
                         accountDetails, fullAdminRoleName) {
   return new Promise((resolve, reject) => {
     if(dbAwsAccount.account_type.toLowerCase() != 'craws') {
@@ -13,7 +13,7 @@ function addDradminRole(dbAwsAccount, dradminRole,
     } else {
       mcawsDbObj.Role(roleResp => {
         roleResp.findOne({
-          where: dradminRole
+          where: drAdminRole
         })
         .then(roleData => {
           if(roleData) {
@@ -134,7 +134,7 @@ exports.handler = function(event, context, callback) {
   const dbIamRoles = event.dbIamRoles;
   const dbAwsAccount = event.dbAwsAccount;
   const fullAdminRoleName = 'FullAdmin';
-  const dradminRole = event.dradminRole;
+  const drAdminRole = event.drAdminRole;
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');
   const cipherText = { CiphertextBlob: encryptedBuf };
   const kms = new AWS.KMS({ region: process.env.KMS_REGION });
@@ -167,7 +167,7 @@ exports.handler = function(event, context, callback) {
             accountDetails = JSON.parse(JSON.stringify(accData));
             createIamRoles(dbIamRoles, accData, mcawsDbObj)
             .then(() => {
-              addDradminRole(dbAwsAccount, dradminRole,
+              addDradminRole(dbAwsAccount, drAdminRole,
                              accountDetails, fullAdminRoleName)
               .then(() => mcawsDbObj.CloseConnection())
             })
