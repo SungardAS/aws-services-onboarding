@@ -5,7 +5,7 @@ const McawsModels = require('./models/mcawsModels.js');
 let mcawsDbObj = null;
 
 function addDradminRole(dbAwsAccount, dradminRole,
-                        accDetails, fullAdminRoleName) {
+                        accountDetails, fullAdminRoleName) {
   return new Promise((resolve, reject) => {
     if(dbAwsAccount.account_type.toLowerCase() != 'craws') {
       console.log("Account type is not craws. Hence skipping.");
@@ -24,31 +24,31 @@ function addDradminRole(dbAwsAccount, dradminRole,
           }
         })
         .then(roleDataResp => {
-          mcawsDbObj.AwsAccountAdminRolesRoleAdminAwsAccounts(accRole =>
-            accRole.findOne({
+          mcawsDbObj.AwsAccountAdminRolesRoleAdminAwsAccounts(accountRole =>
+            accountRole.findOne({
               where: {
-                awsaccount_adminroles: accDetails.id,
+                awsaccount_adminroles: accountDetails.id,
                 role_adminawsaccounts: roleDataResp.dataValues.id
               }
             })
-            .then(accRoleResp => {
-              if(accRoleResp) {
+            .then(accountRoleResp => {
+              if(accountRoleResp) {
                 console.log("Role already added to awsaccount");
-                return accRoleResp;
-              } else return accRole.create({
-                awsaccount_adminroles: accDetails.id,
+                return accountRoleResp;
+              } else return accountRole.create({
+                awsaccount_adminroles: accountDetails.id,
                 role_adminawsaccounts: roleDataResp.dataValues.id
               })
             })
-            .then(accRoleData => {
+            .then(accountRoleData => {
               console.log("Role added to awsaccount");
-              console.log(accRoleData);
+              console.log(accountRoleData);
             })
           );
           mcawsDbObj.AwsIamRole(iamRole =>
             iamRole.findOne({
               where: {
-                account: accDetails.id,
+                account: accountDetails.id,
                 name: fullAdminRoleName
               }
             })
@@ -124,7 +124,7 @@ function createIamRoles(dbIamRoles, accData, mcawsDbObj) {
       dbIamRoles[idx].account = accData.dataValues.id;
     }
     Promise.all(dbIamRoles.map(createIamRole)).then(function(results){
-      console.log("Completed with everything");
+      console.log("Roles creation completed");
       resolve(true);
     })
   });
@@ -138,7 +138,7 @@ exports.handler = function(event, context, callback) {
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');
   const cipherText = { CiphertextBlob: encryptedBuf };
   const kms = new AWS.KMS({ region: process.env.KMS_REGION });
-  let accDetails = null;
+  let accountDetails = null;
   kms.decrypt(cipherText, (err, passwd) => {
     if (err) {
       console.log('Decrypt error:', err);
@@ -152,23 +152,23 @@ exports.handler = function(event, context, callback) {
       'msaws'
     );
 
-    mcawsDbObj.AwsAccount(accResp => {
-      accResp.sync().then(() =>
-        accResp.findOne({
+    mcawsDbObj.AwsAccount(accountResp => {
+      accountResp.sync().then(() =>
+        accountResp.findOne({
              where: dbAwsAccount
         }).then(accountData =>{
              if(accountData) {
                console.log("Account entry is already there.");
                 return accountData;
              }
-             else return accResp.create(dbAwsAccount);
+             else return accountResp.create(dbAwsAccount);
          })
           .then(accData => {
-            accDetails = JSON.parse(JSON.stringify(accData));
+            accountDetails = JSON.parse(JSON.stringify(accData));
             createIamRoles(dbIamRoles, accData, mcawsDbObj)
             .then(() => {
               addDradminRole(dbAwsAccount, dradminRole,
-                             accDetails, fullAdminRoleName)
+                             accountDetails, fullAdminRoleName)
               .then(() => mcawsDbObj.CloseConnection())
             })
           })
