@@ -2,10 +2,10 @@
 
 const AWS = require('aws-sdk');
 const McawsModels = require('./models/mcawsModels.js');
+const fullAdminRoleName = 'FullAdmin';
 let mcawsDbObj = null;
 
-function addDradminRole(dbAwsAccount, drAdminRole,
-                        accountDetails, fullAdminRoleName) {
+function addDradminRole(dbAwsAccount, drAdminRole, accountDetails) {
   return new Promise((resolve, reject) => {
     if(dbAwsAccount.account_type.toLowerCase() != 'craws') {
       console.log("Account type is not craws. Hence skipping.");
@@ -56,8 +56,8 @@ function addDradminRole(dbAwsAccount, drAdminRole,
               if(iamRoleResp) {
                 return iamRoleResp;
               } else {
-                console.log("Target role does not exists");
-                reject("Target role does not exists");
+                console.log("IAM role does not exists");
+                reject("IAM role does not exists");
               }
             })
             .then(iamRoleData =>
@@ -70,7 +70,7 @@ function addDradminRole(dbAwsAccount, drAdminRole,
                 })
                 .then(iamRoleRoleResp => {
                   if(iamRoleRoleResp) {
-                    console.log("Role already added to iam roles");
+                    console.log("dradmin role already added to iam roles");
                     return iamRoleRoleResp;
                   } else return iamRoleRole.create({
                     awsiamrole_roles: iamRoleData.dataValues.id,
@@ -78,7 +78,7 @@ function addDradminRole(dbAwsAccount, drAdminRole,
                   })
                 })
                 .then(iamRoleRoleData => {
-                  console.log("Role added to iam role")
+                  console.log("dradmin role added to iam role")
                   console.log(iamRoleRoleData);
                   resolve(true);
                 })
@@ -124,7 +124,7 @@ function createIamRoles(dbIamRoles, accData, mcawsDbObj) {
       dbIamRoles[idx].account = accData.dataValues.id;
     }
     Promise.all(dbIamRoles.map(createIamRole)).then(function(results){
-      console.log("Roles creation completed");
+      console.log("IAM roles creation completed");
       resolve(true);
     })
   });
@@ -133,7 +133,6 @@ function createIamRoles(dbIamRoles, accData, mcawsDbObj) {
 exports.handler = function(event, context, callback) {
   const dbIamRoles = event.dbIamRoles;
   const dbAwsAccount = event.dbAwsAccount;
-  const fullAdminRoleName = 'FullAdmin';
   const drAdminRole = event.drAdminRole;
   const encryptedBuf = new Buffer(process.env.DB_PASSWORD, 'base64');
   const cipherText = { CiphertextBlob: encryptedBuf };
@@ -167,12 +166,18 @@ exports.handler = function(event, context, callback) {
             accountDetails = JSON.parse(JSON.stringify(accData));
             createIamRoles(dbIamRoles, accData, mcawsDbObj)
             .then(() => {
-              addDradminRole(dbAwsAccount, drAdminRole,
-                             accountDetails, fullAdminRoleName)
+              addDradminRole(dbAwsAccount, drAdminRole, accountDetails)
               .then(() => mcawsDbObj.CloseConnection())
+              .catch(errAddDrAdmin => {
+                console.log(errAddDrAdmin);
+                mcawsDbObj.CloseConnection();
+              })
             })
           })
-        .catch(errAcc => console.log(errAcc))
+        .catch(errAcc => {
+          console.log(errAcc);
+          mcawsDbObj.CloseConnection()
+        })
       );
     });
   });
