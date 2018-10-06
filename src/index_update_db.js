@@ -176,7 +176,7 @@ exports.handler = function(event, context, callback) {
           })
         .catch(errAcc => {
           console.log(errAcc);
-          mcawsDbObj.CloseConnection()
+          mcawsDbObj.CloseConnection();
         })
       );
     });
