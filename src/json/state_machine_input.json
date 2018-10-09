@@ -74,7 +74,7 @@
     "subscriptionFilterDestinationArn": null,
     "params": {
       "stackName": "SungardAS-aws-services-health-pipeline",
-      "templateUrl": "https://s3.amazonaws.com/cloudformation-serverless-codepipeline/codepipeline.yaml",
+      "templateUrl": "https://s3.amazonaws.com/cloudformation-serverless-codepipeline-template/codepipeline.yaml",
       "parameters": [
         {
           "ParameterKey": "CloudformationLambdaExecutionRoleArn",
