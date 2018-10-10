@@ -527,6 +527,11 @@ Resources:
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Pre-New-Federation",
               "InputPath": "$",
+              "Next": "WaitCondition"
+            },
+            "WaitCondition": {
+              "Type": "Wait",
+              "Seconds": 20,
               "Next": "NewAccountFederation"
             },
             "NewAccountFederation": {
@@ -758,6 +763,11 @@ Resources:
               "Type": "Task",
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Pre-New-Federation",
               "InputPath": "$",
+              "Next": "WaitCondition"
+            },
+            "WaitCondition": {
+              "Type": "Wait",
+              "Seconds": 20,
               "Next": "NewAccountFederation"
             },
             "NewAccountFederation": {
