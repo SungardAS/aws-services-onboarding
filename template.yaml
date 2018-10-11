@@ -534,6 +534,14 @@ Resources:
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Federation",
               "InputPath": "$.federation",
               "ResultPath": "$.credentials",
+              "Retry": [
+                {
+                  "ErrorEquals": ["AccessDenied"],
+                  "IntervalSeconds": 10,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2.0
+                }
+              ],
               "Next": "SetNewAccountCredentials"
             },
             "SetNewAccountCredentials": {
@@ -765,6 +773,14 @@ Resources:
               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Federation",
               "InputPath": "$.federation",
               "ResultPath": "$.credentials",
+              "Retry": [
+                {
+                  "ErrorEquals": ["AccessDenied"],
+                  "IntervalSeconds": 10,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2.0
+                }
+              ],
               "Next": "SetNewAccountCredentials"
             },
             "SetNewAccountCredentials": {
