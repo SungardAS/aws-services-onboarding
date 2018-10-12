@@ -5,7 +5,7 @@ const McawsModels = require('./models/mcawsModels.js');
 const fullAdminRoleName = 'FullAdmin';
 let mcawsDbObj = null;
 
-function addDradminRole(dbAwsAccount, drAdminRole, accountDetails, drAdminRoleId) {
+function addDradminRole(dbAwsAccount, drAdminRole, accountDetails) {
   return new Promise((resolve, reject) => {
     if(dbAwsAccount.account_type.toLowerCase() != 'craws') {
       console.log("Account type is not craws. Hence skipping.");
@@ -17,7 +17,6 @@ function addDradminRole(dbAwsAccount, drAdminRole, accountDetails, drAdminRoleId
         })
         .then(roleData => {
           if(roleData) {
-            drAdminRoleId = roleData.dataValues.id
             return roleData;
           } else {
             console.log("dradmin role name provided does not exists");
@@ -86,6 +85,7 @@ function addDradminRole(dbAwsAccount, drAdminRole, accountDetails, drAdminRoleId
               )
             )
           );
+          return roleDataResp.dataValues.id;
         })
       });
     }
@@ -241,8 +241,7 @@ exports.handler = function(event, context, callback) {
             accountDetails = JSON.parse(JSON.stringify(accData));
             createIamRoles(dbIamRoles, accData, mcawsDbObj)
             .then(() => {
-              let drAdminRoleId;
-              addDradminRole(dbAwsAccount, drAdminRole, accountDetails, drAdminRoleId)
+              let drAdminRoleId = addDradminRole(dbAwsAccount, drAdminRole, accountDetails);
               .then(() => {
                 if(drAdminRoleId){
                   console.log("awsAccountId = ",accountDetails.id);
