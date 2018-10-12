@@ -92,6 +92,58 @@ mcawsModels.prototype.AwsIamRoleRolesRoleAwsIamRoles = function(cb) {
   cb(AwsIamRoleRolesRoleAwsIamRoles);
 };
 
+mcawsModels.prototype.Criteria = function(cb) {
+  const Criteria = this.sequelize.define(
+    'criteria',
+    {
+      where: { type: Sequelize.STRING },
+      blacklist: { type: Sequelize.STRING },
+      permission: { type: Sequelize.INTEGER },
+      owner: { type: Sequelize.INTEGER },
+      createdBy: { type: Sequelize.INTEGER}
+    },
+    { freezeTableName: true }
+  );
+  cb(Criteria);
+};
+
+mcawsModels.prototype.Permission = function(cb) {
+  const Permission = this.sequelize.define(
+    'permission',
+    {
+      model: { type: Sequelize.INTEGER },
+      object: { type: Sequelize.INTEGER },
+      role: { type: Sequelize.INTEGER },
+      attribute: { type: Sequelize.STRING },
+      action: { type: Sequelize.STRING },
+      relation: { type: Sequelize.STRING },
+      createdBy: { type: Sequelize.INTEGER },
+      owner: { type: Sequelize.INTEGER },
+      user: { type: Sequelize.INTEGER},
+      userType: { type: Sequelize.STRING},
+      accountType: { type: Sequelize.STRING},
+      state: { type: Sequelize.STRING}
+    },
+    { freezeTableName: true }
+  );
+  cb(Permission);
+};
+
+mcawsModels.prototype.Model = function(cb) {
+  const Model = this.sequelize.define(
+    'model',
+    {
+      name: { type: Sequelize.STRING },
+      identity: { type: Sequelize.STRING },
+      attributes: { type: Sequelize.TEXT },
+      createdBy: { type: Sequelize.INTEGER },
+      owner: { type: Sequelize.INTEGER }
+    },
+    { freezeTableName: true }
+  );
+  cb(Model);
+};
+
 mcawsModels.prototype.CloseConnection = function() {
   this.sequelize.close();
 }
