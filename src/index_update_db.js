@@ -136,84 +136,84 @@ function createCriteriaEntryForDrAdmin(dbAwsAccount, awsAccountId, drAdminRoleId
       console.log("Account type is not craws. Hence skipping.");
       resolve(true);
     } else {
-      let data = {};
-      const accountWhereClause = { 'name': 'AwsAccount' };
-      const assignedAwsAccountWhereClause = { 'name': 'AssignedAwsAccount' };
-      const assignedAwsIamRoleWhereClause = { 'name': 'AssignedAwsIamRole' };
-      const actionClause = 'read';
+    let data = {};
+    const accountWhereClause = { 'name': 'AwsAccount' };
+    const assignedAwsAccountWhereClause = { 'name': 'AssignedAwsAccount' };
+    const assignedAwsIamRoleWhereClause = { 'name': 'AssignedAwsIamRole' };
+    const actionClause = 'read';
 
-      console.log("Inside createCriteriaEntryForDrAdmin");
+    console.log("Inside createCriteriaEntryForDrAdmin");
 
-      mcawsDbObj.Model(modelObj => {
-        modelObj.sync().then(() =>
-          modelObj.findOne({ attributes: ['id'], where: accountWhereClause }))
-          .then(AwsAccountId =>{
-            console.log("Inside createCriteriaEntryForDrAdmin: AwsAccountId = ",AwsAccountId);
-            data.AwsAccount = AwsAccountId.dataValues.id;
-          }).then(() =>
-            modelObj.findOne({ attributes: ['id'], where: assignedAwsAccountWhereClause })
-          ).then(AssignedAwsAccountId => {
-            console.log("Inside createCriteriaEntryForDrAdmin: AssignedAwsAccountId = ",AssignedAwsAccountId);
-            data.AssignedAwsAccount = AssignedAwsAccountId.dataValues.id;
-            return modelObj.findOne({ attributes: ['id'], where: assignedAwsIamRoleWhereClause });
-          }).then(AssignedAwsIamRoleId => {
-            console.log("Inside createCriteriaEntryForDrAdmin: AssignedAwsIamRoleId = ",AssignedAwsIamRoleId);
-            data.AssignedAwsIamRole = AssignedAwsIamRoleId.dataValues.id;
-            mcawsDbObj.Permission(permissionObj => {
-              permissionObj.sync().then(() =>
-                permissionObj.findOne({ attributes: ['id'], where: { role: drAdminRoleId, model: data.AwsAccount, action: actionClause } })
-              ).then(permissionAwsAccountRead => {
-                console.log("Inside createCriteriaEntryForDrAdmin: permissionAwsAccountRead = ",permissionAwsAccountRead);
-                data.permissionAwsAccountRead = permissionAwsAccountRead.dataValues.id;
-                return permissionObj.findOne({ attributes: ['id'], where: { role: drAdminRoleId, model: data.AssignedAwsIamRole, action: actionClause } });
-              })
-                .then(permissionAssignedAwsIamRoleId => {
-                  console.log("Inside createCriteriaEntryForDrAdmin: permissionAssignedAwsIamRoleId = ",permissionAssignedAwsIamRoleId);
-                  data.permissionAssignedAwsIamRoleRead = permissionAssignedAwsIamRoleId.dataValues.id;
-                  return permissionObj.findOne({ attributes: ['id'], where: { role: drAdminRoleId, model: data.AssignedAwsAccount, action: actionClause } });
-                }).then(permissionAssignedAwsAccountRead => {
-                  console.log("Inside createCriteriaEntryForDrAdmin: permissionAssignedAwsAccountRead = ",permissionAssignedAwsAccountRead);
-                  data.permissionAssignedAwsAccountRead = permissionAssignedAwsAccountRead.dataValues.id;
-                  console.log("Before making criteria entry");
-                  console.log("data", data);
-                }).then(() => {
-                  mcawsDbObj.Criteria(criteriaObj => {
-                    criteriaObj.sync().then(() =>
+    mcawsDbObj.Model(modelObj => {
+      modelObj.sync().then(() =>
+        modelObj.findOne({ attributes: ['id'], where: accountWhereClause }))
+        .then(AwsAccountId =>{
+          console.log("Inside createCriteriaEntryForDrAdmin: AwsAccountId = ",AwsAccountId);
+          data.AwsAccount = AwsAccountId.dataValues.id;
+        }).then(() =>
+          modelObj.findOne({ attributes: ['id'], where: assignedAwsAccountWhereClause })
+        ).then(AssignedAwsAccountId => {
+          console.log("Inside createCriteriaEntryForDrAdmin: AssignedAwsAccountId = ",AssignedAwsAccountId);
+          data.AssignedAwsAccount = AssignedAwsAccountId.dataValues.id;
+          return modelObj.findOne({ attributes: ['id'], where: assignedAwsIamRoleWhereClause });
+        }).then(AssignedAwsIamRoleId => {
+          console.log("Inside createCriteriaEntryForDrAdmin: AssignedAwsIamRoleId = ",AssignedAwsIamRoleId);
+          data.AssignedAwsIamRole = AssignedAwsIamRoleId.dataValues.id;
+          mcawsDbObj.Permission(permissionObj => {
+            permissionObj.sync().then(() =>
+              permissionObj.findOne({ attributes: ['id'], where: { role: drAdminRoleId, model: data.AwsAccount, action: actionClause } })
+            ).then(permissionAwsAccountRead => {
+              console.log("Inside createCriteriaEntryForDrAdmin: permissionAwsAccountRead = ",permissionAwsAccountRead);
+              data.permissionAwsAccountRead = permissionAwsAccountRead.dataValues.id;
+              return permissionObj.findOne({ attributes: ['id'], where: { role: drAdminRoleId, model: data.AssignedAwsIamRole, action: actionClause } });
+            })
+              .then(permissionAssignedAwsIamRoleId => {
+                console.log("Inside createCriteriaEntryForDrAdmin: permissionAssignedAwsIamRoleId = ",permissionAssignedAwsIamRoleId);
+                data.permissionAssignedAwsIamRoleRead = permissionAssignedAwsIamRoleId.dataValues.id;
+                return permissionObj.findOne({ attributes: ['id'], where: { role: drAdminRoleId, model: data.AssignedAwsAccount, action: actionClause } });
+              }).then(permissionAssignedAwsAccountRead => {
+                console.log("Inside createCriteriaEntryForDrAdmin: permissionAssignedAwsAccountRead = ",permissionAssignedAwsAccountRead);
+                data.permissionAssignedAwsAccountRead = permissionAssignedAwsAccountRead.dataValues.id;
+                console.log("Before making criteria entry");
+                console.log("data", data);
+              }).then(() => {
+                mcawsDbObj.Criteria(criteriaObj => {
+                  criteriaObj.sync().then(() =>
+                    criteriaObj.findOrCreate(
+                      {
+                        where: { where: '{"id":' + awsAccountId + '}', permission: data.permissionAwsAccountRead },
+                        defaults: { where: '{"id":' + awsAccountId + '}', permission: data.permissionAwsAccountRead, owner: 0, createdBy: 0 }
+                      }
+                    ).then(() =>
                       criteriaObj.findOrCreate(
                         {
-                          where: { where: '{"id":' + awsAccountId + '}', permission: data.permissionAwsAccountRead },
-                          defaults: { where: '{"id":' + awsAccountId + '}', permission: data.permissionAwsAccountRead, owner: 0, createdBy: 0 }
+                          where: { where: '{"account":' + awsAccountId + '}', permission: data.permissionAssignedAwsAccountRead },
+                          defaults: { where: '{"account":' + awsAccountId + '}', permission: data.permissionAssignedAwsAccountRead, owner: 0, createdBy: 0 }
                         }
-                      ).then(() =>
-                        criteriaObj.findOrCreate(
-                          {
-                            where: { where: '{"account":' + awsAccountId + '}', permission: data.permissionAssignedAwsAccountRead },
-                            defaults: { where: '{"account":' + awsAccountId + '}', permission: data.permissionAssignedAwsAccountRead, owner: 0, createdBy: 0 }
-                          }
-                        )
-                      ).then(() =>
-                        criteriaObj.findOrCreate(
-                          {
-                            where: { where: '{"account":{"id":' + awsAccountId + '}}', permission: data.permissionAssignedAwsIamRoleRead },
-                            defaults: { where: '{"account":{"id":' + awsAccountId + '}}', permission: data.permissionAssignedAwsIamRoleRead, owner: 0, createdBy: 0 }
-                          }
-                        )
-                        .then(()=>{
-                          console.log("After making criteria entry");
-                          console.log("Reference data ",data); 
-                          resolve(true);
-                        }).catch(err => {
-                          console.log("Error occured :",err);
-                          reject(err);
-                        })
                       )
-                    );
-                  });
+                    ).then(() =>
+                      criteriaObj.findOrCreate(
+                        {
+                          where: { where: '{"account":{"id":' + awsAccountId + '}}', permission: data.permissionAssignedAwsIamRoleRead },
+                          defaults: { where: '{"account":{"id":' + awsAccountId + '}}', permission: data.permissionAssignedAwsIamRoleRead, owner: 0, createdBy: 0 }
+                        }
+                      )
+                      .then(()=>{
+                        console.log("After making criteria entry");
+                        console.log("Reference data ",data); 
+                        resolve(true);
+                      }).catch(err => {
+                        console.log("Error occured :",err);
+                        reject(err);
+                      })
+                    )
+                  );
                 });
-            });
+              });
           });
-      })
-    }
+        });
+    })
+  }
   });
 }
 
