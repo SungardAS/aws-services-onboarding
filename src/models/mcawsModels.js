@@ -135,7 +135,6 @@ mcawsModels.prototype.Model = function(cb) {
     {
       name: { type: Sequelize.STRING },
       identity: { type: Sequelize.STRING },
-      attributes: { type: Sequelize.TEXT },
       createdBy: { type: Sequelize.INTEGER },
       owner: { type: Sequelize.INTEGER }
     },

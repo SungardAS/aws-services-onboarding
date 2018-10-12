@@ -5,7 +5,7 @@ const McawsModels = require('./models/mcawsModels.js');
 const fullAdminRoleName = 'FullAdmin';
 let mcawsDbObj = null;
 
-function addDradminRole(dbAwsAccount, drAdminRole, accountDetails) {
+function addDradminRole(dbAwsAccount, drAdminRole, accountDetails, drAdminRoleId) {
   return new Promise((resolve, reject) => {
     if(dbAwsAccount.account_type.toLowerCase() != 'craws') {
       console.log("Account type is not craws. Hence skipping.");
@@ -17,6 +17,7 @@ function addDradminRole(dbAwsAccount, drAdminRole, accountDetails) {
         })
         .then(roleData => {
           if(roleData) {
+            drAdminRoleId = roleData.dataValues.id
             return roleData;
           } else {
             console.log("dradmin role name provided does not exists");
@@ -130,6 +131,80 @@ function createIamRoles(dbIamRoles, accData, mcawsDbObj) {
   });
 }
 
+function createCriteriaEntryForDrAdmin(awsAccountId, drAdminRoleId, mcawsDbObj) {
+  return new Promise((resolve, reject) => {
+    let data = {};
+    const accountWhereClause = { 'name': 'AwsAccount' };
+    const assignedAwsAccountWhereClause = { 'name': 'AssignedAwsAccount' };
+    const assignedAwsIamRoleWhereClause = { 'name': 'AssignedAwsIamRole' };
+    const actionClause = 'read';
+
+    mcawsDbObj.Model(modelObj => {
+      modelObj.sync().then(() =>
+        modelObj.findOne({ attributes: ['id'], where: accountWhereClause }))
+        .then(AwsAccountId =>
+          data.AwsAccount = AwsAccountId.dataValues.id
+        ).then(() =>
+          modelObj.findOne({ attributes: ['id'], where: assignedAwsAccountWhereClause })
+        ).then(AssignedAwsAccountId => {
+          data.AssignedAwsAccount = AssignedAwsAccountId.dataValues.id;
+          return modelObj.findOne({ attributes: ['id'], where: assignedAwsIamRoleWhereClause });
+        }).then(AssignedAwsIamRoleId => {
+          data.AssignedAwsIamRole = AssignedAwsIamRoleId.dataValues.id;
+          mcawsDbObj.Permission(permissionObj => {
+            permissionObj.sync().then(() =>
+              permissionObj.findOne({ attributes: ['id'], where: { role: drAdminRoleId, model: data.AwsAccount, action: actionClause } })
+            ).then(permissionAwsAccountRead => {
+              data.permissionAwsAccountRead = permissionAwsAccountRead.dataValues.id;
+              return permissionObj.findOne({ attributes: ['id'], where: { role: drAdminRoleId, model: data.AssignedAwsIamRole, action: actionClause } });
+            })
+              .then(permissionAssignedAwsIamRoleId => {
+                data.permissionAssignedAwsIamRoleRead = permissionAssignedAwsIamRoleId.dataValues.id;
+                return permissionObj.findOne({ attributes: ['id'], where: { role: drAdminRoleId, model: data.AssignedAwsAccount, action: actionClause } });
+              }).then(permissionAssignedAwsAccountRead => {
+                data.permissionAssignedAwsAccountRead = permissionAssignedAwsAccountRead.dataValues.id;
+                console.log("Before making criteria entry");
+                console.log("data", data);
+              }).then(() => {
+                mcawsDbObj.Criteria(criteriaObj => {
+                  criteriaObj.sync().then(() =>
+                    criteriaObj.findOrCreate(
+                      {
+                        where: { where: '{"id":' + awsAccountId + '}', permission: data.permissionAwsAccountRead },
+                        defaults: { where: '{"id":' + awsAccountId + '}', permission: data.permissionAwsAccountRead, owner: 0, createdBy: 0 }
+                      }
+                    ).then(() =>
+                      criteriaObj.findOrCreate(
+                        {
+                          where: { where: '{"account":' + awsAccountId + '}', permission: data.permissionAssignedAwsAccountRead },
+                          defaults: { where: '{"account":' + awsAccountId + '}', permission: data.permissionAssignedAwsAccountRead, owner: 0, createdBy: 0 }
+                        }
+                      )
+                    ).then(() =>
+                      criteriaObj.findOrCreate(
+                        {
+                          where: { where: '{"account":{"id":' + awsAccountId + '}}', permission: data.permissionAssignedAwsIamRoleRead },
+                          defaults: { where: '{"account":{"id":' + awsAccountId + '}}', permission: data.permissionAssignedAwsIamRoleRead, owner: 0, createdBy: 0 }
+                        }
+                      )
+                      .then(()=>{
+                        console.log("After making criteria entry");
+                        console.log("Reference data ",data); 
+                        resolve(true);
+                      }).catch(err => {
+                        console.log("Error occured :",err);
+                        reject(err);
+                      })
+                    )
+                  );
+                });
+              });
+          });
+        });
+    });    
+  });
+}
+
 exports.handler = function(event, context, callback) {
   const dbIamRoles = event.dbIamRoles;
   const dbAwsAccount = event.dbAwsAccount;
@@ -166,8 +241,19 @@ exports.handler = function(event, context, callback) {
             accountDetails = JSON.parse(JSON.stringify(accData));
             createIamRoles(dbIamRoles, accData, mcawsDbObj)
             .then(() => {
-              addDradminRole(dbAwsAccount, drAdminRole, accountDetails)
-              .then(() => mcawsDbObj.CloseConnection())
+              let drAdminRoleId;
+              addDradminRole(dbAwsAccount, drAdminRole, accountDetails, drAdminRoleId)
+              .then(() => {
+                if(drAdminRoleId){
+                  console.log("awsAccountId = ",accountDetails.id);
+                  console.log("drAdminRoleId = ",drAdminRoleId);
+                  createCriteriaEntryForDrAdmin(accountDetails.id, drAdminRoleId, mcawsDbObj);
+                  return true;
+                }else{
+                  console.log("Role `dradmin` not found, hence cannot add the criteria entry");
+                  throw new Error("`dradmin` role not found, criteria cannot be added");
+                }
+              }).then(() => mcawsDbObj.CloseConnection())
               .catch(errAddDrAdmin => {
                 console.log(errAddDrAdmin);
                 mcawsDbObj.CloseConnection();
