@@ -80,12 +80,11 @@ function addDradminRole(dbAwsAccount, drAdminRole, accountDetails) {
                 .then(iamRoleRoleData => {
                   console.log("dradmin role added to iam role")
                   console.log(iamRoleRoleData);
-                  resolve(true);
+                  resolve(roleDataResp.dataValues.id);
                 })
               )
             )
           );
-          return roleDataResp.dataValues.id;
         })
       });
     }
@@ -118,7 +117,7 @@ function createIamRole(dbIamRole) {
   });
 }
 
-function createIamRoles(dbIamRoles, accData, mcawsDbObj) {
+function createIamRoles(dbIamRoles, accData) {
   return new Promise((resolve, reject) => {
 
     for (let idx = 0; idx < dbIamRoles.length; idx++) {
@@ -131,7 +130,7 @@ function createIamRoles(dbIamRoles, accData, mcawsDbObj) {
   });
 }
 
-function createCriteriaEntryForDrAdmin(awsAccountId, drAdminRoleId, mcawsDbObj) {
+function createCriteriaEntryForDrAdmin(awsAccountId, drAdminRoleId) {
   return new Promise((resolve, reject) => {
     let data = {};
     const accountWhereClause = { 'name': 'AwsAccount' };
@@ -139,29 +138,37 @@ function createCriteriaEntryForDrAdmin(awsAccountId, drAdminRoleId, mcawsDbObj) 
     const assignedAwsIamRoleWhereClause = { 'name': 'AssignedAwsIamRole' };
     const actionClause = 'read';
 
+    console.log("Inside createCriteriaEntryForDrAdmin");
+
     mcawsDbObj.Model(modelObj => {
       modelObj.sync().then(() =>
         modelObj.findOne({ attributes: ['id'], where: accountWhereClause }))
-        .then(AwsAccountId =>
-          data.AwsAccount = AwsAccountId.dataValues.id
-        ).then(() =>
+        .then(AwsAccountId =>{
+          console.log("Inside createCriteriaEntryForDrAdmin: AwsAccountId = ",AwsAccountId);
+          data.AwsAccount = AwsAccountId.dataValues.id;
+        }).then(() =>
           modelObj.findOne({ attributes: ['id'], where: assignedAwsAccountWhereClause })
         ).then(AssignedAwsAccountId => {
+          console.log("Inside createCriteriaEntryForDrAdmin: AssignedAwsAccountId = ",AssignedAwsAccountId);
           data.AssignedAwsAccount = AssignedAwsAccountId.dataValues.id;
           return modelObj.findOne({ attributes: ['id'], where: assignedAwsIamRoleWhereClause });
         }).then(AssignedAwsIamRoleId => {
+          console.log("Inside createCriteriaEntryForDrAdmin: AssignedAwsIamRoleId = ",AssignedAwsIamRoleId);
           data.AssignedAwsIamRole = AssignedAwsIamRoleId.dataValues.id;
           mcawsDbObj.Permission(permissionObj => {
             permissionObj.sync().then(() =>
               permissionObj.findOne({ attributes: ['id'], where: { role: drAdminRoleId, model: data.AwsAccount, action: actionClause } })
             ).then(permissionAwsAccountRead => {
+              console.log("Inside createCriteriaEntryForDrAdmin: permissionAwsAccountRead = ",permissionAwsAccountRead);
               data.permissionAwsAccountRead = permissionAwsAccountRead.dataValues.id;
               return permissionObj.findOne({ attributes: ['id'], where: { role: drAdminRoleId, model: data.AssignedAwsIamRole, action: actionClause } });
             })
               .then(permissionAssignedAwsIamRoleId => {
+                console.log("Inside createCriteriaEntryForDrAdmin: permissionAssignedAwsIamRoleId = ",permissionAssignedAwsIamRoleId);
                 data.permissionAssignedAwsIamRoleRead = permissionAssignedAwsIamRoleId.dataValues.id;
                 return permissionObj.findOne({ attributes: ['id'], where: { role: drAdminRoleId, model: data.AssignedAwsAccount, action: actionClause } });
               }).then(permissionAssignedAwsAccountRead => {
+                console.log("Inside createCriteriaEntryForDrAdmin: permissionAssignedAwsAccountRead = ",permissionAssignedAwsAccountRead);
                 data.permissionAssignedAwsAccountRead = permissionAssignedAwsAccountRead.dataValues.id;
                 console.log("Before making criteria entry");
                 console.log("data", data);
@@ -201,7 +208,7 @@ function createCriteriaEntryForDrAdmin(awsAccountId, drAdminRoleId, mcawsDbObj) 
               });
           });
         });
-    });    
+    })
   });
 }
 
@@ -239,23 +246,18 @@ exports.handler = function(event, context, callback) {
          })
           .then(accData => {
             accountDetails = JSON.parse(JSON.stringify(accData));
-            createIamRoles(dbIamRoles, accData, mcawsDbObj)
+            createIamRoles(dbIamRoles, accData)
             .then(() => {
-              let drAdminRoleId = addDradminRole(dbAwsAccount, drAdminRole, accountDetails);
-              .then(() => {
-                if(drAdminRoleId){
-                  console.log("awsAccountId = ",accountDetails.id);
-                  console.log("drAdminRoleId = ",drAdminRoleId);
-                  createCriteriaEntryForDrAdmin(accountDetails.id, drAdminRoleId, mcawsDbObj);
-                  return true;
-                }else{
-                  console.log("Role `dradmin` not found, hence cannot add the criteria entry");
-                  throw new Error("`dradmin` role not found, criteria cannot be added");
-                }
-              }).then(() => mcawsDbObj.CloseConnection())
-              .catch(errAddDrAdmin => {
-                console.log(errAddDrAdmin);
-                mcawsDbObj.CloseConnection();
+              addDradminRole(dbAwsAccount, drAdminRole, accountDetails)
+              .then((drAdminRoleId) => {
+                console.log("awsAccountId = ",accountDetails.id);
+                console.log("drAdminRoleId = ",drAdminRoleId);
+                createCriteriaEntryForDrAdmin(accountDetails.id, drAdminRoleId)
+                .then(() => mcawsDbObj.CloseConnection())
+                .catch(errAddDrAdmin => {
+                  console.log("Error calling add dradmin", errAddDrAdmin);
+                  mcawsDbObj.CloseConnection();
+                });
               })
             })
           })
