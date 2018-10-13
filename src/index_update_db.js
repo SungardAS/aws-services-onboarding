@@ -130,8 +130,12 @@ function createIamRoles(dbIamRoles, accData) {
   });
 }
 
-function createCriteriaEntryForDrAdmin(awsAccountId, drAdminRoleId) {
+function createCriteriaEntryForDrAdmin(dbAwsAccount, awsAccountId, drAdminRoleId) {
   return new Promise((resolve, reject) => {
+    if(dbAwsAccount.account_type.toLowerCase() != 'craws') {
+      console.log("Account type is not craws. Hence skipping.");
+      resolve(true);
+    } else {
     let data = {};
     const accountWhereClause = { 'name': 'AwsAccount' };
     const assignedAwsAccountWhereClause = { 'name': 'AssignedAwsAccount' };
@@ -209,6 +213,7 @@ function createCriteriaEntryForDrAdmin(awsAccountId, drAdminRoleId) {
           });
         });
     })
+  }
   });
 }
 
@@ -252,7 +257,7 @@ exports.handler = function(event, context, callback) {
               .then((drAdminRoleId) => {
                 console.log("awsAccountId = ",accountDetails.id);
                 console.log("drAdminRoleId = ",drAdminRoleId);
-                createCriteriaEntryForDrAdmin(accountDetails.id, drAdminRoleId)
+                createCriteriaEntryForDrAdmin(dbAwsAccount, accountDetails.id, drAdminRoleId)
                 .then(() => mcawsDbObj.CloseConnection())
                 .catch(errAddDrAdmin => {
                   console.log("Error calling add dradmin", errAddDrAdmin);
