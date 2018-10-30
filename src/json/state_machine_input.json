@@ -1,6 +1,9 @@
 {
   "credentials": null,
   "current_region": null,
+  "drAdminRole": {
+    "name": "dradmin"
+  },
   "billing_master": {
     "roles":[]
   },
@@ -74,7 +77,7 @@
     "subscriptionFilterDestinationArn": null,
     "params": {
       "stackName": "SungardAS-aws-services-health-pipeline",
-      "templateUrl": "https://s3.amazonaws.com/cloudformation-serverless-codepipeline.us-east-1/codepipeline.yaml",
+      "templateUrl": "https://s3.amazonaws.com/cloudformation-serverless-codepipeline/codepipeline.yaml",
       "parameters": [
         {
           "ParameterKey": "CloudformationLambdaExecutionRoleArn",
@@ -106,7 +109,7 @@
         },
         {
           "ParameterKey": "ProjectImage",
-          "ParameterValue": "aws/codebuild/nodejs:4.3.2"
+          "ParameterValue": "aws/codebuild/nodejs:8.11.0"
         },
         {
           "ParameterKey": "CustomAuthorizerIAMRoleName",
