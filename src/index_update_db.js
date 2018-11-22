@@ -2,10 +2,10 @@
 
 const AWS = require('aws-sdk');
 const McawsModels = require('./models/mcawsModels.js');
-const fullAdminRoleName = 'FullAdmin';
+let iamRoleName = 'FullAdmin';
 let mcawsDbObj = null;
 
-function addDradminRole(dbAwsAccount, drAdminRole, accountDetails) {
+function addDradminRole(dbAwsAccount, drAdminRole, accountDetails, customerOwned, dbIamRoles) {
   return new Promise((resolve, reject) => {
     if(dbAwsAccount.account_type.toLowerCase() != 'craws') {
       console.log("Account type is not craws. Hence skipping.");
@@ -45,11 +45,15 @@ function addDradminRole(dbAwsAccount, drAdminRole, accountDetails) {
               console.log(accountRoleData);
             })
           );
+            if(customerOwned){
+              iamRoleName = dbIamRoles[0].name;
+              console.log(iamRoleName);
+            }
           mcawsDbObj.AwsIamRole(iamRole =>
             iamRole.findOne({
               where: {
                 account: accountDetails.id,
-                name: fullAdminRoleName
+                name: iamRoleName
               }
             })
             .then(iamRoleResp => {
@@ -119,7 +123,6 @@ function createIamRole(dbIamRole) {
 
 function createIamRoles(dbIamRoles, accData) {
   return new Promise((resolve, reject) => {
-
     for (let idx = 0; idx < dbIamRoles.length; idx++) {
       dbIamRoles[idx].account = accData.dataValues.id;
     }
@@ -253,7 +256,7 @@ exports.handler = function(event, context, callback) {
             accountDetails = JSON.parse(JSON.stringify(accData));
             createIamRoles(dbIamRoles, accData)
             .then(() => {
-              addDradminRole(dbAwsAccount, drAdminRole, accountDetails)
+              addDradminRole(dbAwsAccount, drAdminRole, accountDetails, event.customerOwned, dbIamRoles)
               .then((drAdminRoleId) => {
                 console.log("awsAccountId = ",accountDetails.id);
                 console.log("drAdminRoleId = ",drAdminRoleId);

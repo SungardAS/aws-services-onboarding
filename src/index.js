@@ -1,6 +1,7 @@
 
 var fs = require('fs');
 var AWS = require('aws-sdk');
+const uuid = require('node-uuid');
 const McawsModels = require('./models/mcawsModels.js');
 
 var baseHandler = require('aws-services-lib/lambda/base_handler.js')
@@ -40,22 +41,62 @@ baseHandler.get = function(params, callback) {
 baseHandler.post = function(params, callback) {
 
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
-
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
   var ruleJson = JSON.parse(fs.readFileSync(__dirname + '/json/default_config_rules.json', {encoding:'utf8'}));
-  
-  var account = {
-     "id": params.account,
-     "name": params.awsname,
-     "desc": params.awsdesc,
-     "email": params.email,
-     "type": params.account_type,
-     "masterAwsId": params.masterBillingAWSAccount,
-     "OfferingNum": params.offeringNum,
-     "SGID": params.sgid,
-     "guid": params.companyguid,
-     "checkStatus": true,
+  if(params.awsid){
+    inputDoc.customerOwned = "true";
+    const dbAwsAccount = {
+      awsid: params.awsid,
+      name: params.awsname,
+      description: params.awsdesc,
+      company_guid: params.companyguid,
+      account_type: params.account_type
+    };
+    inputDoc.dbAwsAccount = dbAwsAccount;
+    var dbIamRoles = [];
+    dbIamRoles.push({
+      externalId: uuid.v4(),
+      path: "/",
+      name: "ReadOnly",
+      arn: `arn:aws:iam::${params.awsid}:role/ReadOnly`
+    });
+    inputDoc.dbIamRoles = dbIamRoles;
+    inputDoc.share_portfolio_params.aws_region_id = process.env.AWS_DEFAULT_REGION;
+    inputDoc.share_portfolio_params.aws_account_id = params.awsid;
+    inputDoc.share_portfolio_params.role_details.role_name = dbIamRoles[0].name;
+    inputDoc.share_portfolio_params.role_details.external_id = dbIamRoles[0].externalId;
+    var stateMachineArn = process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
+    var input = {
+      stateMachineArn: stateMachineArn,
+      input: JSON.stringify(inputDoc),
+      name: "New-Account-Setup-For-" + params.awsname.replace(/ /g, '-')
+    };
+    console.log("======INPUT=====");
+    console.log(input);
+    stepfunctions.startExecution(input, function(err, data) {
+       if (err) {
+         console.log(err, err.stack);
+         callback(err);
+        }
+       else {
+          console.log(data);
+          callback(null, data);
+        }
+    });
   }
+  else{
+     var account = {
+        "id": params.account,
+        "name": params.awsname,
+        "desc": params.awsdesc,
+        "email": params.email,
+        "type": params.account_type,
+        "masterAwsId": params.masterBillingAWSAccount,
+        "OfferingNum": params.offeringNum,
+        "SGID": params.sgid,
+        "guid": params.companyguid,
+        "checkStatus": true,
+     }
 
   inputDoc.account.billingDetails = account;
   inputDoc.current_region = process.env.AWS_DEFAULT_REGION;
@@ -116,10 +157,11 @@ baseHandler.post = function(params, callback) {
                 console.log(data);
                 callback(null, data);
               }
-            });
+            }); 
           });
         });
       });
     }
   })
+}
 };
