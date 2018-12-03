@@ -22,11 +22,6 @@ exports.handler = function(event, context, callback) {
     })
   );
 
-  options.account = event.final_result.account_id;
-  options.assumeRolePolicyDocument = awsroles.assumeRolePolicyDocument;
-  options.onboardAccount = true;
-  options.path = awsroles.adminRolePath;
-
   if (event.account && event.account.billingDetails) {
     const accountData = event.account.billingDetails;
     const roles = awsroles.roles[accountData.type.toLowerCase()];
