@@ -387,7 +387,9 @@ Resources:
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
-          STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref OnBoardingStateMachineForUnManaged
+          STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref GcloudOnBoardingStateMachineForUnManaged
+          GCLOUD_STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
+          GCLOUD_STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref GcloudOnBoardingStateMachineForUnManaged
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
           KMS_REGION: !Ref AWS::Region
           DB_PASSWORD: !Ref DbPassword
@@ -964,7 +966,7 @@ Resources:
             },
             "TriggerDataDog": {
               "Type" : "Task",
-              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Create-Gcloud-Aws-Iam-Roles",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Create-Gcloud-DataDog-Role",
               "Next": "UpdateDb"
             },
             "UpdateDb": {
@@ -1138,7 +1140,7 @@ Resources:
     Properties:
       DefinitionString: |-
         {
-          "Comment": "Gcloud OnBoarding Process for New Account",
+          "Comment": "Gcloud OnBoarding Process for New UnManaged Account",
           "StartAt": "PreMasterFederation",
           "States": {
             "PreMasterFederation": {
