@@ -20,7 +20,7 @@ exports.handler = (event, context) => {
 }
 
 baseHandler.get = function(params, callback) {
-  
+
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
   var input = {
     executionArn: params.executionArn
@@ -43,7 +43,10 @@ baseHandler.post = function(params, callback) {
 
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
   var ruleJson = JSON.parse(fs.readFileSync(__dirname + '/json/default_config_rules.json', {encoding:'utf8'}));
-  
+
+  console.log(params);
+  console.log(event);
+
   var account = {
      "id": params.account,
      "name": params.awsname,
