@@ -45,6 +45,7 @@ baseHandler.post = function(params, callback) {
   var ruleJson = JSON.parse(fs.readFileSync(__dirname + '/json/default_config_rules.json', {encoding:'utf8'}));
 
   console.log(params);
+  console.log("event------>");
   console.log(event);
 
   var account = {
