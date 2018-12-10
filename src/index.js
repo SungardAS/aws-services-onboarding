@@ -37,7 +37,7 @@ baseHandler.get = function(params, callback) {
   });
 };
 
-baseHandler.post = function(params, callback) {
+baseHandler.post = function(event, params, callback) {
 
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
 
