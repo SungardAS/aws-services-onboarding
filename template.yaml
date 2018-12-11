@@ -401,6 +401,32 @@ Resources:
           KINESIS_STREAM_ARN: !Ref KinesisStreamArn
           ADMIN_ROLE_NAME: !Ref AdminRoleName
           MASTER_MGM_AWS_ID: !Ref MasterMgmAwsId
+
+  GcloudProxyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Gcloud-Proxy
+      Handler: index.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt ProxyLambdaFunctionIAMRole.Arn
+      Timeout: 60
+      VpcConfig:
+         SecurityGroupIds: !Split [ "," , !Ref SGS ]
+         SubnetIds: !Split [ "," , !Ref Sbnts ]
+      Environment:
+        Variables:
+          STATE_MACHINE_ARN: !Ref GcloudOnBoardingStateMachine
+          STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref GcloudOnBoardingStateMachineForUnManaged
+          KMS_KEY_ID: !Ref EncryptionDecryptionKey
+          KMS_REGION: !Ref AWS::Region
+          DB_HOST: !Ref DbHost
+          SUBSC_FILTER_DEST: !Ref DestinationArn
+          GIT_HUB_ACCESS_TOKEN: !Ref GitHubAccessToken
+          CWL_KINESIS_ROLE_ARN: !Ref CwlKinesisRoleArn
+          KINESIS_STREAM_ARN: !Ref KinesisStreamArn
+          ADMIN_ROLE_NAME: !Ref AdminRoleName
+          MASTER_MGM_AWS_ID: !Ref MasterMgmAwsId
           
       Events:
         GetResource:
@@ -952,12 +978,12 @@ Resources:
               "Type" : "Choice",
               "Choices": [
                 {
-                  "Variable": "$.datadog.enableDatadog",
+                  "Variable": "$.enableDatadog",
                   "StringEquals": "true",
                   "Next": "TriggerDataDog"
                 },
                 {
-                  "Variable": "$.datadog.enableDatadog",
+                  "Variable": "$.enableDatadog",
                   "StringEquals": "false",
                   "Next": "UpdateDb"
                 }

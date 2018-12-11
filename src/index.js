@@ -77,6 +77,7 @@ baseHandler.post = function(params, callback) {
     inputDoc.health.gitHubPersonalAccessToken = process.env.GIT_HUB_ACCESS_TOKEN
     inputDoc.health.subscriptionFilterDestinationArn = process.env.SUBSC_FILTER_DEST
     inputDoc.cloudcheckr = params.cloudcheckr;
+    inputDoc.enableDatadog = params.enableDatadog;
     var stateMachineArn = process.env.STATE_MACHINE_ARN
   } else {
     var stateMachineArn = process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
