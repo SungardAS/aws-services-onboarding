@@ -65,9 +65,6 @@ Parameters:
   NotificationEmail:
     Type: String
     Description: Email ID to send the Console Sign-in alerts to
-  GcloudDbHost:
-    Type: String
-    Description: Gcloud mcaws db host
 
 Resources:
   EncryptionDecryptionKey:
@@ -419,7 +416,7 @@ Resources:
         Variables:
           STATE_MACHINE_ARN: !Ref GcloudOnBoardingStateMachine
           STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref GcloudOnBoardingStateMachineForUnManaged
-          DB_HOST: !Ref GcloudDbHost
+          DB_HOST: !Ref DbHost
           SUBSC_FILTER_DEST: !Ref DestinationArn
           GIT_HUB_ACCESS_TOKEN: !Ref GitHubAccessToken
           CWL_KINESIS_ROLE_ARN: !Ref CwlKinesisRoleArn
