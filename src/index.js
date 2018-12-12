@@ -37,16 +37,14 @@ baseHandler.get = function(params, callback) {
   });
 };
 
-baseHandler.post = function(event, params, callback) {
+baseHandler.post = function(params, callback) {
 
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
 
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
   var ruleJson = JSON.parse(fs.readFileSync(__dirname + '/json/default_config_rules.json', {encoding:'utf8'}));
 
-  console.log(params);
-  //console.log("event------>");
-  //console.log(event);
+  params.platform = "ukgc"
 
   var account = {
      "id": params.account,
@@ -59,7 +57,16 @@ baseHandler.post = function(event, params, callback) {
      "SGID": params.sgid,
      "guid": params.companyguid,
      "checkStatus": true,
+     "platform": params.platform
   }
+
+  if(params.platform.toLowerCase() == "ukgc") {
+    inputDoc.vpcpreconfig.managedVpcPreConfig.regions = inputDoc.vpcpreconfig.managedVpcPreConfig.regions.ukgc;
+  } else {
+    inputDoc.vpcpreconfig.managedVpcPreConfig.regions = inputDoc.vpcpreconfig.managedVpcPreConfig.regions.commercial;
+  }
+
+  console.log(inputDoc.managedvpcpreconfig.regions);
 
   inputDoc.account.billingDetails = account;
   inputDoc.current_region = process.env.AWS_DEFAULT_REGION;
