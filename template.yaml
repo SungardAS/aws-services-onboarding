@@ -65,6 +65,9 @@ Parameters:
   NotificationEmail:
     Type: String
     Description: Email ID to send the Console Sign-in alerts to
+  GcloudDbHost:
+    Type: String
+    Description: Gcloud mcaws db host
 
 Resources:
   EncryptionDecryptionKey:
@@ -387,9 +390,7 @@ Resources:
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
-          STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref GcloudOnBoardingStateMachineForUnManaged
-          GCLOUD_STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
-          GCLOUD_STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref GcloudOnBoardingStateMachineForUnManaged
+          STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref OnBoardingStateMachineForUnManaged
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
           KMS_REGION: !Ref AWS::Region
           DB_PASSWORD: !Ref DbPassword
@@ -418,9 +419,7 @@ Resources:
         Variables:
           STATE_MACHINE_ARN: !Ref GcloudOnBoardingStateMachine
           STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref GcloudOnBoardingStateMachineForUnManaged
-          KMS_KEY_ID: !Ref EncryptionDecryptionKey
-          KMS_REGION: !Ref AWS::Region
-          DB_HOST: !Ref DbHost
+          DB_HOST: !Ref GcloudDbHost
           SUBSC_FILTER_DEST: !Ref DestinationArn
           GIT_HUB_ACCESS_TOKEN: !Ref GitHubAccessToken
           CWL_KINESIS_ROLE_ARN: !Ref CwlKinesisRoleArn
