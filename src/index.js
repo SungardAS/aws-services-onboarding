@@ -44,8 +44,6 @@ baseHandler.post = function(params, callback) {
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
   var ruleJson = JSON.parse(fs.readFileSync(__dirname + '/json/default_config_rules.json', {encoding:'utf8'}));
 
-  params.platform = "ukgc"
-
   var account = {
      "id": params.account,
      "name": params.awsname,
@@ -60,13 +58,7 @@ baseHandler.post = function(params, callback) {
      "platform": params.platform
   }
 
-  if(params.platform.toLowerCase() == "ukgc") {
-    inputDoc.vpcpreconfig.managedVpcPreConfig.regions = inputDoc.vpcpreconfig.managedVpcPreConfig.regions.ukgc;
-  } else {
-    inputDoc.vpcpreconfig.managedVpcPreConfig.regions = inputDoc.vpcpreconfig.managedVpcPreConfig.regions.commercial;
-  }
-
-  console.log(inputDoc.managedvpcpreconfig.regions);
+  inputDoc.vpcpreconfig.managedVpcPreConfig.regions = inputDoc.vpcpreconfig.managedVpcPreConfig.regions[params.platform];
 
   inputDoc.account.billingDetails = account;
   inputDoc.current_region = process.env.AWS_DEFAULT_REGION;
