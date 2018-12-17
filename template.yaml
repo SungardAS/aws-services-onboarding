@@ -415,7 +415,6 @@ Resources:
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref GcloudOnBoardingStateMachine
-          STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref GcloudOnBoardingStateMachineForUnManaged
           DB_HOST: !Ref DbHost
           SUBSC_FILTER_DEST: !Ref DestinationArn
           GIT_HUB_ACCESS_TOKEN: !Ref GitHubAccessToken
