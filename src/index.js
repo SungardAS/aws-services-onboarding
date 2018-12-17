@@ -55,10 +55,10 @@ baseHandler.post = function(params, callback) {
      "SGID": params.sgid,
      "guid": params.companyguid,
      "checkStatus": true,
-     "platform": params.platform
+     "platform": params.product
   }
 
-  inputDoc.vpcpreconfig.managedVpcPreConfig.regions = inputDoc.vpcpreconfig.managedVpcPreConfig.regions[params.platform];
+  inputDoc.vpcpreconfig.managedVpcPreConfig.regions = inputDoc.vpcpreconfig.managedVpcPreConfig.regions[params.product];
 
   inputDoc.account.billingDetails = account;
   inputDoc.current_region = process.env.AWS_DEFAULT_REGION;

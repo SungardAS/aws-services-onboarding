@@ -135,7 +135,7 @@
        "account":null,
        "region":null,
        "regions": {
-         "ukgc": ["eu-west-2"],
+         "ukgcloud": ["eu-west-2"],
          "commercial": ["us-east-1","us-west-2"]
        }
     },
