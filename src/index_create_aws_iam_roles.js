@@ -22,6 +22,8 @@ exports.handler = function(event, context, callback) {
     })
   );
 
+  const powerUserPolicyDocument = awsroles.powerUserPolicyDocument;
+
   options.account = event.final_result.account_id;
   options.assumeRolePolicyDocument = awsroles.assumeRolePolicyDocument;
   options.onboardAccount = true;
@@ -65,6 +67,9 @@ exports.handler = function(event, context, callback) {
       Object.assign(payload, options, roles[i]);
       payload.externalId = uuid.v4();
       payload = JSON.parse(JSON.stringify(payload));
+      if (payload.roleName == 'PowerUser') {
+        payload.PolicyDocument = powerUserPolicyDocument;
+      }
       if (payload.roleName == 'DatadogAWSIntegrationRole') {
         payload.PolicyDocument = dataDogPolicyDoc;
         payload.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${process
@@ -76,6 +81,9 @@ exports.handler = function(event, context, callback) {
         event.share_portfolio_params.aws_account_id = payload.account;
         event.share_portfolio_params.role_details.role_name = payload.roleName;
         event.share_portfolio_params.role_details.external_id = payload.externalId;
+      }
+      if (payload.roleName == 'PowerUser') {
+        payload.PolicyDocument = dataDogPolicyDoc;
       }
       if (payload.federate) {
         dbIamRoles.push({
