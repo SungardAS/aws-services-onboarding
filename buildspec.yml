@@ -3,8 +3,8 @@ phases:
   install:
     commands:
       - npm install time
-      - sed -i "s/AWS::REGION/$AWS_DEFAULT_REGION/g" template.yaml
-      - sed -i "s/AWS::ACCOUNT_ID/$AWS_ACCOUNT_ID/g" template.yaml
+      - sed -i "s/AWS::REGION/$AWS_DEFAULT_REGION/g" ukgcloud-template.yaml
+      - sed -i "s/AWS::ACCOUNT_ID/$AWS_ACCOUNT_ID/g" ukgcloud-template.yaml
       - sed -i "s/AWS::REGION/$AWS_DEFAULT_REGION/g" ukgcloud-swagger.yaml
       - sed -i "s/AWS::ACCOUNT_ID/$AWS_ACCOUNT_ID/g" ukgcloud-swagger.yaml
       - sed -i "s/AWS::CUSTOM_AUTHORIZER_LAMBDA_NAME/$CUSTOM_AUTHORIZER_LAMBDA_NAME/g" ukgcloud-swagger.yaml
@@ -12,7 +12,7 @@ phases:
       - sed -i "s/AWS::VPCE_ID/vpce-00fdc8ef83d53374e/g" ukgcloud-swagger.yaml
       - cd src; npm install; cd ..
       - aws cloudformation package
-         --template-file template.yaml
+         --template-file ukgcloud-template.yaml
          --s3-bucket $S3_BUCKET_NAME
          --output-template-file samTemplate.yaml
 artifacts:
