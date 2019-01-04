@@ -332,7 +332,8 @@ Resources:
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
-      DefinitionUri: ./swagger.yaml
+      EndpointConfiguration: PRIVATE
+      DefinitionUri: ./ukgcloud-swagger.yaml
       StageName: Prod
       Variables:
         LambdaFunctionName: !Ref ProxyLambdaFunction
