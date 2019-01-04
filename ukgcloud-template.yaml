@@ -1,0 +1,1168 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: State machine For New Account Onboarding Processes.
+
+Parameters:
+  AccountLogGroupName:
+    Type: String
+    Default: "/SungardAS/Alerts/Account"
+    Description: Account Cloudwatch Log Group Name
+  DestinationArn:
+    Type: String
+    Description: Subscription Filter Destination Arn
+  DbUserName:
+    Type: String
+    Description: user name of mcaws db
+  DbPassword:
+    Type: String
+    NoEcho: true
+    Description: password of mcaws db
+  DbHost:
+    Type: String
+    Description: Host of mcaws db
+  MasterMgmAwsId:
+    Type: String
+    Description: AWS Id of Management Account
+  AdminRoleName:
+    Type: String
+    Description: AWS admin role name
+  SCAdminRoleName:
+    Type: String
+    Description: AWS Service Catalog admin role name
+  DataDogAwsId:
+    Type: String
+    Description: Aws Id of Datadog Aws Account
+  BillingApiKey:
+    Type: String
+    Description: Access key of Billing System
+  BillingSecretKey:
+    Type: String
+    Description: API key of Billing System
+  BillingServer :
+    Type: String
+    Description: billingServer Url
+  FromEmail:
+    Type: String
+    Description: From Email id 
+  ToEmail:
+    Type: String
+    Description: To Email id 
+  KinesisStreamArn :
+    Type: String
+    Description: Kinesis stream arn
+  CwlKinesisRoleArn :
+    Type: String
+    Description: Cwl to kinesis role arn
+  GitHubAccessToken:
+    Type: String
+    Description: Git hub access token
+  Sbnts :
+    Type: String
+    Description: Sunetid of vpc
+  SGS :
+    Type: String
+    Description: Security group 
+  NotificationEmail:
+    Type: String
+    Description: Email ID to send the Console Sign-in alerts to
+
+Resources:
+  EncryptionDecryptionKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: "Encryption and Decryption key for Lambda"
+      KeyPolicy:
+        Id: "LambdaEncDec"
+        Version: "2012-10-17"
+        Statement:
+          -
+            Sid: "Allow administration of the key"
+            Effect: "Allow"
+            Action:
+              - "kms:*"
+            Principal:
+              AWS: !Ref AWS::AccountId
+            Resource: '*'
+          -
+            Sid: "Allow Encryption Service to use this key"
+            Effect: "Allow"
+            Action:
+              - "kms:Encrypt"
+            Principal:
+              AWS: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+            Resource: '*'
+          -
+            Sid: "Allow Decryption Service to use this key"
+            Effect: "Allow"
+            Action:
+              - "kms:Decrypt"
+            Principal:
+              AWS: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+            Resource: '*'
+  StateMachineLambdaFunctionIAMRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+          Path: "/"
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Sid: "AllowLambdaServiceToAssumeRole"
+                Effect: "Allow"
+                Action:
+                  - "sts:AssumeRole"
+                Principal:
+                  Service:
+                    - "lambda.amazonaws.com"
+          Policies:
+            -
+              PolicyName: "InlinePolicy"
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "logs:CreateLogGroup"
+                      - "logs:CreateLogStream"
+                      - "logs:PutLogEvents"
+                    Resource: "arn:aws:logs:*:*:*"
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "ec2:*"
+                      - "iam:*"
+                      - "cloudformation:*"
+                      - "logs:*"
+                      - "ses:*"
+                      - "kms:*"
+                      - "events:*"
+                      - "sns:*"
+                    Resource: "*"
+
+  PreMasterFederationLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Pre-Master-Federation
+      Handler: index_pre_master_account_federation.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+  SetMasterCredentialsLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Set-Master-Credentials
+      Handler: index_set_master_account_credentials.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+  EnableBillingActivationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Enable-Billing-Activation
+      Handler: index_enable_billing_activation.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+      Environment:
+        Variables:
+          KMS_KEY_ID: !Ref EncryptionDecryptionKey
+          BILLING_TO_ALERT_EMAIL: !Ref ToEmail
+          BILLING_FROM_ALERT_EMAIL: !Ref FromEmail
+          BILLING_SERVER: !Ref BillingServer
+          BILLING_SECRET_KEY: !Ref BillingSecretKey
+          BILLING_API_KEY: !Ref BillingApiKey
+  SetAccountLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Set-Account
+      Handler: index_set_account.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+  PreNewFederationLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Pre-New-Federation
+      Handler: index_pre_new_account_federation.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+  SetNewCredentialsLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Set-New-Credentials
+      Handler: index_set_new_account_credentials.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+  CreateAwsIamRolesLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Create-Aws-Iam-Roles
+      Handler: index_create_aws_iam_roles.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+      Environment:
+        Variables:
+          MASTER_MGM_AWS_ID: !Ref MasterMgmAwsId
+          DATADOG_AWD_ID: !Ref DataDogAwsId
+          ADMIN_ROLE_NAME: !Ref AdminRoleName
+          SC_ADMIN_ROLE_NAME: !Ref SCAdminRoleName
+  CreateGcloudAwsIamRolesLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Create-Gcloud-Aws-Iam-Roles
+      Handler: index_create_gcloud_aws_iam_roles.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+      Environment:
+        Variables:
+          MASTER_MGM_AWS_ID: !Ref MasterMgmAwsId
+          ADMIN_ROLE_NAME: !Ref AdminRoleName
+          SC_ADMIN_ROLE_NAME: !Ref SCAdminRoleName
+  CreateGcloudDataDogRoleLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Create-Gcloud-DataDog-Role
+      Handler: index_create_gcloud_datadog_role.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+      Environment:
+        Variables:
+          DATADOG_AWD_ID: !Ref DataDogAwsId
+  UpdateDbLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Update-Db
+      Handler: index_update_db.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 70
+      VpcConfig:
+         SecurityGroupIds: !Split [ "," , !Ref SGS ]
+         SubnetIds: !Split [ "," , !Ref Sbnts ]
+      Environment:
+        Variables:
+          KMS_KEY_ID: !Ref EncryptionDecryptionKey
+          KMS_REGION: !Ref AWS::Region
+          DB_PASSWORD: !Ref DbPassword
+          DB_USERNAME: !Ref DbUserName
+          DB_HOST: !Ref DbHost
+  FindRegionsLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Find-Regions
+      Handler: index_find_regions.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+  NextRegionLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Next-Region
+      Handler: index_next_region.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+  SetResultsLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Set-Results
+      Handler: index_set_results.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+  FinalResultLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Final-Result
+      Handler: index_final_result.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 60
+  HealthStackSetupLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Setup-Health
+      Handler: index_health_stack.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 300
+  AddAccountToDestinationLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Add-Account-To-Destination
+      Handler: index_alerts_destination.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 300
+  SetConsoleSignInAlertLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Set-Console-Sign-In-Alert
+      Handler: index_set_console_signin_alert.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt StateMachineLambdaFunctionIAMRole.Arn
+      Timeout: 300
+      Environment:
+        Variables:
+          NotificationEmail: !Ref NotificationEmail 
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration: PRIVATE
+      DefinitionUri: ./ukgcloud-swagger.yaml
+      StageName: Prod
+      Variables:
+        LambdaFunctionName: !Ref ProxyLambdaFunction
+  ProxyLambdaFunctionIAMRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+          Path: "/"
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Sid: "AllowLambdaServiceToAssumeRole"
+                Effect: "Allow"
+                Action:
+                  - "sts:AssumeRole"
+                Principal:
+                  Service:
+                    - "lambda.amazonaws.com"
+          Policies:
+            -
+              PolicyName: "InlinePolicy"
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "logs:CreateLogGroup"
+                      - "logs:CreateLogStream"
+                      - "logs:PutLogEvents"
+                    Resource: "arn:aws:logs:*:*:*"
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "vpc:*"
+                      - "ec2:*"
+                      - "states:*"
+                      - "kms:*"
+                    Resource: "*"
+  ProxyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-Proxy
+      Handler: index.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt ProxyLambdaFunctionIAMRole.Arn
+      Timeout: 60
+      VpcConfig:
+         SecurityGroupIds: !Split [ "," , !Ref SGS ]
+         SubnetIds: !Split [ "," , !Ref Sbnts ]
+      Environment:
+        Variables:
+          STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
+          STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN: !Ref OnBoardingStateMachineForUnManaged
+          KMS_KEY_ID: !Ref EncryptionDecryptionKey
+          KMS_REGION: !Ref AWS::Region
+          DB_PASSWORD: !Ref DbPassword
+          DB_USERNAME: !Ref DbUserName
+          DB_HOST: !Ref DbHost
+          SUBSC_FILTER_DEST: !Ref DestinationArn
+          GIT_HUB_ACCESS_TOKEN: !Ref GitHubAccessToken
+          CWL_KINESIS_ROLE_ARN: !Ref CwlKinesisRoleArn
+          KINESIS_STREAM_ARN: !Ref KinesisStreamArn
+          ADMIN_ROLE_NAME: !Ref AdminRoleName
+          MASTER_MGM_AWS_ID: !Ref MasterMgmAwsId
+
+  UKGCloudProxyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-UKGcloud-Proxy
+      Handler: index.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt ProxyLambdaFunctionIAMRole.Arn
+      Timeout: 60
+      VpcConfig:
+         SecurityGroupIds: !Split [ "," , !Ref SGS ]
+         SubnetIds: !Split [ "," , !Ref Sbnts ]
+      Environment:
+        Variables:
+          STATE_MACHINE_ARN: !Ref UKGCloudOnBoardingStateMachine
+          DB_HOST: !Ref DbHost
+          SUBSC_FILTER_DEST: !Ref DestinationArn
+          GIT_HUB_ACCESS_TOKEN: !Ref GitHubAccessToken
+          CWL_KINESIS_ROLE_ARN: !Ref CwlKinesisRoleArn
+          KINESIS_STREAM_ARN: !Ref KinesisStreamArn
+          ADMIN_ROLE_NAME: !Ref AdminRoleName
+          MASTER_MGM_AWS_ID: !Ref MasterMgmAwsId
+          
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /{proxy+}
+            Method: ANY
+
+  AlertLambdaFunctionIAMRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Sid: "AllowLambdaServiceToAssumeRole"
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRole"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+      Policies:
+        -
+          PolicyName: "InlinePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
+              -
+                Effect: "Allow"
+                Action:
+                  - "logs:*"
+                  - "cloudwatchlogs:*"
+                Resource: "*"
+  CloudWatchLogsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Onboarding-CloudwatchLogs
+      Handler: index_cloudwatchlogs.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      Role: !GetAtt AlertLambdaFunctionIAMRole.Arn
+      Timeout: 300
+      Environment:
+        Variables:
+          ACCOUNT_LOG_GROUP_NAME: !Ref AccountLogGroupName
+          STATE_MACHINE_ARN: !Ref OnBoardingStateMachine
+  AccountLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Ref AccountLogGroupName
+  SubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn: AccountLogGroup
+    Properties:
+      LogGroupName: !Ref AccountLogGroupName
+      FilterPattern: ""
+      DestinationArn: !Ref DestinationArn
+
+  StateMachineIAMRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+          Path: "/"
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "sts:AssumeRole"
+                Principal:
+                  Service:
+                    - !Join
+                      - "."
+                      - - states
+                        - !Ref AWS::Region
+                        - "amazonaws.com"
+          Policies:
+            -
+              PolicyName: "InlinePolicy"
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "lambda:InvokeFunction"
+                    Resource: "*"
+  OnBoardingStateMachine:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString: |-
+        {
+          "Comment": "OnBoarding Process for New Account",
+          "StartAt": "PreMasterFederation",
+          "States": {
+            "PreMasterFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Pre-Master-Federation",
+              "InputPath": "$",
+              "Next": "MasterFederation"
+            },
+            "MasterFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Federation",
+              "InputPath": "$.federation",
+              "ResultPath": "$.credentials",
+              "Next": "SetMasterCredentials"
+            },
+            "SetMasterCredentials": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Master-Credentials",
+              "InputPath": "$",
+              "Next": "CreateAccount"
+            },
+            "CreateAccount": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Account",
+              "InputPath": "$.account",
+              "ResultPath": "$.account.result",
+              "Next": "EnableBillingActivation"
+            },
+            "EnableBillingActivation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Enable-Billing-Activation",
+              "InputPath": "$",
+              "Next": "SetAccount"
+            },
+            "SetAccount": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Account",
+              "InputPath": "$",
+              "Next": "AddAccountToAlertDestinations"
+            },
+            "AddAccountToAlertDestinations": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Add-Account-To-Destination",
+              "InputPath": "$.alerts_destination",
+              "ResultPath": "$.alerts_destination.result",
+              "Next": "PreNewAccountFederation"
+            },
+            "PreNewAccountFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Pre-New-Federation",
+              "InputPath": "$",
+              "Next": "NewAccountFederation"
+            },
+            "NewAccountFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Federation",
+              "InputPath": "$.federation",
+              "ResultPath": "$.credentials",
+              "Retry": [
+                {
+                  "ErrorEquals": ["AccessDenied"],
+                  "IntervalSeconds": 10,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2.0
+                }
+              ],
+              "Next": "SetNewAccountCredentials"
+            },
+            "SetNewAccountCredentials": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-New-Credentials",
+              "InputPath": "$",
+              "Next": "CreateAwsIamRoles"
+            },
+            "CreateAwsIamRoles": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Create-Aws-Iam-Roles",
+              "InputPath": "$",
+              "Next": "UpdateDb"
+            },
+            "UpdateDb": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Update-Db",
+              "InputPath": "$",
+              "Next": "CloudcheckrChoiceState"
+            },
+            "CloudcheckrChoiceState": {
+              "Type" : "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.cloudcheckr.enableCloudCheckr",
+                  "StringEquals": "true",
+                  "Next": "TriggerCloudCheckr"
+                },
+                {
+                  "Variable": "$.cloudcheckr.enableCloudCheckr",
+                  "StringEquals": "false",
+                  "Next": "SetupHealthAlert"
+                }
+              ],
+              "Default": "SetupHealthAlert"
+            },
+            "TriggerCloudCheckr": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-TriggerCloudCheckr",
+              "Next": "SetupHealthAlert"
+            },
+            "SetupHealthAlert": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Setup-Health",
+              "InputPath": "$.health",
+              "ResultPath": "$.health.result",
+              "Next": "IsManagedAccount"
+            },
+            "IsManagedAccount": {
+              "Type" : "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.dbAwsAccount.account_type",
+                  "StringEquals": "Managed",
+                  "Next": "TriggerPreconfig"
+                }
+              ],
+              "Default": "FindRegionsState"
+            },
+            "TriggerPreconfig": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:ManagedVpcPreConfig-Trigger-StateMachine",
+              "InputPath": "$",
+              "ResultPath": "$",
+              "Next": "FindRegionsState"
+            },
+            "FindRegionsState": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Find-Regions",
+              "InputPath": "$",
+              "Next": "ChoiceState"
+            },
+            "ChoiceState": {
+              "Type" : "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.num_of_regions",
+                  "NumericGreaterThan": 0,
+                  "Next": "NextRegionState"
+                },
+                {
+                  "Variable": "$.num_of_regions",
+                  "NumericEquals": 0,
+                  "Next": "SetFinalResultState"
+                }
+              ],
+              "Default": "SetFinalResultState"
+            },
+            "NextRegionState": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Next-Region",
+              "Next": "Parallel"
+            },
+            "Parallel": {
+              "Type": "Parallel",
+              "Next": "AWSConsoleSignInAlertState",
+              "Branches": [
+                {
+                  "StartAt": "CloudtrailChoiceState",
+                  "States": {
+                    "CloudtrailChoiceState": {
+                      "Type" : "Choice",
+                      "Choices": [
+                        {
+                          "Variable": "$.cloudtrail.body.region",
+                          "StringEquals": "us-east-1",
+                          "Next": "CloudtrailActionState"
+                        },
+                        {
+                          "Variable": "$.cloudtrail.body.region",
+                          "StringEquals": "us-west-2",
+                          "Next": "CloudtrailActionState"
+                        }
+                      ],
+                      "Default": "PassCloudtrailActionState"
+                    },
+                    "CloudtrailActionState": {
+                      "Type" : "Task",
+                      "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-CloudTrail",
+                      "InputPath": "$.cloudtrail",
+                      "ResultPath": "$.cloudtrail.result",
+                      "End": true
+                    },
+                    "PassCloudtrailActionState": {
+                    "Type": "Pass",
+                    "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "AWSConfigActionState",
+                  "States": {
+                    "AWSConfigActionState": {
+                      "Type" : "Task",
+                      "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-AWSConfig",
+                      "InputPath": "$.awsconfig",
+                      "ResultPath": "$.awsconfig.result",
+                      "End": true
+                    }
+                  }
+                }
+              ]
+            },
+            "AWSConsoleSignInAlertState": {
+               "Type" : "Task",
+               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Console-Sign-In-Alert",
+               "InputPath": "$[0].awsevents",
+               "ResultPath": "$[0].awsevents.result",
+               "Next": "ConfigRulesActionState"
+            },
+            "ConfigRulesActionState": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-ConfigRules",
+              "InputPath": "$[0].configrules",
+              "ResultPath": "$[0].configrules.result",
+              "Next": "SetResultsState"
+            },
+            "SetResultsState": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Results",
+              "Next": "ChoiceState"
+            },
+            "SetFinalResultState": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Final-Result",
+              "Next": "SaveCloudwatchLog"
+            },
+            "SaveCloudwatchLog": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-CloudwatchLogs",
+              "Next": "FinalState"
+            },
+            "FinalState": {
+              "Type": "Pass",
+              "End": true
+            }
+          }
+        }
+      RoleArn: !GetAtt StateMachineIAMRole.Arn
+
+  OnBoardingStateMachineForUnManaged:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString: |-
+        {
+          "Comment": "OnBoarding Process for New Account",
+          "StartAt": "PreMasterFederation",
+          "States": {
+            "PreMasterFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Pre-Master-Federation",
+              "InputPath": "$",
+              "Next": "MasterFederation"
+            },
+            "MasterFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Federation",
+              "InputPath": "$.federation",
+              "ResultPath": "$.credentials",
+              "Next": "SetMasterCredentials"
+            },
+            "SetMasterCredentials": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Master-Credentials",
+              "InputPath": "$",
+              "Next": "CreateAccount"
+            },
+            "CreateAccount": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Account",
+              "InputPath": "$.account",
+              "ResultPath": "$.account.result",
+              "Next": "SetAccount"
+            },
+            "SetAccount": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Account",
+              "InputPath": "$",
+              "Next": "PreNewAccountFederation"
+            },
+            "PreNewAccountFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Pre-New-Federation",
+              "InputPath": "$",
+              "Next": "NewAccountFederation"
+            },
+            "NewAccountFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Federation",
+              "InputPath": "$.federation",
+              "ResultPath": "$.credentials",
+              "Retry": [
+                {
+                  "ErrorEquals": ["AccessDenied"],
+                  "IntervalSeconds": 10,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2.0
+                }
+              ],
+              "Next": "SetNewAccountCredentials"
+            },
+            "SetNewAccountCredentials": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-New-Credentials",
+              "InputPath": "$",
+              "Next": "CreateAwsIamRoles"
+            },
+            "CreateAwsIamRoles": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Create-Aws-Iam-Roles",
+              "InputPath": "$",
+              "Next": "UpdateDb"
+            },
+            "UpdateDb": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Update-Db",
+              "InputPath": "$",
+              "Next": "InvokeSharePortfolio"
+            },
+            "InvokeSharePortfolio": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:cbr-invoke-sharedportfolio",
+              "InputPath": "$",
+              "Next": "CheckSharePortfilioStatus"
+            },
+            "CheckSharePortfilioStatus": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:cbr-check-sharedportfolio-invocation",
+              "InputPath": "$",
+              "Retry": [
+                {
+                  "ErrorEquals": ["States.TaskFailed"],
+                  "IntervalSeconds": 5,
+                  "MaxAttempts": 120,
+                  "BackoffRate": 1.0
+                }
+              ],
+              "Next": "SetFinalResultState"
+            },
+            "SetFinalResultState": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Final-Result",
+              "Next": "FinalState"
+            },
+            "FinalState": {
+              "Type": "Pass",
+              "End": true
+            }
+          }
+        }
+      RoleArn: !GetAtt StateMachineIAMRole.Arn
+
+  UKGCloudOnBoardingStateMachine:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString: |-
+        {
+          "Comment": "Gcloud OnBoarding Process for New Account",
+          "StartAt": "PreMasterFederation",
+          "States": {
+            "PreMasterFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Pre-Master-Federation",
+              "InputPath": "$",
+              "Next": "MasterFederation"
+            },
+            "MasterFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Federation",
+              "InputPath": "$.federation",
+              "ResultPath": "$.credentials",
+              "Next": "SetMasterCredentials"
+            },
+            "SetMasterCredentials": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Master-Credentials",
+              "InputPath": "$",
+              "Next": "CreateAccount"
+            },
+            "CreateAccount": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Account",
+              "InputPath": "$.account",
+              "ResultPath": "$.account.result",
+              "Next": "EnableBillingActivation"
+            },
+            "EnableBillingActivation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Enable-Billing-Activation",
+              "InputPath": "$",
+              "Next": "SetAccount"
+            },
+            "SetAccount": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Account",
+              "InputPath": "$",
+              "Next": "AddAccountToAlertDestinations"
+            },
+            "AddAccountToAlertDestinations": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Add-Account-To-Destination",
+              "InputPath": "$.alerts_destination",
+              "ResultPath": "$.alerts_destination.result",
+              "Next": "PreNewAccountFederation"
+            },
+            "PreNewAccountFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Pre-New-Federation",
+              "InputPath": "$",
+              "Next": "NewAccountFederation"
+            },
+            "NewAccountFederation": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Federation",
+              "InputPath": "$.federation",
+              "ResultPath": "$.credentials",
+              "Retry": [
+                {
+                  "ErrorEquals": ["AccessDenied"],
+                  "IntervalSeconds": 10,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2.0
+                }
+              ],
+              "Next": "SetNewAccountCredentials"
+            },
+            "SetNewAccountCredentials": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-New-Credentials",
+              "InputPath": "$",
+              "Next": "CreateAwsIamRoles"
+            },
+            "CreateAwsIamRoles": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Create-Gcloud-Aws-Iam-Roles",
+              "InputPath": "$",
+              "Next": "DataDogChoiceState"
+            },
+            "DataDogChoiceState": {
+              "Type" : "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.enableDatadog",
+                  "StringEquals": "true",
+                  "Next": "TriggerDataDog"
+                },
+                {
+                  "Variable": "$.enableDatadog",
+                  "StringEquals": "false",
+                  "Next": "UpdateDb"
+                }
+              ],
+              "Default": "UpdateDb"
+            },
+            "TriggerDataDog": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Create-Gcloud-DataDog-Role",
+              "Next": "UpdateDb"
+            },
+            "UpdateDb": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Update-Db",
+              "InputPath": "$",
+              "Next": "CloudcheckrChoiceState"
+            },
+            "CloudcheckrChoiceState": {
+              "Type" : "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.cloudcheckr.enableCloudCheckr",
+                  "StringEquals": "true",
+                  "Next": "TriggerCloudCheckr"
+                },
+                {
+                  "Variable": "$.cloudcheckr.enableCloudCheckr",
+                  "StringEquals": "false",
+                  "Next": "SetupHealthAlert"
+                }
+              ],
+              "Default": "SetupHealthAlert"
+            },
+            "TriggerCloudCheckr": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-TriggerCloudCheckr",
+              "Next": "SetupHealthAlert"
+            },
+            "SetupHealthAlert": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Setup-Health",
+              "InputPath": "$.health",
+              "ResultPath": "$.health.result",
+              "Next": "IsManagedAccount"
+            },
+            "IsManagedAccount": {
+              "Type" : "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.dbAwsAccount.account_type",
+                  "StringEquals": "Managed",
+                  "Next": "TriggerPreconfig"
+                }
+              ],
+              "Default": "FindRegionsState"
+            },
+            "TriggerPreconfig": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:ManagedVpcPreConfig-Trigger-StateMachine",
+              "InputPath": "$",
+              "ResultPath": "$",
+              "Next": "FindRegionsState"
+            },
+            "FindRegionsState": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Find-Regions",
+              "InputPath": "$",
+              "Next": "ChoiceState"
+            },
+            "ChoiceState": {
+              "Type" : "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.num_of_regions",
+                  "NumericGreaterThan": 0,
+                  "Next": "NextRegionState"
+                },
+                {
+                  "Variable": "$.num_of_regions",
+                  "NumericEquals": 0,
+                  "Next": "SetFinalResultState"
+                }
+              ],
+              "Default": "SetFinalResultState"
+            },
+            "NextRegionState": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Next-Region",
+              "Next": "Parallel"
+            },
+            "Parallel": {
+              "Type": "Parallel",
+              "Next": "AWSConsoleSignInAlertState",
+              "Branches": [
+                {
+                  "StartAt": "CloudtrailChoiceState",
+                  "States": {
+                    "CloudtrailChoiceState": {
+                      "Type" : "Choice",
+                      "Choices": [
+                        {
+                          "Variable": "$.cloudtrail.body.region",
+                          "StringEquals": "us-east-1",
+                          "Next": "CloudtrailActionState"
+                        },
+                        {
+                          "Variable": "$.cloudtrail.body.region",
+                          "StringEquals": "us-west-2",
+                          "Next": "CloudtrailActionState"
+                        }
+                      ],
+                      "Default": "PassCloudtrailActionState"
+                    },
+                    "CloudtrailActionState": {
+                      "Type" : "Task",
+                      "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-CloudTrail",
+                      "InputPath": "$.cloudtrail",
+                      "ResultPath": "$.cloudtrail.result",
+                      "End": true
+                    },
+                    "PassCloudtrailActionState": {
+                    "Type": "Pass",
+                    "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "AWSConfigActionState",
+                  "States": {
+                    "AWSConfigActionState": {
+                      "Type" : "Task",
+                      "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-AWSConfig",
+                      "InputPath": "$.awsconfig",
+                      "ResultPath": "$.awsconfig.result",
+                      "End": true
+                    }
+                  }
+                }
+              ]
+            },
+            "AWSConsoleSignInAlertState": {
+               "Type" : "Task",
+               "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Console-Sign-In-Alert",
+               "InputPath": "$[0].awsevents",
+               "ResultPath": "$[0].awsevents.result",
+               "Next": "ConfigRulesActionState"
+            },
+            "ConfigRulesActionState": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-ConfigRules",
+              "InputPath": "$[0].configrules",
+              "ResultPath": "$[0].configrules.result",
+              "Next": "SetResultsState"
+            },
+            "SetResultsState": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Set-Results",
+              "Next": "ChoiceState"
+            },
+            "SetFinalResultState": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-Final-Result",
+              "Next": "SaveCloudwatchLog"
+            },
+            "SaveCloudwatchLog": {
+              "Type" : "Task",
+              "Resource": "arn:aws:lambda:AWS::REGION:AWS::ACCOUNT_ID:function:SungardAS-Onboarding-CloudwatchLogs",
+              "Next": "FinalState"
+            },
+            "FinalState": {
+              "Type": "Pass",
+              "End": true
+            }
+          }
+        }
+      RoleArn: !GetAtt StateMachineIAMRole.Arn
+
+  APIURL:
+    Description: "URL of your API endpoint"
+    Value: !Join
+      - ''
+      - - https://
+        - !Ref ApiGatewayApi
+        - '.execute-api.'
+        - !Ref 'AWS::Region'
+        - '.amazonaws.com/Prod'
