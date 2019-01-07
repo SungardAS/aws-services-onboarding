@@ -55,7 +55,7 @@ baseHandler.post = function(params, callback) {
      "SGID": params.sgid,
      "guid": params.companyguid,
      "checkStatus": true,
-     "platform": params.product
+     "product": params.product
   }
 
   inputDoc.vpcpreconfig.managedVpcPreConfig.regions = inputDoc.vpcpreconfig.managedVpcPreConfig.regions[params.product];
