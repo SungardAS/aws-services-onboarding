@@ -122,24 +122,24 @@
       ]
     }
   },
-  "vpcpreconfig":{  
+  "vpcpreconfig":{
     "credentials":null,
-    "federation":{  
-       "roles":[  
+    "federation":{
+       "roles":[
 
        ],
        "authorizer_user_guid":null,
        "durationSeconds":0
     },
-    "managedVpcPreConfig":{  
+    "managedVpcPreConfig":{
        "account":null,
        "region":null,
-       "regions":[  
-          "us-east-1",
-          "us-west-2"
-       ]
+       "regions": {
+         "ukgcloud": ["eu-west-2"],
+         "commercial": ["us-east-1","us-west-2"]
+       }
     },
-    "dbStatus":[  
+    "dbStatus":[
 
     ]
  },
