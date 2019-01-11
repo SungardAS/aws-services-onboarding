@@ -82,9 +82,6 @@ exports.handler = function(event, context, callback) {
         event.share_portfolio_params.role_details.role_name = payload.roleName;
         event.share_portfolio_params.role_details.external_id = payload.externalId;
       }
-      if (payload.roleName == 'PowerUser') {
-        payload.PolicyDocument = dataDogPolicyDoc;
-      }
       if (payload.federate) {
         dbIamRoles.push({
           externalId: payload.externalId,
