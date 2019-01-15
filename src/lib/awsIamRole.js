@@ -57,7 +57,7 @@ var createRole = function(iam, options, cb) {
     //    attachRolePolicy(iam, options, cb);
      // } else {
         addInlineRolePolicy(iam, options, cb);
-      }
+      //}
     }
   });
 }
