@@ -70,7 +70,7 @@ exports.handler = function(event, context, callback) {
       payload = JSON.parse(JSON.stringify(payload));
       if (payload.roleName == 'PowerUser') {
         payload.policyDocument = powerUserPolicyDocument;
-      console.log('Power User Policy' ,payload.PolicyDocument);
+      console.log('Power User Policy' ,payload.policyDocument);
       }
       if (payload.roleName == 'DatadogAWSIntegrationRole') {
         payload.policyDocument = dataDogPolicyDoc;
