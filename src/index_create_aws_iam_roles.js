@@ -42,7 +42,6 @@ exports.handler = function(event, context, callback) {
         policyArn: awsroles.adminPolicyArn,
         federate: true
       });
-      console.log('Adding roles ' , roles);
     } else if (accountData.type.toLowerCase() == 'craws') {
       // Add Service Catalog admin role
       roles.push({
@@ -70,7 +69,6 @@ exports.handler = function(event, context, callback) {
       payload = JSON.parse(JSON.stringify(payload));
       if (payload.roleName == 'PowerUser') {
         payload.policyDocument = powerUserPolicyDocument;
-      console.log('Power User Policy' ,payload.policyDocument);
       }
       if (payload.roleName == 'DatadogAWSIntegrationRole') {
         payload.policyDocument = dataDogPolicyDoc;

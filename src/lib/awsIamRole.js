@@ -51,8 +51,6 @@ var createRole = function(iam, options, cb) {
     }
     else {
       options.roleArn = data.Role.Arn;
-	console.log('**********************************^^^^^^^^^');
-	console.log('Policy' ,options.policyDocument);
       if (typeof options.policyDocument === 'undefined' || options.policyDocument === null) {
         attachRolePolicy(iam, options, cb);
       } else {
@@ -255,8 +253,6 @@ var deleteUser = function(iam, options, cb) {
 }
 
 var addInlineRolePolicy = function(iam, options, cb) {
-	console.log('*************&&&&&&&&&&&&&&&&&&&&&&&&&&*********************^^^^^^^^^');
-	console.log('PolicyDocument' ,options.policyDocument);
     if (typeof options.policyDocument === 'undefined' || options.policyDocument === null) {
       policy = {
           Version: "2012-10-17",
@@ -287,10 +283,10 @@ var addInlineRolePolicy = function(iam, options, cb) {
             return cb("Failed to add inline policy to role "+ options.roleName +" : " + err);
         }
         else {
-            cb(null, data);
+            cb(null, options.roleArn);
         }
+      } 
     });
-	console.log('*************&&&&&&&&&&&&&&&&&&&&&&&&&&*********************^^^^^^^^^');
 }
 
 var listServerCertificates = function(iam, options, cb) {
