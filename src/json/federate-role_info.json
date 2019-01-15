@@ -94,18 +94,16 @@
 	"PowerUserPolicyDocument":{
 		"Version": "2012-10-17",
   		"Statement": [
-    			{
-            		"Sid": "AllowToDescribeAll",
+    		  {
             		"Effect": "Allow",
             		"Action": [
                 		"ec2:DescribeInstanceAttribute",
                 		"ec2:DescribeInstanceStatus",
                 		"ec2:DescribeInstances"
-            		],
+			],
             		"Resource": "*"
-    			},
-    			{
-      			"Sid": "AllowStartStopInstances",
+    		  },
+    		  {
       			"Action": [
         			"ec2:StartInstances",
         			"ec2:StopInstances",
@@ -113,7 +111,7 @@
       			],
       			"Effect": "Allow",
       			"Resource": "arn:aws:ec2:*:*:instance/*"
-    			}		
+    		  }		
   		]
 	}
 }
