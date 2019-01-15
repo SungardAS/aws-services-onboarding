@@ -285,7 +285,6 @@ var addInlineRolePolicy = function(iam, options, cb) {
         else {
             cb(null, options.roleArn);
         }
-      } 
     });
 }
 
