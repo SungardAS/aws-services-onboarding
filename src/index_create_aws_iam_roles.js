@@ -22,7 +22,7 @@ exports.handler = function(event, context, callback) {
     })
   );
 
-  const powerUserPolicyDocument = awsroles.powerUserPolicyDocument;
+  const powerUserPolicyDocument = awsroles.PowerUserPolicyDocument;
 
   options.account = event.final_result.account_id;
   options.assumeRolePolicyDocument = awsroles.assumeRolePolicyDocument;
