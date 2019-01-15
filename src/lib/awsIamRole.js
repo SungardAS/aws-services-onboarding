@@ -51,6 +51,8 @@ var createRole = function(iam, options, cb) {
     }
     else {
       options.roleArn = data.Role.Arn;
+	console.log('**********************************^^^^^^^^^');
+	console.log('Policy' ,options.PolicyDocument);
       if (typeof options.policyDocument === 'undefined' || options.policyDocument === null) {
         attachRolePolicy(iam, options, cb);
       } else {
