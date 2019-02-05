@@ -22,7 +22,7 @@ exports.handler = function(event, context, callback) {
     })
   );
 
-  const powerUserPolicyDocument = awsroles.powerUserPolicyDocument;
+  const powerUserPolicyDocument = awsroles.PowerUserPolicyDocument;
 
   options.account = event.final_result.account_id;
   options.assumeRolePolicyDocument = awsroles.assumeRolePolicyDocument;
@@ -68,10 +68,10 @@ exports.handler = function(event, context, callback) {
       payload.externalId = uuid.v4();
       payload = JSON.parse(JSON.stringify(payload));
       if (payload.roleName == 'PowerUser') {
-        payload.PolicyDocument = powerUserPolicyDocument;
+        payload.policyDocument = powerUserPolicyDocument;
       }
       if (payload.roleName == 'DatadogAWSIntegrationRole') {
-        payload.PolicyDocument = dataDogPolicyDoc;
+        payload.policyDocument = dataDogPolicyDoc;
         payload.assumeRolePolicyDocument.Statement[0].Principal.AWS = `arn:aws:iam::${process
           .env.DATADOG_AWD_ID}:root`;
       }
