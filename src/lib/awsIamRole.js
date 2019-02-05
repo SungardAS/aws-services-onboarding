@@ -283,7 +283,7 @@ var addInlineRolePolicy = function(iam, options, cb) {
             return cb("Failed to add inline policy to role "+ options.roleName +" : " + err);
         }
         else {
-            cb(null, data);
+            cb(null, options.roleArn);
         }
     });
 }
