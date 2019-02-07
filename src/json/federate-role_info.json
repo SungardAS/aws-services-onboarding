@@ -114,4 +114,20 @@
     		  }		
   		]
 	}
+    "iamPermissionsPolicyDocument":{
+        "Version": "2012-10-17",
+        "Statement": [
+        {
+         "Sid": "",
+         "Effect": "Allow",
+         "Action": [
+            "iam:CreatePolicy",
+            "iam:AttachUserPolicy",
+            "iam:CreateUser",
+            "iam:CreateAccessKey"
+         ],
+         "Resource": "*"
+        }
+        ]
+    }
 }
