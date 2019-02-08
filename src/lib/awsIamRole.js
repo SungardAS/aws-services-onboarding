@@ -41,7 +41,7 @@ var deleteIAMRole = function(iam, options, cb) {
 var createRole = function(iam, options, cb) {
    var extid = options.externalId;
    const awsroles = JSON.parse(fs.readFileSync('./json/federate-role_info.json', 'utf8'));
-   const iamPermissionsPolicyDocument = awsroles.iamPermissionsPolicyDocument;
+   const createUserIAMPolicyDocument = awsroles.createUserIAMPolicyDocument;
    options.assumeRolePolicyDocument.Statement[0].Condition.StringEquals = {"sts:ExternalId": extid};
    var params = {
     AssumeRolePolicyDocument: JSON.stringify(options.assumeRolePolicyDocument),
@@ -55,11 +55,11 @@ var createRole = function(iam, options, cb) {
      else {
        options.roleArn = data.Role.Arn;
        if (options.roleName == process.env.SC_ADMIN_ROLE_NAME){
-         options.policyDocument = iamPermissionsPolicyDocument
+         options.policyDocument = createUserIAMPolicyDocument
          addInlineRolePolicy(iam, options, cb);
          attachRolePolicy(iam, options, cb);
        }
-       if (typeof options.policyDocument === 'undefined' || options.policyDocument === null) {
+       else if (typeof options.policyDocument === 'undefined' || options.policyDocument === null) {
          attachRolePolicy(iam, options, cb);
        }
        else{
