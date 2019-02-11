@@ -20,7 +20,7 @@ exports.handler = (event, context) => {
 }
 
 baseHandler.get = function(params, callback) {
-  
+
   var stepfunctions = new AWS.StepFunctions({region: process.env.AWS_DEFAULT_REGION});
   var input = {
     executionArn: params.executionArn
@@ -43,7 +43,7 @@ baseHandler.post = function(params, callback) {
 
   var inputDoc = JSON.parse(fs.readFileSync(__dirname + '/json/state_machine_input.json', {encoding:'utf8'}));
   var ruleJson = JSON.parse(fs.readFileSync(__dirname + '/json/default_config_rules.json', {encoding:'utf8'}));
-  
+
   var account = {
      "id": params.account,
      "name": params.awsname,
@@ -55,7 +55,10 @@ baseHandler.post = function(params, callback) {
      "SGID": params.sgid,
      "guid": params.companyguid,
      "checkStatus": true,
+     "product": params.product
   }
+
+  inputDoc.vpcpreconfig.managedVpcPreConfig.regions = inputDoc.vpcpreconfig.managedVpcPreConfig.regions[params.product];
 
   inputDoc.account.billingDetails = account;
   inputDoc.current_region = process.env.AWS_DEFAULT_REGION;
@@ -77,6 +80,7 @@ baseHandler.post = function(params, callback) {
     inputDoc.health.gitHubPersonalAccessToken = process.env.GIT_HUB_ACCESS_TOKEN
     inputDoc.health.subscriptionFilterDestinationArn = process.env.SUBSC_FILTER_DEST
     inputDoc.cloudcheckr = params.cloudcheckr;
+    inputDoc.enableDatadog = params.enableDatadog;
     var stateMachineArn = process.env.STATE_MACHINE_ARN
   } else {
     var stateMachineArn = process.env.STATE_MACHINE_FOR_UNMANAGED_ACCOUNT_ARN;
