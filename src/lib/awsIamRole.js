@@ -38,25 +38,30 @@ var deleteIAMRole = function(iam, options, cb) {
 }
 */
 var createRole = function(iam, options, cb) {
-  var extid = options.externalId;
-  options.assumeRolePolicyDocument.Statement[0].Condition.StringEquals = {"sts:ExternalId": extid};
-  var params = {
+   var extid = options.externalId;
+   options.assumeRolePolicyDocument.Statement[0].Condition.StringEquals = {"sts:ExternalId": extid};
+   var params = {
     AssumeRolePolicyDocument: JSON.stringify(options.assumeRolePolicyDocument),
     RoleName: options.roleName,
     Path: options.path
-  };
-  iam.createRole(params, function(err, data) {
-    if (err) {
-      return cb("Failed to create a role : " + err);
-    }
-    else {
-      options.roleArn = data.Role.Arn;
-      if (typeof options.policyDocument === 'undefined' || options.policyDocument === null) {
-        attachRolePolicy(iam, options, cb);
-      } else {
-        addInlineRolePolicy(iam, options, cb);
-      }
-    }
+   };
+   iam.createRole(params, function(err, data) {
+     if (err) {
+       return cb("Failed to create a role : " + err);
+     }
+     else {
+       options.roleArn = data.Role.Arn;
+       if (typeof options.policyDocument === 'undefined' || options.policyDocument === null) {
+         attachRolePolicy(iam, options, cb);
+       }
+       else if (options.policyDocument && options.policyArn){
+         attachRolePolicy(iam, options, cb);
+         addInlineRolePolicy(iam, options, cb);
+       }
+       else{
+         addInlineRolePolicy(iam, options, cb);
+       }
+     }
   });
 }
 
