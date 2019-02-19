@@ -129,5 +129,26 @@
          "Resource": "*"
         }
         ]
-    }
+    },
+	"crawsPolicies": [{
+                "Name": "amazonEC2FullPolicy",
+                "policyArn": "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+            },
+            {
+                "Name": "amazonS3FullPolicy",
+                "policyArn": "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+            },
+            {
+                "Name": "vpcReadOnlyPolicy",
+                "policyArn": "arn:aws:iam::aws:policy/AmazonVPCReadOnlyAccess"
+            },
+            {
+                "Name": "IAMReadOnlyPolicy",
+                "policyArn": "arn:aws:iam::aws:policy/IAMReadOnlyAccess"
+            },
+            {
+                "Name": "AmazonSNSFullPolicy",
+                "policyArn": "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
+            }
+    ]
 }

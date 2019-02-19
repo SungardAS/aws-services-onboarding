@@ -24,6 +24,7 @@ exports.handler = function(event, context, callback) {
 
   const powerUserPolicyDocument = awsroles.PowerUserPolicyDocument;
   const createUserIAMPolicyDocument = awsroles.createUserIAMPolicyDocument;
+  const crawspolicies = awsroles.crawsPolicies;
   options.account = event.final_result.account_id;
   options.assumeRolePolicyDocument = awsroles.assumeRolePolicyDocument;
   options.onboardAccount = true;
@@ -94,6 +95,16 @@ exports.handler = function(event, context, callback) {
       awsIamRole.createRole(payload, (err, data) => {
         console.log('Error:', err);
         console.log('Res:', data);
+        if (roles[i].roleName === process.env.SC_ADMIN_ROLE_NAME){
+          for (let k = 0; k < crawspolicies.length; k++){
+             options.policyArn = crawspolicies[k].policyArn;
+             options.roleName = process.env.SC_ADMIN_ROLE_NAME;
+             awsIamRole.attachRolePolicy(options, (err, res) => {
+               console.log('Error:', err);
+               console.log('Res:', res);
+             });
+          }
+        }
       });
     }
     event.dbIamRoles = dbIamRoles;
