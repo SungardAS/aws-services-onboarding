@@ -113,42 +113,5 @@
       			"Resource": "arn:aws:ec2:*:*:instance/*"
     		  }		
   		]
-	},
-    "createUserIAMPolicyDocument":{
-        "Version": "2012-10-17",
-        "Statement": [
-        {
-         "Sid": "SCUserCreationPolicy",
-         "Effect": "Allow",
-         "Action": [
-            "iam:CreatePolicy",
-            "iam:AttachUserPolicy",
-            "iam:CreateUser",
-            "iam:CreateAccessKey"
-         ],
-         "Resource": "*"
-        }
-        ]
-    },
-	"crawsPolicies": [{
-                "Name": "amazonEC2FullPolicy",
-                "policyArn": "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
-            },
-            {
-                "Name": "amazonS3FullPolicy",
-                "policyArn": "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-            },
-            {
-                "Name": "vpcReadOnlyPolicy",
-                "policyArn": "arn:aws:iam::aws:policy/AmazonVPCReadOnlyAccess"
-            },
-            {
-                "Name": "IAMReadOnlyPolicy",
-                "policyArn": "arn:aws:iam::aws:policy/IAMReadOnlyAccess"
-            },
-            {
-                "Name": "AmazonSNSFullPolicy",
-                "policyArn": "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
-            }
-    ]
+	}
 }

@@ -441,18 +441,6 @@ IAMService.prototype.addInlineRolePolicy = function(options,cb) {
     return addInlineRolePolicy(iam, options, cb);
 };
 
-IAMService.prototype.attachRolePolicy = function(options,cb) {
-    var params = {};
-    var creds = new AWS.Credentials({
-    accessKeyId: options.accessKeyId,
-    secretAccessKey: options.secretAccessKey,
-    sessionToken: options.sessionToken
-  });
-    params.credentials = creds;
-    var iam = new AWS.IAM(params);
-    return attachRolePolicy(iam, options, cb);
-};
-
 IAMService.prototype.listServerCertificates = function(options,cb) {
     console.log.info("listServerCertificates options=" + JSON.stringify(options));
 
