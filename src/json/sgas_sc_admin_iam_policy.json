@@ -1,0 +1,116 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+         "iam:CreatePolicy",
+         "iam:AttachUserPolicy",
+         "iam:CreateUser",
+         "iam:CreateAccessKey"
+       ],
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "sns:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:GenerateCredentialReport",
+        "iam:GenerateServiceLastAccessedDetails",
+        "iam:Get*",
+        "iam:List*",
+        "iam:SimulateCustomPolicy",
+        "iam:SimulatePrincipalPolicy"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeAccountAttributes",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeClassicLinkInstances",
+        "ec2:DescribeCustomerGateways",
+        "ec2:DescribeDhcpOptions",
+        "ec2:DescribeEgressOnlyInternetGateways",
+        "ec2:DescribeFlowLogs",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeMovingAddresses",
+        "ec2:DescribeNatGateways",
+        "ec2:DescribeNetworkAcls",
+        "ec2:DescribeNetworkInterfaceAttribute",
+        "ec2:DescribeNetworkInterfacePermissions",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribePrefixLists",
+        "ec2:DescribeRouteTables",
+        "ec2:DescribeSecurityGroupReferences",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeStaleSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeTags",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeVpcClassicLink",
+        "ec2:DescribeVpcClassicLinkDnsSupport",
+        "ec2:DescribeVpcEndpoints",
+        "ec2:DescribeVpcEndpointConnectionNotifications",
+        "ec2:DescribeVpcEndpointConnections",
+        "ec2:DescribeVpcEndpointServiceConfigurations",
+        "ec2:DescribeVpcEndpointServicePermissions",
+        "ec2:DescribeVpcEndpointServices",
+        "ec2:DescribeVpcPeeringConnections",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeVpnConnections",
+        "ec2:DescribeVpnGateways"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "s3:*",
+      "Resource": "*"
+    },
+    {
+      "Action": "ec2:*",
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "elasticloadbalancing:*",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "cloudwatch:*",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "autoscaling:*",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "iam:CreateServiceLinkedRole",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "iam:AWSServiceName": [
+            "autoscaling.amazonaws.com",
+            "ec2scheduled.amazonaws.com",
+            "elasticloadbalancing.amazonaws.com",
+            "spot.amazonaws.com",
+            "spotfleet.amazonaws.com",
+            "transitgateway.amazonaws.com"
+          ]
+        }
+      }
+    }
+  ]
+}

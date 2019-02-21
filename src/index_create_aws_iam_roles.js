@@ -16,6 +16,11 @@ exports.handler = function(event, context, callback) {
       encoding: 'utf8'
     })
   );
+  const sgasScPolicyDoc = JSON.parse(
+    fs.readFileSync(`${__dirname}/json/sgas_sc_admin_iam_policy.json`, {
+      encoding: 'utf8'
+    })
+  );
   const dataDogPolicyDoc = JSON.parse(
     fs.readFileSync(`${__dirname}/json/datadog-integration_policy.json`, {
       encoding: 'utf8'
@@ -23,7 +28,6 @@ exports.handler = function(event, context, callback) {
   );
 
   const powerUserPolicyDocument = awsroles.PowerUserPolicyDocument;
-  const createUserIAMPolicyDocument = awsroles.createUserIAMPolicyDocument;
   options.account = event.final_result.account_id;
   options.assumeRolePolicyDocument = awsroles.assumeRolePolicyDocument;
   options.onboardAccount = true;
@@ -81,7 +85,7 @@ exports.handler = function(event, context, callback) {
         event.share_portfolio_params.aws_account_id = payload.account;
         event.share_portfolio_params.role_details.role_name = payload.roleName;
         event.share_portfolio_params.role_details.external_id = payload.externalId;
-        payload.policyDocument = createUserIAMPolicyDocument;
+        payload.policyDocument = sgasScPolicyDoc;
       }
       if (payload.federate) {
         dbIamRoles.push({

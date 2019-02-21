@@ -113,21 +113,5 @@
       			"Resource": "arn:aws:ec2:*:*:instance/*"
     		  }		
   		]
-	},
-    "createUserIAMPolicyDocument":{
-        "Version": "2012-10-17",
-        "Statement": [
-        {
-         "Sid": "SCUserCreationPolicy",
-         "Effect": "Allow",
-         "Action": [
-            "iam:CreatePolicy",
-            "iam:AttachUserPolicy",
-            "iam:CreateUser",
-            "iam:CreateAccessKey"
-         ],
-         "Resource": "*"
-        }
-        ]
-    }
+	}
 }
